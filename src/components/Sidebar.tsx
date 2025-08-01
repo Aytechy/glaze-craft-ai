@@ -229,16 +229,27 @@ const Sidebar: React.FC<SidebarProps> = ({ isOpen, onClose, onNewChat, width = 2
           </div>
 
           {/* Bottom section with settings and profile */}
-          <div className="border-t border-sidebar-border p-4 space-y-2">
+          <div className="border-t border-sidebar-border p-3 space-y-1">
+            {/* Settings Button */}
+            <Button
+              onClick={handleSettingsClick}
+              variant="ghost"
+              className="w-full justify-start text-sidebar-foreground hover:bg-sidebar-accent mb-2"
+              size="sm"
+            >
+              <Settings className="h-4 w-4 mr-3" />
+              Settings
+            </Button>
+
             {/* User Profile Section */}
             <div 
               onClick={handleProfileClick}
-              className="flex items-center gap-3 p-3 rounded-lg hover:bg-sidebar-accent 
+              className="flex items-center gap-2 p-2 rounded-lg hover:bg-sidebar-accent 
                         transition-colors cursor-pointer"
             >
-              <Avatar className="h-10 w-10">
+              <Avatar className="h-8 w-8">
                 <AvatarImage src={user.avatar} alt={user.name} />
-                <AvatarFallback className="bg-primary text-primary-foreground text-sm">
+                <AvatarFallback className="bg-primary text-primary-foreground text-xs">
                   {user.name.split(' ').map(n => n[0]).join('')}
                 </AvatarFallback>
               </Avatar>
@@ -251,17 +262,6 @@ const Sidebar: React.FC<SidebarProps> = ({ isOpen, onClose, onNewChat, width = 2
                 </div>
               </div>
             </div>
-
-            {/* Settings Button */}
-            <Button
-              onClick={handleSettingsClick}
-              variant="ghost"
-              className="w-full justify-start text-sidebar-foreground hover:bg-sidebar-accent"
-              size="sm"
-            >
-              <Settings className="h-4 w-4 mr-3" />
-              Settings
-            </Button>
           </div>
         </div>
 
