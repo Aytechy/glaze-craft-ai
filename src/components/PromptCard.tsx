@@ -212,7 +212,7 @@ const PromptCard: React.FC<PromptCardProps> = ({
       width: '100%',
       height: hasMessages ? 'auto' : 'auto'
     }}>
-      <div className="w-full max-w-4xl mx-auto" style={{ width: hasMessages ? '90%' : '100%' }}>
+      <div className="w-full max-w-4xl mx-auto px-4 md:px-6" style={{ width: hasMessages ? '90%' : '100%' }}>
         {/* Pro plan unlock notice */}
         <div className="text-center mb-4">
           <a 
@@ -283,18 +283,15 @@ const PromptCard: React.FC<PromptCardProps> = ({
               <div className="flex items-center gap-2">
                 <Button
                   type="button"
-                  variant="ghost"
+                  variant="outline"
                   size="sm"
                   onClick={handleUploadClick}
                   disabled={isLoading}
-                  className="flex items-center gap-2 px-3 py-2 rounded-sm border border-amber-300 
-                           bg-gradient-to-r from-amber-100 to-yellow-100 text-amber-800 
-                           hover:from-amber-200 hover:to-yellow-200 shadow-sm 
-                           hover:shadow-md transition-all duration-200"
-                  style={{ borderWidth: '1px', borderRadius: '1px' }}
+                  className="flex items-center gap-2 border-primary/20 text-primary 
+                           hover:bg-primary/5 hover:border-primary/30 transition-all duration-200"
                 >
                   <Upload className="w-4 h-4" />
-                  <span className="text-sm font-medium">Upload any Glaze Image</span>
+                  <span className="text-sm font-medium hidden sm:block">Upload any Glaze Image</span>
                 </Button>
                 
                 {/* Hidden file input */}

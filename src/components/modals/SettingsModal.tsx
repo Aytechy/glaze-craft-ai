@@ -43,6 +43,7 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({ isOpen, onClose })
   const [appearance, setAppearance] = useState({
     theme: 'system',
     fontSize: 'medium',
+    messageFontSize: 'medium',
     animations: true,
   });
 
@@ -286,6 +287,27 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({ isOpen, onClose })
                           variant={appearance.fontSize === size.toLowerCase() ? 'default' : 'outline'}
                           size="sm"
                           onClick={() => setAppearance(prev => ({ ...prev, fontSize: size.toLowerCase() }))}
+                        >
+                          {size}
+                        </Button>
+                      ))}
+                    </div>
+                  </div>
+
+                  <div className="flex items-center justify-between">
+                    <div>
+                      <Label>Message Font Size</Label>
+                      <p className="text-sm text-muted-foreground">
+                        Adjust AI response and message text size
+                      </p>
+                    </div>
+                    <div className="flex gap-2">
+                      {['Small', 'Medium', 'Large'].map((size) => (
+                        <Button
+                          key={size}
+                          variant={appearance.messageFontSize === size.toLowerCase() ? 'default' : 'outline'}
+                          size="sm"
+                          onClick={() => setAppearance(prev => ({ ...prev, messageFontSize: size.toLowerCase() }))}
                         >
                           {size}
                         </Button>
