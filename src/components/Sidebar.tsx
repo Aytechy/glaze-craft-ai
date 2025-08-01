@@ -1,7 +1,8 @@
 import React from 'react';
-import { X, Home, History, Settings, User, Plus } from 'lucide-react';
+import { X, Home, History, Settings, User, Plus, FileText } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
+import { Link, useLocation } from 'react-router-dom';
 
 // TypeScript interface for sidebar props - ensures type safety
 interface SidebarProps {
@@ -39,6 +40,8 @@ interface UserProfile {
  * - Sanitized user input display
  */
 const Sidebar: React.FC<SidebarProps> = ({ isOpen, onClose }) => {
+  const location = useLocation();
+  
   // Mock user data - In production, this would come from secure authentication
   const user: UserProfile = {
     name: "John Doe",
@@ -53,10 +56,17 @@ const Sidebar: React.FC<SidebarProps> = ({ isOpen, onClose }) => {
     { id: '3', title: 'Kiln Temperature Guide', timestamp: '3 days ago' },
   ];
 
+  // Navigation items with active state detection
+  const navigationItems = [
+    { name: 'Home', path: '/', icon: Home },
+    { name: 'Notes', path: '/notes', icon: FileText },
+    { name: 'Chat History', path: '/history', icon: History },
+  ];
+
   // Handle new chat creation with security validation
   const handleNewChat = () => {
     // In production: validate user permissions, create new chat securely
-    console.log('Creating new chat...');
+    window.location.href = '/'; // Navigate to fresh chat
     onClose(); // Close sidebar after action
   };
 
@@ -117,23 +127,26 @@ const Sidebar: React.FC<SidebarProps> = ({ isOpen, onClose }) => {
 
           {/* Navigation Links */}
           <nav className="px-4 space-y-2">
-            <Button
-              variant="ghost"
-              className="w-full justify-start text-sidebar-foreground hover:bg-sidebar-accent"
-              size="sm"
-            >
-              <Home className="h-4 w-4 mr-3" />
-              Home
-            </Button>
-            
-            <Button
-              variant="ghost"
-              className="w-full justify-start text-sidebar-foreground hover:bg-sidebar-accent"
-              size="sm"
-            >
-              <History className="h-4 w-4 mr-3" />
-              Chat History
-            </Button>
+            {navigationItems.map((item) => {
+              const isActive = location.pathname === item.path;
+              const Icon = item.icon;
+              
+              return (
+                <Link
+                  key={item.path}
+                  to={item.path}
+                  onClick={onClose}
+                  className={`flex items-center w-full justify-start px-3 py-2 rounded-lg text-sm font-medium transition-all duration-200 ${
+                    isActive 
+                      ? 'bg-accent/50 text-primary border border-primary/20 shadow-sm' 
+                      : 'text-sidebar-foreground hover:bg-sidebar-accent hover:text-sidebar-accent-foreground'
+                  }`}
+                >
+                  <Icon className="h-4 w-4 mr-3" />
+                  {item.name}
+                </Link>
+              );
+            })}
           </nav>
 
           {/* Chat History Section */}

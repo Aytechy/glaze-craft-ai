@@ -15,7 +15,24 @@ interface Message {
 interface ResponseAreaProps {
   messages: Message[]; // Array of chat messages
   isTyping: boolean; // AI typing indicator state
+  onSuggestionSelect?: (text: string) => void; // Callback for suggestion selection
 }
+
+// Suggestion Button Component
+interface SuggestionButtonProps {
+  text: string;
+  onSelect: (text: string) => void;
+}
+
+const SuggestionButton: React.FC<SuggestionButtonProps> = ({ text, onSelect }) => (
+  <button 
+    className="px-4 py-2 rounded-lg bg-accent hover:bg-accent/80 
+               text-accent-foreground transition-colors text-sm"
+    onClick={() => onSelect(text)}
+  >
+    {text}
+  </button>
+);
 
 /**
  * ResponseArea Component - Chat message display area for GlazeAI
@@ -33,7 +50,7 @@ interface ResponseAreaProps {
  * - Image URLs are validated
  * - XSS prevention through proper React rendering
  */
-const ResponseArea: React.FC<ResponseAreaProps> = ({ messages, isTyping }) => {
+const ResponseArea: React.FC<ResponseAreaProps> = ({ messages, isTyping, onSuggestionSelect }) => {
   // Ref for auto-scrolling to bottom of chat
   const messagesEndRef = React.useRef<HTMLDivElement>(null);
 
@@ -54,7 +71,7 @@ const ResponseArea: React.FC<ResponseAreaProps> = ({ messages, isTyping }) => {
   };
 
   return (
-    <div className="flex-1 overflow-y-auto px-4 py-6 space-y-6">
+    <div className="flex-1 overflow-y-auto px-4 py-6 space-y-6" style={{ maxHeight: 'calc(100vh - 56px - 20vh - 50px)', paddingBottom: '70px' }}>
       {/* Welcome message when no messages exist */}
       {messages.length === 0 && !isTyping && (
         <div className="flex flex-col items-center justify-center h-full text-center max-w-2xl mx-auto">
@@ -79,18 +96,18 @@ const ResponseArea: React.FC<ResponseAreaProps> = ({ messages, isTyping }) => {
           
           {/* Quick action suggestions */}
           <div className="mt-8 flex flex-wrap gap-3 justify-center">
-            <button className="px-4 py-2 rounded-lg bg-accent hover:bg-accent/80 
-                             text-accent-foreground transition-colors text-sm">
-              Any advice for me?
-            </button>
-            <button className="px-4 py-2 rounded-lg bg-accent hover:bg-accent/80 
-                             text-accent-foreground transition-colors text-sm">
-              Some glaze recipe ideas
-            </button>
-            <button className="px-4 py-2 rounded-lg bg-accent hover:bg-accent/80 
-                             text-accent-foreground transition-colors text-sm">
-              Kiln firing techniques
-            </button>
+            <SuggestionButton 
+              text="Any advice for me?"
+              onSelect={(text) => onSuggestionSelect && onSuggestionSelect(text)}
+            />
+            <SuggestionButton 
+              text="Some glaze recipe ideas"
+              onSelect={(text) => onSuggestionSelect && onSuggestionSelect(text)}
+            />
+            <SuggestionButton 
+              text="Kiln firing techniques"
+              onSelect={(text) => onSuggestionSelect && onSuggestionSelect(text)}
+            />
           </div>
         </div>
       )}

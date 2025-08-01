@@ -75,6 +75,17 @@ const Index: React.FC = () => {
   };
 
   /**
+   * Handle suggestion selection - auto-type and send
+   */
+  const handleSuggestionSelect = async (text: string) => {
+    try {
+      await sendUserMessage(text);
+    } catch (error) {
+      console.error('Error sending suggestion:', error);
+    }
+  };
+
+  /**
    * Handle keyboard shortcuts
    */
   useEffect(() => {
@@ -137,11 +148,12 @@ const Index: React.FC = () => {
         {/* Main chat container */}
         <main className={`flex-1 flex flex-col transition-all duration-300 ${
           isSidebarOpen ? 'ml-0' : 'ml-0'
-        }`}>
+        }`} style={{ height: 'calc(100vh - 56px)' }}>
           {/* Chat messages area */}
           <ResponseArea
             messages={messages}
             isTyping={isLoading}
+            onSuggestionSelect={handleSuggestionSelect}
           />
           
           {/* Input prompt card */}

@@ -207,7 +207,7 @@ const PromptCard: React.FC<PromptCardProps> = ({
       hasMessages 
         ? 'fixed bottom-0 left-0 right-0 p-4 bg-background/80 backdrop-blur-sm border-t border-border/40' 
         : 'flex justify-center items-center min-h-[200px]'
-    }`}>
+    }`} style={{ height: hasMessages ? '20vh' : 'auto', maxHeight: '20vh' }}>
       <div className="w-full max-w-4xl mx-auto">
         {/* Pro plan unlock notice */}
         <div className="text-center mb-4">
@@ -267,9 +267,9 @@ const PromptCard: React.FC<PromptCardProps> = ({
               onChange={handleTextareaChange}
               onKeyDown={handleKeyDown}
               placeholder="Ask me anything about ceramics, glazes, and pottery..."
-              className="min-h-[60px] max-h-[200px] resize-none border-0 bg-transparent 
+              className="min-h-[60px] max-h-[120px] resize-none border-0 bg-transparent 
                        focus-visible:ring-0 focus-visible:ring-offset-0 text-base
-                       placeholder:text-muted-foreground"
+                       placeholder:text-muted-foreground overflow-y-auto"
               disabled={isLoading}
             />
 

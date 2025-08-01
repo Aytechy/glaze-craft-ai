@@ -20,6 +20,7 @@ import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import Index from "./pages/Index";
+import Notes from "./pages/Notes";
 import NotFound from "./pages/NotFound";
 
 // Configure React Query client with security-focused settings
@@ -111,6 +112,9 @@ const App: React.FC = () => {
             <Routes>
               {/* Main chat interface */}
               <Route path="/" element={<Index />} />
+              
+              {/* Notes interface */}
+              <Route path="/notes" element={<Notes />} />
               
               {/* Future routes can be added here */}
               {/* <Route path="/settings" element={<Settings />} /> */}
