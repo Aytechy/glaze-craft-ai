@@ -1,73 +1,49 @@
-# Welcome to your Lovable project
+# Welcome to Your AI Project – Built by RealDiamond Digitals
 
-## Project info
+## 🌐 Live Project URL
 
-**URL**: https://lovable.dev/projects/c1300c5f-6760-4475-92ef-ee045f42b330
+**URL:** [https://realdiamonddigital.com](https://realdiamonddigital.com)
 
-## How can I edit this code?
+> This is your public-facing frontend. You can deploy it to any host of your choice.
 
-There are several ways of editing your application.
+---
 
-**Use Lovable**
+## 🛠 Project Overview
 
-Simply visit the [Lovable Project](https://lovable.dev/projects/c1300c5f-6760-4475-92ef-ee045f42b330) and start prompting.
+This frontend application is built with modern web technologies:
 
-Changes made via Lovable will be committed automatically to this repo.
+- **Vite**
+- **TypeScript**
+- **React**
+- **shadcn-ui**
+- **Tailwind CSS**
 
-**Use your preferred IDE**
+It's designed for performance, scalability, and clean UI development.
 
-If you want to work locally using your own IDE, you can clone this repo and push changes. Pushed changes will also be reflected in Lovable.
+---
 
-The only requirement is having Node.js & npm installed - [install with nvm](https://github.com/nvm-sh/nvm#installing-and-updating)
+## 🧑‍💻 How to Run the Project Locally
 
-Follow these steps:
+You can edit and run the project using your preferred IDE. Follow the steps below to set up your local environment:
 
-```sh
-# Step 1: Clone the repository using the project's Git URL.
+### ✅ Prerequisites
+
+Ensure you have **Node.js** and **npm** installed.  
+We recommend installing via [nvm](https://github.com/nvm-sh/nvm#installing-and-updating).
+
+---
+
+### 🚀 Setup Instructions
+
+```bash
+# Step 1: Clone the repository
 git clone <YOUR_GIT_URL>
 
-# Step 2: Navigate to the project directory.
+# Step 2: Go into the project directory
 cd <YOUR_PROJECT_NAME>
 
-# Step 3: Install the necessary dependencies.
-npm i
+# Step 3: Install dependencies
+npm install
 
-# Step 4: Start the development server with auto-reloading and an instant preview.
+# Step 4: Start the development server
 npm run dev
-```
-
-**Edit a file directly in GitHub**
-
-- Navigate to the desired file(s).
-- Click the "Edit" button (pencil icon) at the top right of the file view.
-- Make your changes and commit the changes.
-
-**Use GitHub Codespaces**
-
-- Navigate to the main page of your repository.
-- Click on the "Code" button (green button) near the top right.
-- Select the "Codespaces" tab.
-- Click on "New codespace" to launch a new Codespace environment.
-- Edit files directly within the Codespace and commit and push your changes once you're done.
-
-## What technologies are used for this project?
-
-This project is built with:
-
-- Vite
-- TypeScript
-- React
-- shadcn-ui
-- Tailwind CSS
-
-## How can I deploy this project?
-
-Simply open [Lovable](https://lovable.dev/projects/c1300c5f-6760-4475-92ef-ee045f42b330) and click on Share -> Publish.
-
-## Can I connect a custom domain to my Lovable project?
-
-Yes, you can!
-
-To connect a domain, navigate to Project > Settings > Domains and click Connect Domain.
-
-Read more here: [Setting up a custom domain](https://docs.lovable.dev/tips-tricks/custom-domain#step-by-step-guide)
