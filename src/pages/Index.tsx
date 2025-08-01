@@ -1,11 +1,163 @@
-// Update this page (the content is just a fallback if you fail to update the page)
+/**
+ * Index Page - Main GlazeAI Chat Interface
+ * 
+ * This is the primary user interface for GlazeAI, featuring:
+ * - Responsive chat layout
+ * - Sliding sidebar navigation
+ * - Message display area
+ * - Interactive prompt input
+ * - Real-time AI responses
+ * 
+ * Security features:
+ * - Input validation and sanitization
+ * - File upload restrictions
+ * - Rate limiting
+ * - Error boundary protection
+ * - XSS prevention
+ */
 
-const Index = () => {
+import React, { useState, useEffect } from 'react';
+import Header from '@/components/Header';
+import Sidebar from '@/components/Sidebar';
+import ResponseArea from '@/components/ResponseArea';
+import PromptCard from '@/components/PromptCard';
+import { useChat } from '@/hooks/useChat';
+import { useToast } from '@/hooks/use-toast';
+
+/**
+ * Main Index Component - GlazeAI Chat Interface
+ */
+const Index: React.FC = () => {
+  // Sidebar state management
+  const [isSidebarOpen, setIsSidebarOpen] = useState<boolean>(false);
+  
+  // Chat functionality from custom hook
+  const {
+    messages,
+    isLoading,
+    error,
+    sendUserMessage,
+    canSendMessage,
+    messageCount,
+    rateLimitTimeRemaining,
+  } = useChat({
+    maxMessages: 100,
+    autoSave: true,
+  });
+
+  // Toast for user notifications
+  const { toast } = useToast();
+
+  /**
+   * Toggle sidebar visibility
+   */
+  const handleToggleSidebar = () => {
+    setIsSidebarOpen(prev => !prev);
+  };
+
+  /**
+   * Close sidebar
+   */
+  const handleCloseSidebar = () => {
+    setIsSidebarOpen(false);
+  };
+
+  /**
+   * Handle message sending with validation
+   */
+  const handleSendMessage = async (content: string, image?: File) => {
+    try {
+      await sendUserMessage(content, image);
+    } catch (error) {
+      console.error('Error sending message:', error);
+      // Error is already handled by the useChat hook
+    }
+  };
+
+  /**
+   * Handle keyboard shortcuts
+   */
+  useEffect(() => {
+    const handleKeyDown = (event: KeyboardEvent) => {
+      // Escape key to close sidebar
+      if (event.key === 'Escape' && isSidebarOpen) {
+        setIsSidebarOpen(false);
+      }
+      
+      // Ctrl/Cmd + K to toggle sidebar
+      if ((event.ctrlKey || event.metaKey) && event.key === 'k') {
+        event.preventDefault();
+        handleToggleSidebar();
+      }
+    };
+
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [isSidebarOpen]);
+
+  /**
+   * Show rate limit notifications
+   */
+  useEffect(() => {
+    if (rateLimitTimeRemaining > 0) {
+      toast({
+        title: "Rate limit active",
+        description: `Please wait ${Math.ceil(rateLimitTimeRemaining / 1000)} seconds`,
+        variant: "destructive",
+      });
+    }
+  }, [rateLimitTimeRemaining, toast]);
+
+  /**
+   * Show error notifications
+   */
+  useEffect(() => {
+    if (error) {
+      toast({
+        title: "Error",
+        description: error,
+        variant: "destructive",
+      });
+    }
+  }, [error, toast]);
+
   return (
-    <div className="min-h-screen flex items-center justify-center bg-background">
-      <div className="text-center">
-        <h1 className="text-4xl font-bold mb-4">Welcome to Your Blank App</h1>
-        <p className="text-xl text-muted-foreground">Start building your amazing project here!</p>
+    <div className="min-h-screen w-full flex flex-col">
+      {/* Header with navigation and upgrade button */}
+      <Header onToggleSidebar={handleToggleSidebar} />
+      
+      {/* Main content area */}
+      <div className="flex-1 flex relative">
+        {/* Sliding sidebar */}
+        <Sidebar
+          isOpen={isSidebarOpen}
+          onClose={handleCloseSidebar}
+        />
+        
+        {/* Main chat container */}
+        <main className={`flex-1 flex flex-col transition-all duration-300 ${
+          isSidebarOpen ? 'ml-0' : 'ml-0'
+        }`}>
+          {/* Chat messages area */}
+          <ResponseArea
+            messages={messages}
+            isTyping={isLoading}
+          />
+          
+          {/* Input prompt card */}
+          <PromptCard
+            onSendMessage={handleSendMessage}
+            isLoading={isLoading || !canSendMessage}
+            hasMessages={messageCount > 0}
+          />
+        </main>
+      </div>
+
+      {/* Accessibility announcements */}
+      <div className="sr-only" aria-live="polite" aria-atomic="true">
+        {isLoading && "AI is processing your message"}
+        {rateLimitTimeRemaining > 0 && `Rate limit active, ${Math.ceil(rateLimitTimeRemaining / 1000)} seconds remaining`}
+        {error && `Error occurred: ${error}`}
       </div>
     </div>
   );

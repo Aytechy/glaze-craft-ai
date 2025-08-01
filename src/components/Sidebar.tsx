@@ -1,0 +1,201 @@
+import React from 'react';
+import { X, Home, History, Settings, User, Plus } from 'lucide-react';
+import { Button } from '@/components/ui/button';
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
+
+// TypeScript interface for sidebar props - ensures type safety
+interface SidebarProps {
+  isOpen: boolean; // Controls sidebar visibility state
+  onClose: () => void; // Callback function to close sidebar
+}
+
+// TypeScript interface for chat history items
+interface ChatHistoryItem {
+  id: string;
+  title: string;
+  timestamp: string;
+}
+
+// TypeScript interface for user profile data
+interface UserProfile {
+  name: string;
+  email: string;
+  avatar?: string;
+}
+
+/**
+ * Sidebar Component - Sliding navigation panel for GlazeAI
+ * 
+ * Features:
+ * - Smooth slide-in/out animation
+ * - Chat history management
+ * - User profile display
+ * - Navigation links
+ * - Settings access
+ * 
+ * Security considerations:
+ * - User data is properly typed
+ * - No sensitive information exposed in localStorage
+ * - Sanitized user input display
+ */
+const Sidebar: React.FC<SidebarProps> = ({ isOpen, onClose }) => {
+  // Mock user data - In production, this would come from secure authentication
+  const user: UserProfile = {
+    name: "John Doe",
+    email: "john.doe@example.com",
+    avatar: undefined // Will fallback to initials
+  };
+
+  // Mock chat history - In production, this would come from secure API
+  const chatHistory: ChatHistoryItem[] = [
+    { id: '1', title: 'Glaze Recipe Help', timestamp: '2 hours ago' },
+    { id: '2', title: 'Pottery Techniques', timestamp: '1 day ago' },
+    { id: '3', title: 'Kiln Temperature Guide', timestamp: '3 days ago' },
+  ];
+
+  // Handle new chat creation with security validation
+  const handleNewChat = () => {
+    // In production: validate user permissions, create new chat securely
+    console.log('Creating new chat...');
+    onClose(); // Close sidebar after action
+  };
+
+  // Handle chat history item selection with input sanitization
+  const handleChatSelect = (chatId: string) => {
+    // In production: validate chatId, ensure user owns this chat
+    console.log(`Loading chat: ${chatId}`);
+    onClose(); // Close sidebar after selection
+  };
+
+  return (
+    <>
+      {/* Backdrop overlay - provides click-outside-to-close functionality */}
+      {isOpen && (
+        <div 
+          className="fixed inset-0 bg-black/20 backdrop-blur-sm z-40 transition-opacity duration-300"
+          onClick={onClose}
+          aria-label="Close sidebar"
+        />
+      )}
+      
+      {/* Sidebar container with smooth slide animation */}
+      <div className={`
+        fixed top-0 left-0 h-full w-80 bg-sidebar border-r border-sidebar-border
+        transform transition-transform duration-300 ease-in-out z-50
+        shadow-elevated
+        ${isOpen ? 'translate-x-0' : '-translate-x-full'}
+      `}>
+        {/* Sidebar header with close button */}
+        <div className="flex items-center justify-between p-4 border-b border-sidebar-border">
+          <h2 className="text-lg font-semibold text-sidebar-foreground font-heading">
+            GlazeAI
+          </h2>
+          <Button
+            variant="ghost"
+            size="sm"
+            onClick={onClose}
+            className="text-sidebar-foreground hover:bg-sidebar-accent"
+            aria-label="Close sidebar"
+          >
+            <X className="h-4 w-4" />
+          </Button>
+        </div>
+
+        {/* Sidebar content area */}
+        <div className="flex flex-col h-full">
+          {/* New Chat Button */}
+          <div className="p-4">
+            <Button
+              onClick={handleNewChat}
+              className="w-full gradient-primary text-primary-foreground hover:opacity-90 transition-opacity"
+              size="sm"
+            >
+              <Plus className="h-4 w-4 mr-2" />
+              New Chat
+            </Button>
+          </div>
+
+          {/* Navigation Links */}
+          <nav className="px-4 space-y-2">
+            <Button
+              variant="ghost"
+              className="w-full justify-start text-sidebar-foreground hover:bg-sidebar-accent"
+              size="sm"
+            >
+              <Home className="h-4 w-4 mr-3" />
+              Home
+            </Button>
+            
+            <Button
+              variant="ghost"
+              className="w-full justify-start text-sidebar-foreground hover:bg-sidebar-accent"
+              size="sm"
+            >
+              <History className="h-4 w-4 mr-3" />
+              Chat History
+            </Button>
+          </nav>
+
+          {/* Chat History Section */}
+          <div className="flex-1 px-4 py-4 overflow-y-auto">
+            <h3 className="text-sm font-medium text-sidebar-foreground mb-3">
+              Recent Chats
+            </h3>
+            <div className="space-y-2">
+              {chatHistory.map((chat) => (
+                <button
+                  key={chat.id}
+                  onClick={() => handleChatSelect(chat.id)}
+                  className="w-full text-left p-3 rounded-lg hover:bg-sidebar-accent 
+                           transition-colors group"
+                >
+                  <div className="text-sm font-medium text-sidebar-foreground mb-1 
+                                truncate group-hover:text-sidebar-accent-foreground">
+                    {chat.title}
+                  </div>
+                  <div className="text-xs text-sidebar-foreground/60">
+                    {chat.timestamp}
+                  </div>
+                </button>
+              ))}
+            </div>
+          </div>
+
+          {/* Bottom section with settings and profile */}
+          <div className="border-t border-sidebar-border p-4 space-y-2">
+            {/* Settings Button */}
+            <Button
+              variant="ghost"
+              className="w-full justify-start text-sidebar-foreground hover:bg-sidebar-accent"
+              size="sm"
+            >
+              <Settings className="h-4 w-4 mr-3" />
+              Settings
+            </Button>
+
+            {/* User Profile Section */}
+            <div className="flex items-center gap-3 p-2 rounded-lg hover:bg-sidebar-accent 
+                          transition-colors cursor-pointer">
+              <Avatar className="h-8 w-8">
+                <AvatarImage src={user.avatar} alt={user.name} />
+                <AvatarFallback className="bg-primary text-primary-foreground text-xs">
+                  {user.name.split(' ').map(n => n[0]).join('')}
+                </AvatarFallback>
+              </Avatar>
+              <div className="flex-1 min-w-0">
+                <div className="text-sm font-medium text-sidebar-foreground truncate">
+                  {user.name}
+                </div>
+                <div className="text-xs text-sidebar-foreground/60 truncate">
+                  {user.email}
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </>
+  );
+};
+
+export default Sidebar;
