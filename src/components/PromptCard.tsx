@@ -205,7 +205,7 @@ const PromptCard: React.FC<PromptCardProps> = ({
   return (
     <div className={`transition-all duration-500 ${
       hasMessages 
-        ? 'sticky bottom-0 p-4 bg-background/95 backdrop-blur-sm border-t border-border/40 z-10' 
+        ? 'sticky bottom-0 p-3 z-10' 
         : 'flex justify-center items-center min-h-[200px] w-full'
     }`} 
     style={{ 
@@ -213,17 +213,19 @@ const PromptCard: React.FC<PromptCardProps> = ({
       height: hasMessages ? 'auto' : 'auto'
     }}>
       <div className="w-full max-w-4xl mx-auto px-4 md:px-6" style={{ width: hasMessages ? '90%' : '100%' }}>
-        {/* Pro plan unlock notice */}
-        <div className="text-center mb-4">
-          <a 
-            href="#upgrade" 
-            className="inline-flex items-center gap-2 text-sm text-muted-foreground 
-                     hover:text-foreground transition-colors"
-          >
-            <Zap className="w-4 h-4" />
-            Unlock more features with the pro plan
-          </a>
-        </div>
+        {/* Pro plan unlock notice - only show when no messages */}
+        {!hasMessages && (
+          <div className="text-center mb-4">
+            <a 
+              href="#upgrade" 
+              className="inline-flex items-center gap-2 text-sm text-muted-foreground 
+                       hover:text-foreground transition-colors"
+            >
+              <Zap className="w-4 h-4" />
+              Unlock more features with the pro plan
+            </a>
+          </div>
+        )}
 
         {/* Main input card */}
         <div className={`relative gradient-card border border-input-border rounded-xl 
