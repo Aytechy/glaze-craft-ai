@@ -228,7 +228,7 @@ const PromptCard: React.FC<PromptCardProps> = ({
         )}
 
         {/* Main input card */}
-        <div className={`relative gradient-card border border-input-border rounded-xl 
+        <div className={`relative ${hasMessages ? 'bg-transparent' : 'gradient-card'} border border-input-border rounded-xl 
                         shadow-moderate transition-all duration-200 ${
           isDragging ? 'border-primary shadow-glow' : ''
         }`}

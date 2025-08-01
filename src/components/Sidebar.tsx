@@ -137,14 +137,6 @@ const Sidebar: React.FC<SidebarProps> = ({ isOpen, onClose, onNewChat, width = 2
 
   return (
     <>
-      {/* Backdrop overlay - provides click-outside-to-close functionality */}
-      {isOpen && (
-        <div 
-          className="fixed inset-0 bg-black/20 backdrop-blur-sm z-40 transition-opacity duration-300 md:hidden"
-          onClick={onClose}
-          aria-label="Close sidebar"
-        />
-      )}
       
       {/* Sidebar container with smooth slide animation */}
       <div 
