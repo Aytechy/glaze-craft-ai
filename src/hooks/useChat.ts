@@ -294,11 +294,8 @@ export function useChat(options: UseChatOptions = {}): UseChatReturn {
     setError(null);
     lastMessageRef.current = null;
     
-    toast({
-      title: "Messages cleared",
-      description: "Chat history has been cleared.",
-    });
-  }, [toast]);
+    // Remove the toast notification for clearing messages
+  }, []);
 
   /**
    * Delete a specific message

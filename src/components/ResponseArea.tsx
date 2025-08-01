@@ -1,6 +1,7 @@
 import React from 'react';
-import { Bot, User } from 'lucide-react';
+import { User } from 'lucide-react';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
+import { MessageActions } from '@/components/MessageActions';
 
 // TypeScript interfaces for message structure
 interface Message {
@@ -16,6 +17,7 @@ interface ResponseAreaProps {
   messages: Message[]; // Array of chat messages
   isTyping: boolean; // AI typing indicator state
   onSuggestionSelect?: (text: string) => void; // Callback for suggestion selection
+  onEditMessage?: (content: string) => void; // Callback for editing messages
 }
 
 // Suggestion Button Component
@@ -50,7 +52,7 @@ const SuggestionButton: React.FC<SuggestionButtonProps> = ({ text, onSelect }) =
  * - Image URLs are validated
  * - XSS prevention through proper React rendering
  */
-const ResponseArea: React.FC<ResponseAreaProps> = ({ messages, isTyping, onSuggestionSelect }) => {
+const ResponseArea: React.FC<ResponseAreaProps> = ({ messages, isTyping, onSuggestionSelect, onEditMessage }) => {
   // Ref for auto-scrolling to bottom of chat
   const messagesEndRef = React.useRef<HTMLDivElement>(null);
 
@@ -71,7 +73,7 @@ const ResponseArea: React.FC<ResponseAreaProps> = ({ messages, isTyping, onSugge
   };
 
   return (
-    <div className="flex-1 overflow-y-auto px-4 py-6 space-y-6" style={{ maxHeight: 'calc(100vh - 56px - 20vh - 50px)', paddingBottom: '70px' }}>
+    <div className="flex-1 overflow-y-auto py-6 space-y-6 max-w-4xl mx-auto w-full" style={{ maxHeight: 'calc(100vh - 56px - 20vh - 50px)', paddingBottom: '70px' }}>
       {/* Welcome message when no messages exist */}
       {messages.length === 0 && !isTyping && (
         <div className="flex flex-col items-center justify-center h-full text-center max-w-2xl mx-auto">
@@ -79,7 +81,7 @@ const ResponseArea: React.FC<ResponseAreaProps> = ({ messages, isTyping, onSugge
           <div className="mb-6">
             <div className="w-16 h-16 rounded-2xl gradient-subtle flex items-center justify-center 
                           shadow-moderate">
-              <Bot className="w-8 h-8 text-primary" />
+              <User className="w-8 h-8 text-primary" />
             </div>
           </div>
           
@@ -114,53 +116,59 @@ const ResponseArea: React.FC<ResponseAreaProps> = ({ messages, isTyping, onSugge
 
       {/* Chat messages */}
       {messages.map((message) => (
-        <div key={message.id} className={`flex gap-4 ${
+        <div key={message.id} className={`group flex gap-4 ${
           message.type === 'user' ? 'flex-row-reverse' : 'flex-row'
         }`}>
-          {/* Message avatar */}
-          <Avatar className="w-8 h-8 mt-1 flex-shrink-0">
-            <AvatarFallback className={
-              message.type === 'user' 
-                ? 'bg-primary text-primary-foreground' 
-                : 'bg-accent text-accent-foreground'
-            }>
-              {message.type === 'user' ? (
+          {/* Message avatar - only for user messages */}
+          {message.type === 'user' && (
+            <Avatar className="w-8 h-8 mt-1 flex-shrink-0">
+              <AvatarFallback className="bg-primary text-primary-foreground">
                 <User className="w-4 h-4" />
-              ) : (
-                <Bot className="w-4 h-4" />
-              )}
-            </AvatarFallback>
-          </Avatar>
+              </AvatarFallback>
+            </Avatar>
+          )}
 
           {/* Message content */}
           <div className={`flex-1 max-w-3xl ${
             message.type === 'user' ? 'text-right' : 'text-left'
           }`}>
-            <div className={`inline-block px-4 py-3 rounded-2xl shadow-subtle ${
-              message.type === 'user'
-                ? 'gradient-primary text-primary-foreground'
-                : 'bg-card text-card-foreground border border-border/50'
-            }`}>
-              {/* Image attachment for user messages */}
-              {message.image && message.type === 'user' && (
-                <div className="mb-3">
-                  <img
-                    src={message.image}
-                    alt="User uploaded content"
-                    className="max-w-xs rounded-lg shadow-subtle"
-                    onError={(e) => {
-                      // Handle broken image links securely
-                      const target = e.target as HTMLImageElement;
-                      target.style.display = 'none';
-                    }}
-                  />
+            <div className="relative">
+              <div className={`inline-block px-4 py-3 rounded-2xl shadow-subtle ${
+                message.type === 'user'
+                  ? 'gradient-primary text-primary-foreground'
+                  : 'bg-card text-card-foreground border border-border/50'
+              }`}>
+                {/* Image attachment for user messages */}
+                {message.image && message.type === 'user' && (
+                  <div className="mb-3">
+                    <img
+                      src={message.image}
+                      alt="User uploaded content"
+                      className="max-w-xs rounded-lg shadow-subtle"
+                      onError={(e) => {
+                        // Handle broken image links securely
+                        const target = e.target as HTMLImageElement;
+                        target.style.display = 'none';
+                      }}
+                    />
+                  </div>
+                )}
+                
+                {/* Message text content */}
+                <div className="text-sm leading-relaxed whitespace-pre-wrap">
+                  {formatMessageContent(message.content)}
                 </div>
-              )}
-              
-              {/* Message text content */}
-              <div className="text-sm leading-relaxed whitespace-pre-wrap">
-                {formatMessageContent(message.content)}
               </div>
+              
+              {/* Message actions */}
+              <MessageActions
+                content={message.content}
+                messageType={message.type}
+                onEdit={onEditMessage}
+                className={`absolute ${
+                  message.type === 'user' ? 'left-0 top-0' : 'right-0 top-0'
+                } -translate-x-8`}
+              />
             </div>
             
             {/* Timestamp */}
@@ -176,13 +184,7 @@ const ResponseArea: React.FC<ResponseAreaProps> = ({ messages, isTyping, onSugge
       {/* AI typing indicator */}
       {isTyping && (
         <div className="flex gap-4">
-          <Avatar className="w-8 h-8 mt-1 flex-shrink-0">
-            <AvatarFallback className="bg-accent text-accent-foreground">
-              <Bot className="w-4 h-4" />
-            </AvatarFallback>
-          </Avatar>
-          
-          <div className="flex-1">
+          <div className="flex-1 max-w-3xl">
             <div className="inline-block px-4 py-3 rounded-2xl bg-card text-card-foreground 
                           border border-border/50 shadow-subtle">
               <div className="flex items-center gap-1">

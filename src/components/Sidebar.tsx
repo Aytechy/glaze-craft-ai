@@ -8,6 +8,7 @@ import { Link, useLocation } from 'react-router-dom';
 interface SidebarProps {
   isOpen: boolean; // Controls sidebar visibility state
   onClose: () => void; // Callback function to close sidebar
+  onNewChat?: () => void; // Optional callback for new chat
 }
 
 // TypeScript interface for chat history items
@@ -39,7 +40,7 @@ interface UserProfile {
  * - No sensitive information exposed in localStorage
  * - Sanitized user input display
  */
-const Sidebar: React.FC<SidebarProps> = ({ isOpen, onClose }) => {
+const Sidebar: React.FC<SidebarProps> = ({ isOpen, onClose, onNewChat }) => {
   const location = useLocation();
   
   // Mock user data - In production, this would come from secure authentication
@@ -65,8 +66,14 @@ const Sidebar: React.FC<SidebarProps> = ({ isOpen, onClose }) => {
 
   // Handle new chat creation with security validation
   const handleNewChat = () => {
-    // In production: validate user permissions, create new chat securely
-    window.location.href = '/'; // Navigate to fresh chat
+    if (onNewChat) {
+      onNewChat(); // Use callback if provided
+    } else {
+      // Fallback for other pages
+      if (location.pathname !== '/') {
+        window.location.href = '/'; // Navigate to fresh chat
+      }
+    }
     onClose(); // Close sidebar after action
   };
 
@@ -82,7 +89,7 @@ const Sidebar: React.FC<SidebarProps> = ({ isOpen, onClose }) => {
       {/* Backdrop overlay - provides click-outside-to-close functionality */}
       {isOpen && (
         <div 
-          className="fixed inset-0 bg-black/20 backdrop-blur-sm z-40 transition-opacity duration-300"
+          className="fixed inset-0 bg-black/20 backdrop-blur-sm z-40 transition-opacity duration-300 md:hidden"
           onClick={onClose}
           aria-label="Close sidebar"
         />
@@ -90,7 +97,7 @@ const Sidebar: React.FC<SidebarProps> = ({ isOpen, onClose }) => {
       
       {/* Sidebar container with smooth slide animation */}
       <div className={`
-        fixed top-0 left-0 h-full w-80 bg-sidebar border-r border-sidebar-border
+        fixed top-0 left-0 h-full w-[150px] bg-sidebar border-r border-sidebar-border
         transform transition-transform duration-300 ease-in-out z-50
         shadow-elevated
         ${isOpen ? 'translate-x-0' : '-translate-x-full'}

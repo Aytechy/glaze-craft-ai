@@ -21,6 +21,7 @@ import Header from '@/components/Header';
 import Sidebar from '@/components/Sidebar';
 import ResponseArea from '@/components/ResponseArea';
 import PromptCard from '@/components/PromptCard';
+import { NewChatModal } from '@/components/modals/NewChatModal';
 import { useChat } from '@/hooks/useChat';
 import { useToast } from '@/hooks/use-toast';
 
@@ -30,6 +31,7 @@ import { useToast } from '@/hooks/use-toast';
 const Index: React.FC = () => {
   // Sidebar state management
   const [isSidebarOpen, setIsSidebarOpen] = useState<boolean>(false);
+  const [isNewChatModalOpen, setIsNewChatModalOpen] = useState<boolean>(false);
   
   // Chat functionality from custom hook
   const {
@@ -40,6 +42,7 @@ const Index: React.FC = () => {
     canSendMessage,
     messageCount,
     rateLimitTimeRemaining,
+    clearMessages,
   } = useChat({
     maxMessages: 100,
     autoSave: true,
@@ -83,6 +86,26 @@ const Index: React.FC = () => {
     } catch (error) {
       console.error('Error sending suggestion:', error);
     }
+  };
+
+  /**
+   * Handle edit message - populate the input with content
+   */
+  const handleEditMessage = (content: string) => {
+    // This would populate the input field with the message content
+    // For now, we'll show a toast
+    toast({
+      title: "Edit feature",
+      description: "Edit functionality would populate the input field with this message.",
+    });
+  };
+
+  /**
+   * Handle new chat
+   */
+  const handleNewChat = () => {
+    clearMessages();
+    setIsNewChatModalOpen(false);
   };
 
   /**
@@ -143,17 +166,19 @@ const Index: React.FC = () => {
         <Sidebar
           isOpen={isSidebarOpen}
           onClose={handleCloseSidebar}
+          onNewChat={() => setIsNewChatModalOpen(true)}
         />
         
-        {/* Main chat container */}
+        {/* Main chat container with sidebar-aware layout */}
         <main className={`flex-1 flex flex-col transition-all duration-300 ${
-          isSidebarOpen ? 'ml-0' : 'ml-0'
+          isSidebarOpen ? 'ml-[150px]' : 'ml-0'
         }`} style={{ height: 'calc(100vh - 56px)' }}>
           {/* Chat messages area */}
           <ResponseArea
             messages={messages}
             isTyping={isLoading}
             onSuggestionSelect={handleSuggestionSelect}
+            onEditMessage={handleEditMessage}
           />
           
           {/* Input prompt card */}
@@ -164,6 +189,13 @@ const Index: React.FC = () => {
           />
         </main>
       </div>
+
+      {/* New Chat Modal */}
+      <NewChatModal
+        isOpen={isNewChatModalOpen}
+        onClose={() => setIsNewChatModalOpen(false)}
+        onNewChat={handleNewChat}
+      />
 
       {/* Accessibility announcements */}
       <div className="sr-only" aria-live="polite" aria-atomic="true">

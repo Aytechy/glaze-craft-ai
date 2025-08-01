@@ -1,6 +1,8 @@
-import React from 'react';
-import { Menu, Crown } from 'lucide-react';
+import React, { useState } from 'react';
+import { Menu, Crown, Settings } from 'lucide-react';
 import { Button } from '@/components/ui/button';
+import { UpgradeModal } from '@/components/modals/UpgradeModal';
+import { SettingsModal } from '@/components/modals/SettingsModal';
 
 // TypeScript interface for header component props
 interface HeaderProps {
@@ -21,10 +23,16 @@ interface HeaderProps {
  * - No sensitive data exposed in header
  */
 const Header: React.FC<HeaderProps> = ({ onToggleSidebar }) => {
-  // Handle upgrade button click - would redirect to secure payment page
+  const [isUpgradeModalOpen, setIsUpgradeModalOpen] = useState(false);
+  const [isSettingsModalOpen, setIsSettingsModalOpen] = useState(false);
+
+  // Handle upgrade button click
   const handleUpgrade = () => {
-    // In production: redirect to secure payment/subscription page
-    console.log('Redirecting to upgrade page...');
+    setIsUpgradeModalOpen(true);
+  };
+
+  const handleSettings = () => {
+    setIsSettingsModalOpen(true);
   };
 
   return (
@@ -51,8 +59,17 @@ const Header: React.FC<HeaderProps> = ({ onToggleSidebar }) => {
           </h1>
         </div>
 
-        {/* Right section with upgrade button */}
-        <div className="flex items-center">
+        {/* Right section with upgrade and settings buttons */}
+        <div className="flex items-center gap-2">
+          <Button
+            variant="ghost"
+            size="sm"
+            onClick={handleSettings}
+            className="text-foreground hover:bg-accent"
+            aria-label="Settings"
+          >
+            <Settings className="h-4 w-4" />
+          </Button>
           <Button
             onClick={handleUpgrade}
             className="gradient-primary text-primary-foreground hover:opacity-90 
@@ -64,6 +81,16 @@ const Header: React.FC<HeaderProps> = ({ onToggleSidebar }) => {
           </Button>
         </div>
       </div>
+      
+      {/* Modals */}
+      <UpgradeModal 
+        isOpen={isUpgradeModalOpen} 
+        onClose={() => setIsUpgradeModalOpen(false)} 
+      />
+      <SettingsModal 
+        isOpen={isSettingsModalOpen} 
+        onClose={() => setIsSettingsModalOpen(false)} 
+      />
     </header>
   );
 };

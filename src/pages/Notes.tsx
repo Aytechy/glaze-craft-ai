@@ -10,11 +10,14 @@
  */
 
 import React, { useState, useRef } from 'react';
-import { Bold, Italic, Heading1, Heading2, Save, Plus } from 'lucide-react';
+import { Bold, Italic, Heading1, Heading2, Save, Plus, Type, Palette } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { Separator } from '@/components/ui/separator';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
 import Header from '@/components/Header';
+import Sidebar from '@/components/Sidebar';
 
 // TypeScript interfaces
 interface Note {
@@ -32,6 +35,7 @@ interface Note {
 const Notes: React.FC = () => {
   // State management
   const [currentNote, setCurrentNote] = useState<Note | null>(null);
+  const [isSidebarOpen, setIsSidebarOpen] = useState<boolean>(false);
   const [notes, setNotes] = useState<Note[]>([
     {
       id: '1',
@@ -133,9 +137,12 @@ const Notes: React.FC = () => {
     }
   };
 
-  // Mock sidebar toggle - in real app this would connect to main sidebar
   const handleToggleSidebar = () => {
-    console.log('Toggle sidebar');
+    setIsSidebarOpen(prev => !prev);
+  };
+
+  const handleCloseSidebar = () => {
+    setIsSidebarOpen(false);
   };
 
   return (
@@ -144,7 +151,16 @@ const Notes: React.FC = () => {
       <Header onToggleSidebar={handleToggleSidebar} />
       
       {/* Main content area */}
-      <div className="flex-1 flex">
+      <div className="flex-1 flex relative">
+        {/* Sidebar */}
+        <Sidebar
+          isOpen={isSidebarOpen}
+          onClose={handleCloseSidebar}
+        />
+        
+        <div className={`flex-1 flex transition-all duration-300 ${
+          isSidebarOpen ? 'ml-[150px]' : 'ml-0'
+        }`}>
         {/* Main editor area */}
         <main className="flex-1 flex flex-col min-h-0">
           {/* Toolbar */}
@@ -274,6 +290,7 @@ const Notes: React.FC = () => {
             ))}
           </div>
         </aside>
+        </div>
       </div>
     </div>
   );
