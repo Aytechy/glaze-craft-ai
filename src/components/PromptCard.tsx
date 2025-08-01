@@ -203,12 +203,19 @@ const PromptCard: React.FC<PromptCardProps> = ({
   };
 
   return (
-    <div className={`w-full transition-all duration-500 ${
+    <div className={`transition-all duration-500 ${
       hasMessages 
-        ? 'fixed bottom-0 left-0 right-0 p-4 bg-background/80 backdrop-blur-sm border-t border-border/40' 
-        : 'flex justify-center items-center min-h-[200px]'
-    }`} style={{ height: hasMessages ? '20vh' : 'auto', maxHeight: '20vh' }}>
-      <div className="w-full max-w-4xl mx-auto">
+        ? 'fixed bottom-0 p-4 bg-background/80 backdrop-blur-sm border-t border-border/40' 
+        : 'flex justify-center items-center min-h-[200px] w-full'
+    }`} 
+    style={{ 
+      width: hasMessages ? '100vw' : '100%',
+      left: hasMessages ? '0' : 'auto',
+      right: hasMessages ? '0' : 'auto',
+      height: hasMessages ? '20vh' : 'auto', 
+      maxHeight: '20vh' 
+    }}>
+      <div className="w-full max-w-4xl mx-auto" style={{ width: hasMessages ? '80vw' : '100%' }}>
         {/* Pro plan unlock notice */}
         <div className="text-center mb-4">
           <a 
@@ -283,10 +290,14 @@ const PromptCard: React.FC<PromptCardProps> = ({
                   size="sm"
                   onClick={handleUploadClick}
                   disabled={isLoading}
-                  className="text-muted-foreground hover:text-foreground"
+                  className="flex items-center gap-2 px-3 py-2 rounded-sm border border-amber-300 
+                           bg-gradient-to-r from-amber-100 to-yellow-100 text-amber-800 
+                           hover:from-amber-200 hover:to-yellow-200 shadow-sm 
+                           hover:shadow-md transition-all duration-200"
+                  style={{ borderWidth: '1px', borderRadius: '1px' }}
                 >
-                  <Paperclip className="w-4 h-4" />
-                  <span className="sr-only">Upload image</span>
+                  <Upload className="w-4 h-4" />
+                  <span className="text-sm font-medium">Upload any Glaze Image</span>
                 </Button>
                 
                 {/* Hidden file input */}

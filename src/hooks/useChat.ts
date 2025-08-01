@@ -40,6 +40,7 @@ export interface UseChatReturn {
   clearMessages: () => void;
   retryLastMessage: () => Promise<void>;
   deleteMessage: (messageId: string) => void;
+  editMessage: (messageId: string, newContent: string) => Promise<void>;
   
   // Session management
   startNewSession: () => void;
@@ -310,6 +311,39 @@ export function useChat(options: UseChatOptions = {}): UseChatReturn {
   }, [toast]);
 
   /**
+   * Edit a message and resend to get new AI response
+   */
+  const editMessage = useCallback(async (messageId: string, newContent: string): Promise<void> => {
+    if (!newContent.trim()) {
+      toast({
+        title: "Empty message",
+        description: "Please enter a message.",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    // Find the message index
+    const messageIndex = messages.findIndex(msg => msg.id === messageId);
+    if (messageIndex === -1) return;
+
+    const messageToEdit = messages[messageIndex];
+    if (messageToEdit.type !== 'user') return; // Only allow editing user messages
+
+    // Remove the edited message and all messages after it (including AI responses)
+    const messagesBeforeEdit = messages.slice(0, messageIndex);
+    setMessages(messagesBeforeEdit);
+
+    // Send the edited message as a new message
+    await sendUserMessage(newContent.trim(), undefined);
+    
+    toast({
+      title: "Message edited",
+      description: "Your message has been updated and resent.",
+    });
+  }, [messages, sendUserMessage, toast]);
+
+  /**
    * Start a new chat session
    */
   const startNewSession = useCallback((): void => {
@@ -448,6 +482,7 @@ export function useChat(options: UseChatOptions = {}): UseChatReturn {
     clearMessages,
     retryLastMessage,
     deleteMessage,
+    editMessage,
     
     // Session management
     startNewSession,

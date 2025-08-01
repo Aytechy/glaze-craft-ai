@@ -17,7 +17,7 @@ interface ResponseAreaProps {
   messages: Message[]; // Array of chat messages
   isTyping: boolean; // AI typing indicator state
   onSuggestionSelect?: (text: string) => void; // Callback for suggestion selection
-  onEditMessage?: (content: string) => void; // Callback for editing messages
+  onEditMessage?: (messageId: string, content: string) => void; // Callback for editing messages with ID
 }
 
 // Suggestion Button Component
@@ -160,15 +160,6 @@ const ResponseArea: React.FC<ResponseAreaProps> = ({ messages, isTyping, onSugge
                 </div>
               </div>
               
-              {/* Message actions */}
-              <MessageActions
-                content={message.content}
-                messageType={message.type}
-                onEdit={onEditMessage}
-                className={`absolute ${
-                  message.type === 'user' ? 'left-0 top-0' : 'right-0 top-0'
-                } -translate-x-8`}
-              />
             </div>
             
             {/* Timestamp */}
@@ -176,6 +167,17 @@ const ResponseArea: React.FC<ResponseAreaProps> = ({ messages, isTyping, onSugge
               message.type === 'user' ? 'text-right' : 'text-left'
             }`}>
               {formatTimestamp(message.timestamp)}
+            </div>
+
+            {/* Message actions - positioned beneath message */}
+            <div className={`mt-2 ${
+              message.type === 'user' ? 'flex justify-end' : 'flex justify-start'
+            }`}>
+              <MessageActions
+                content={message.content}
+                messageType={message.type}
+                onEdit={(content) => onEditMessage && onEditMessage(message.id, content)}
+              />
             </div>
           </div>
         </div>

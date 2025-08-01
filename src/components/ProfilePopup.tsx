@@ -1,5 +1,5 @@
 import React from 'react';
-import { X, User, LogOut } from 'lucide-react';
+import { X, User, LogOut, Crown } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Link } from 'react-router-dom';
@@ -26,50 +26,39 @@ export const ProfilePopup: React.FC<ProfilePopupProps> = ({ isOpen, onClose, use
       />
       
       {/* Popup */}
-      <div className="fixed left-[150px] top-0 h-full w-80 bg-card border-r border-border shadow-elevated z-50 
-                      transform transition-transform duration-300 ease-in-out">
+      <div className="fixed right-4 top-16 w-64 bg-card border border-border shadow-elevated rounded-lg z-50 
+                      transform transition-all duration-300 ease-in-out animate-fade-in"
+                      style={{ animation: 'fade-in 0.2s ease-out' }}>
         {/* Header */}
-        <div className="flex items-center justify-between p-4 border-b border-border">
-          <h3 className="text-lg font-semibold text-card-foreground">Profile</h3>
+        <div className="flex items-center justify-between p-3 border-b border-border">
+          <h3 className="text-sm font-semibold text-card-foreground">Quick Actions</h3>
           <Button
             variant="ghost"
             size="sm"
             onClick={onClose}
-            className="text-card-foreground hover:bg-accent"
+            className="text-card-foreground hover:bg-accent h-6 w-6 p-0"
           >
-            <X className="h-4 w-4" />
+            <X className="h-3 w-3" />
           </Button>
         </div>
 
-        {/* Profile Section */}
-        <div className="p-6">
-          <div className="flex flex-col items-center text-center space-y-4">
-            <Avatar className="h-20 w-20">
-              <AvatarImage src={user.avatar} alt={user.name} />
-              <AvatarFallback className="bg-primary text-primary-foreground text-xl">
-                {user.name.split(' ').map(n => n[0]).join('')}
-              </AvatarFallback>
-            </Avatar>
-            
-            <div>
-              <h4 className="text-xl font-semibold text-card-foreground">
-                {user.name}
-              </h4>
-              <p className="text-sm text-muted-foreground mt-1">
-                {user.email}
-              </p>
-            </div>
-          </div>
-        </div>
-
         {/* Actions */}
-        <div className="p-4 space-y-2">
+        <div className="p-2 space-y-1">
+          <Button
+            variant="ghost"
+            className="w-full justify-start text-card-foreground hover:bg-accent text-sm h-8"
+            onClick={onClose}
+          >
+            <Crown className="h-3 w-3 mr-2" />
+            Upgrade
+          </Button>
+          
           <Link to="/profile" onClick={onClose}>
             <Button
               variant="ghost"
-              className="w-full justify-start text-card-foreground hover:bg-accent"
+              className="w-full justify-start text-card-foreground hover:bg-accent text-sm h-8"
             >
-              <User className="h-4 w-4 mr-3" />
+              <User className="h-3 w-3 mr-2" />
               View Profile
             </Button>
           </Link>
@@ -77,9 +66,9 @@ export const ProfilePopup: React.FC<ProfilePopupProps> = ({ isOpen, onClose, use
           <Link to="/logout" onClick={onClose}>
             <Button
               variant="ghost"
-              className="w-full justify-start text-destructive hover:bg-destructive/10"
+              className="w-full justify-start text-destructive hover:bg-destructive/10 text-sm h-8"
             >
-              <LogOut className="h-4 w-4 mr-3" />
+              <LogOut className="h-3 w-3 mr-2" />
               Log Out
             </Button>
           </Link>

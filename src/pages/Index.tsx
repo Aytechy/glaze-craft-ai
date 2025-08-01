@@ -44,6 +44,7 @@ const Index: React.FC = () => {
     messageCount,
     rateLimitTimeRemaining,
     clearMessages,
+    editMessage,
   } = useChat({
     maxMessages: 100,
     autoSave: true,
@@ -90,15 +91,14 @@ const Index: React.FC = () => {
   };
 
   /**
-   * Handle edit message - populate the input with content
+   * Handle edit message - edit and resend
    */
-  const handleEditMessage = (content: string) => {
-    // This would populate the input field with the message content
-    // For now, we'll show a toast
-    toast({
-      title: "Edit feature",
-      description: "Edit functionality would populate the input field with this message.",
-    });
+  const handleEditMessage = async (messageId: string, content: string) => {
+    try {
+      await editMessage(messageId, content);
+    } catch (error) {
+      console.error('Error editing message:', error);
+    }
   };
 
   /**
@@ -172,7 +172,7 @@ const Index: React.FC = () => {
         />
         
         {/* Main chat container with sidebar-aware layout */}
-        <main 
+        <div 
           className="flex-1 flex flex-col transition-all duration-300"
           style={{ 
             height: 'calc(100vh - 56px)',
@@ -193,7 +193,7 @@ const Index: React.FC = () => {
             isLoading={isLoading || !canSendMessage}
             hasMessages={messageCount > 0}
           />
-        </main>
+        </div>
       </div>
 
       {/* New Chat Modal */}

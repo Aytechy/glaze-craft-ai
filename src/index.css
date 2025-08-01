@@ -67,6 +67,9 @@
     --transition-smooth: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
     --transition-fast: all 0.15s cubic-bezier(0.4, 0, 0.2, 1);
 
+    /* Upload Button Gradient */
+    --gradient-upload: linear-gradient(135deg, hsl(45 93% 85%), hsl(48 100% 88%));
+
     /* Spacing & Layout */
     --radius: 0.75rem;
     --radius-lg: 1rem;
@@ -152,6 +155,26 @@
 
   .transition-fast {
     transition: var(--transition-fast);
+  }
+
+  .gradient-upload {
+    background: var(--gradient-upload);
+  }
+
+  /* Animation keyframes */
+  @keyframes fade-in {
+    0% {
+      opacity: 0;
+      transform: translateY(-10px) scale(0.95);
+    }
+    100% {
+      opacity: 1;
+      transform: translateY(0) scale(1);
+    }
+  }
+
+  .animate-fade-in {
+    animation: fade-in 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   }
 }
 
