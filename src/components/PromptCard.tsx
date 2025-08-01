@@ -205,17 +205,14 @@ const PromptCard: React.FC<PromptCardProps> = ({
   return (
     <div className={`transition-all duration-500 ${
       hasMessages 
-        ? 'fixed bottom-0 p-4 bg-background/80 backdrop-blur-sm border-t border-border/40' 
+        ? 'sticky bottom-0 p-4 bg-background/95 backdrop-blur-sm border-t border-border/40 z-10' 
         : 'flex justify-center items-center min-h-[200px] w-full'
     }`} 
     style={{ 
-      width: hasMessages ? '100vw' : '100%',
-      left: hasMessages ? '0' : 'auto',
-      right: hasMessages ? '0' : 'auto',
-      height: hasMessages ? '20vh' : 'auto', 
-      maxHeight: '20vh' 
+      width: '100%',
+      height: hasMessages ? 'auto' : 'auto'
     }}>
-      <div className="w-full max-w-4xl mx-auto" style={{ width: hasMessages ? '80vw' : '100%' }}>
+      <div className="w-full max-w-4xl mx-auto" style={{ width: hasMessages ? '90%' : '100%' }}>
         {/* Pro plan unlock notice */}
         <div className="text-center mb-4">
           <a 

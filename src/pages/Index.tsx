@@ -173,26 +173,40 @@ const Index: React.FC = () => {
         
         {/* Main chat container with sidebar-aware layout */}
         <div 
-          className="flex-1 flex flex-col transition-all duration-300"
+          className="flex-1 flex flex-col transition-all duration-300 relative"
           style={{ 
             height: 'calc(100vh - 56px)',
-            marginLeft: isSidebarOpen ? `${sidebarWidth}px` : '0'
+            marginLeft: window.innerWidth >= 768 ? (isSidebarOpen ? `${sidebarWidth}px` : '0') : '0'
           }}
         >
           {/* Chat messages area */}
-          <ResponseArea
-            messages={messages}
-            isTyping={isLoading}
-            onSuggestionSelect={handleSuggestionSelect}
-            onEditMessage={handleEditMessage}
-          />
+          <div 
+            className="flex-1 transition-all duration-300"
+            style={{
+              marginLeft: window.innerWidth >= 768 ? '0' : (isSidebarOpen ? `${sidebarWidth}px` : '0')
+            }}
+          >
+            <ResponseArea
+              messages={messages}
+              isTyping={isLoading}
+              onSuggestionSelect={handleSuggestionSelect}
+              onEditMessage={handleEditMessage}
+            />
+          </div>
           
-          {/* Input prompt card */}
-          <PromptCard
-            onSendMessage={handleSendMessage}
-            isLoading={isLoading || !canSendMessage}
-            hasMessages={messageCount > 0}
-          />
+          {/* Input prompt card - fixed at bottom */}
+          <div 
+            className="transition-all duration-300"
+            style={{
+              marginLeft: window.innerWidth >= 768 ? '0' : (isSidebarOpen ? `${sidebarWidth}px` : '0')
+            }}
+          >
+            <PromptCard
+              onSendMessage={handleSendMessage}
+              isLoading={isLoading || !canSendMessage}
+              hasMessages={messageCount > 0}
+            />
+          </div>
         </div>
       </div>
 

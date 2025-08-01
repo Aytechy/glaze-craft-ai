@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Menu, Crown, Settings, User } from 'lucide-react';
+import { AlignJustify, Crown, Settings, User } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { UpgradeModal } from '@/components/modals/UpgradeModal';
 import { SettingsModal } from '@/components/modals/SettingsModal';
@@ -28,6 +28,16 @@ const Header: React.FC<HeaderProps> = ({ onToggleSidebar }) => {
   const [isSettingsModalOpen, setIsSettingsModalOpen] = useState(false);
   const [isProfilePopupOpen, setIsProfilePopupOpen] = useState(false);
 
+  // Listen for upgrade modal events from profile popup
+  React.useEffect(() => {
+    const handleUpgradeEvent = () => {
+      setIsUpgradeModalOpen(true);
+    };
+    
+    window.addEventListener('openUpgradeModal', handleUpgradeEvent);
+    return () => window.removeEventListener('openUpgradeModal', handleUpgradeEvent);
+  }, []);
+
   // Handle upgrade button click
   const handleUpgrade = () => {
     setIsUpgradeModalOpen(true);
@@ -54,7 +64,7 @@ const Header: React.FC<HeaderProps> = ({ onToggleSidebar }) => {
             className="text-foreground hover:bg-accent ml-2"
             aria-label="Toggle sidebar"
           >
-            <Menu className="h-5 w-5" />
+            <AlignJustify className="h-5 w-5" />
           </Button>
         </div>
 

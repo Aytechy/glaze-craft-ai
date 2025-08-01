@@ -73,7 +73,7 @@ const ResponseArea: React.FC<ResponseAreaProps> = ({ messages, isTyping, onSugge
   };
 
   return (
-    <div className="flex-1 overflow-y-auto py-6 space-y-6 max-w-4xl mx-auto w-full" style={{ maxHeight: 'calc(100vh - 56px - 20vh - 50px)', paddingBottom: '70px' }}>
+    <div className="flex-1 overflow-y-auto py-6 space-y-6 max-w-4xl mx-auto w-full" style={{ maxHeight: 'calc(100vh - 56px - 200px)', paddingBottom: '20px' }}>
       {/* Welcome message when no messages exist */}
       {messages.length === 0 && !isTyping && (
         <div className="flex flex-col items-center justify-center h-full text-center max-w-2xl mx-auto">

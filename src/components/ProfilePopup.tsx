@@ -2,7 +2,7 @@ import React from 'react';
 import { X, User, LogOut, Crown } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 
 interface ProfilePopupProps {
   isOpen: boolean;
@@ -15,7 +15,21 @@ interface ProfilePopupProps {
 }
 
 export const ProfilePopup: React.FC<ProfilePopupProps> = ({ isOpen, onClose, user }) => {
+  const navigate = useNavigate();
+  
   if (!isOpen) return null;
+
+  const handleUpgrade = () => {
+    onClose();
+    // Trigger upgrade modal - we'll need to pass this through props or use a global state
+    const upgradeEvent = new CustomEvent('openUpgradeModal');
+    window.dispatchEvent(upgradeEvent);
+  };
+
+  const handleViewProfile = () => {
+    onClose();
+    navigate('/profile');
+  };
 
   return (
     <>
@@ -47,21 +61,20 @@ export const ProfilePopup: React.FC<ProfilePopupProps> = ({ isOpen, onClose, use
           <Button
             variant="ghost"
             className="w-full justify-start text-card-foreground hover:bg-accent text-sm h-8"
-            onClick={onClose}
+            onClick={handleUpgrade}
           >
             <Crown className="h-3 w-3 mr-2" />
             Upgrade
           </Button>
           
-          <Link to="/profile" onClick={onClose}>
-            <Button
-              variant="ghost"
-              className="w-full justify-start text-card-foreground hover:bg-accent text-sm h-8"
-            >
-              <User className="h-3 w-3 mr-2" />
-              View Profile
-            </Button>
-          </Link>
+          <Button
+            variant="ghost"
+            className="w-full justify-start text-card-foreground hover:bg-accent text-sm h-8"
+            onClick={handleViewProfile}
+          >
+            <User className="h-3 w-3 mr-2" />
+            View Profile
+          </Button>
           
           <Link to="/logout" onClick={onClose}>
             <Button
