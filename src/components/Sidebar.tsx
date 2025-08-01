@@ -1,14 +1,17 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { X, Home, History, Settings, User, Plus, FileText } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Link, useLocation } from 'react-router-dom';
+import { ProfilePopup } from '@/components/ProfilePopup';
+import { SettingsModal } from '@/components/modals/SettingsModal';
 
 // TypeScript interface for sidebar props - ensures type safety
 interface SidebarProps {
   isOpen: boolean; // Controls sidebar visibility state
   onClose: () => void; // Callback function to close sidebar
   onNewChat?: () => void; // Optional callback for new chat
+  width?: number; // Adjustable sidebar width
 }
 
 // TypeScript interface for chat history items
@@ -40,8 +43,12 @@ interface UserProfile {
  * - No sensitive information exposed in localStorage
  * - Sanitized user input display
  */
-const Sidebar: React.FC<SidebarProps> = ({ isOpen, onClose, onNewChat }) => {
+const Sidebar: React.FC<SidebarProps> = ({ isOpen, onClose, onNewChat, width = 250 }) => {
   const location = useLocation();
+  const [isProfilePopupOpen, setIsProfilePopupOpen] = useState(false);
+  const [isSettingsModalOpen, setIsSettingsModalOpen] = useState(false);
+  const [sidebarWidth, setSidebarWidth] = useState(width);
+  const [isResizing, setIsResizing] = useState(false);
   
   // Mock user data - In production, this would come from secure authentication
   const user: UserProfile = {
@@ -56,6 +63,38 @@ const Sidebar: React.FC<SidebarProps> = ({ isOpen, onClose, onNewChat }) => {
     { id: '2', title: 'Pottery Techniques', timestamp: '1 day ago' },
     { id: '3', title: 'Kiln Temperature Guide', timestamp: '3 days ago' },
   ];
+
+  // Handle mouse down for resizing
+  const handleMouseDown = (e: React.MouseEvent) => {
+    setIsResizing(true);
+    e.preventDefault();
+  };
+
+  // Handle mouse move for resizing
+  React.useEffect(() => {
+    const handleMouseMove = (e: MouseEvent) => {
+      if (!isResizing) return;
+      
+      const newWidth = e.clientX;
+      if (newWidth >= 200 && newWidth <= 400) {
+        setSidebarWidth(newWidth);
+      }
+    };
+
+    const handleMouseUp = () => {
+      setIsResizing(false);
+    };
+
+    if (isResizing) {
+      document.addEventListener('mousemove', handleMouseMove);
+      document.addEventListener('mouseup', handleMouseUp);
+    }
+
+    return () => {
+      document.removeEventListener('mousemove', handleMouseMove);
+      document.removeEventListener('mouseup', handleMouseUp);
+    };
+  }, [isResizing]);
 
   // Navigation items with active state detection
   const navigationItems = [
@@ -81,7 +120,19 @@ const Sidebar: React.FC<SidebarProps> = ({ isOpen, onClose, onNewChat }) => {
   const handleChatSelect = (chatId: string) => {
     // In production: validate chatId, ensure user owns this chat
     console.log(`Loading chat: ${chatId}`);
+    // Navigate to fresh homepage
+    window.location.href = '/';
     onClose(); // Close sidebar after selection
+  };
+
+  // Handle profile popup
+  const handleProfileClick = () => {
+    setIsProfilePopupOpen(true);
+  };
+
+  // Handle settings
+  const handleSettingsClick = () => {
+    setIsSettingsModalOpen(true);
   };
 
   return (
@@ -96,12 +147,15 @@ const Sidebar: React.FC<SidebarProps> = ({ isOpen, onClose, onNewChat }) => {
       )}
       
       {/* Sidebar container with smooth slide animation */}
-      <div className={`
-        fixed top-0 left-0 h-full w-[150px] bg-sidebar border-r border-sidebar-border
-        transform transition-transform duration-300 ease-in-out z-50
-        shadow-elevated
-        ${isOpen ? 'translate-x-0' : '-translate-x-full'}
-      `}>
+      <div 
+        className={`
+          fixed top-0 left-0 h-full bg-sidebar border-r border-sidebar-border
+          transform transition-transform duration-300 ease-in-out z-50
+          shadow-elevated
+          ${isOpen ? 'translate-x-0' : '-translate-x-full'}
+        `}
+        style={{ width: `${sidebarWidth}px` }}
+      >
         {/* Sidebar header with close button */}
         <div className="flex items-center justify-between p-4 border-b border-sidebar-border">
           <h2 className="text-lg font-semibold text-sidebar-foreground font-heading">
@@ -163,10 +217,11 @@ const Sidebar: React.FC<SidebarProps> = ({ isOpen, onClose, onNewChat }) => {
             </h3>
             <div className="space-y-2">
               {chatHistory.map((chat) => (
-                <button
+                <Link
                   key={chat.id}
-                  onClick={() => handleChatSelect(chat.id)}
-                  className="w-full text-left p-3 rounded-lg hover:bg-sidebar-accent 
+                  to="/"
+                  onClick={onClose}
+                  className="block w-full text-left p-3 rounded-lg hover:bg-sidebar-accent 
                            transition-colors group"
                 >
                   <div className="text-sm font-medium text-sidebar-foreground mb-1 
@@ -176,29 +231,22 @@ const Sidebar: React.FC<SidebarProps> = ({ isOpen, onClose, onNewChat }) => {
                   <div className="text-xs text-sidebar-foreground/60">
                     {chat.timestamp}
                   </div>
-                </button>
+                </Link>
               ))}
             </div>
           </div>
 
           {/* Bottom section with settings and profile */}
           <div className="border-t border-sidebar-border p-4 space-y-2">
-            {/* Settings Button */}
-            <Button
-              variant="ghost"
-              className="w-full justify-start text-sidebar-foreground hover:bg-sidebar-accent"
-              size="sm"
-            >
-              <Settings className="h-4 w-4 mr-3" />
-              Settings
-            </Button>
-
             {/* User Profile Section */}
-            <div className="flex items-center gap-3 p-2 rounded-lg hover:bg-sidebar-accent 
-                          transition-colors cursor-pointer">
-              <Avatar className="h-8 w-8">
+            <div 
+              onClick={handleProfileClick}
+              className="flex items-center gap-3 p-3 rounded-lg hover:bg-sidebar-accent 
+                        transition-colors cursor-pointer"
+            >
+              <Avatar className="h-10 w-10">
                 <AvatarImage src={user.avatar} alt={user.name} />
-                <AvatarFallback className="bg-primary text-primary-foreground text-xs">
+                <AvatarFallback className="bg-primary text-primary-foreground text-sm">
                   {user.name.split(' ').map(n => n[0]).join('')}
                 </AvatarFallback>
               </Avatar>
@@ -211,9 +259,39 @@ const Sidebar: React.FC<SidebarProps> = ({ isOpen, onClose, onNewChat }) => {
                 </div>
               </div>
             </div>
+
+            {/* Settings Button */}
+            <Button
+              onClick={handleSettingsClick}
+              variant="ghost"
+              className="w-full justify-start text-sidebar-foreground hover:bg-sidebar-accent"
+              size="sm"
+            >
+              <Settings className="h-4 w-4 mr-3" />
+              Settings
+            </Button>
           </div>
         </div>
+
+        {/* Resize handle */}
+        <div
+          className="absolute top-0 right-0 w-1 h-full cursor-ew-resize bg-border/50 hover:bg-border transition-colors"
+          onMouseDown={handleMouseDown}
+        />
       </div>
+
+      {/* Profile Popup */}
+      <ProfilePopup
+        isOpen={isProfilePopupOpen}
+        onClose={() => setIsProfilePopupOpen(false)}
+        user={user}
+      />
+
+      {/* Settings Modal */}
+      <SettingsModal
+        isOpen={isSettingsModalOpen}
+        onClose={() => setIsSettingsModalOpen(false)}
+      />
     </>
   );
 };

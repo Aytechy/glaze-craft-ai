@@ -10,7 +10,7 @@
  */
 
 import React, { useState, useRef } from 'react';
-import { Bold, Italic, Heading1, Heading2, Save, Plus, Type, Palette } from 'lucide-react';
+import { Bold, Italic, Heading2, Heading3, Save, Plus, Upload, Palette } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { Separator } from '@/components/ui/separator';
@@ -36,6 +36,9 @@ const Notes: React.FC = () => {
   // State management
   const [currentNote, setCurrentNote] = useState<Note | null>(null);
   const [isSidebarOpen, setIsSidebarOpen] = useState<boolean>(false);
+  const [noteTitle, setNoteTitle] = useState<string>('');
+  const [fontSize, setFontSize] = useState<string>('16');
+  const [textColor, setTextColor] = useState<string>('#000000');
   const [notes, setNotes] = useState<Note[]>([
     {
       id: '1',
@@ -55,8 +58,9 @@ const Notes: React.FC = () => {
     }
   ]);
   
-  // Editor ref for content manipulation
+  // Editor refs for content manipulation
   const editorRef = useRef<HTMLDivElement>(null);
+  const titleRef = useRef<HTMLInputElement>(null);
 
   /**
    * Handle text formatting commands
@@ -85,6 +89,7 @@ const Notes: React.FC = () => {
     
     setNotes(prev => [newNote, ...prev]);
     setCurrentNote(newNote);
+    setNoteTitle('Untitled Note');
   };
 
   /**
@@ -92,6 +97,7 @@ const Notes: React.FC = () => {
    */
   const handleSelectNote = (note: Note) => {
     setCurrentNote(note);
+    setNoteTitle(note.title);
   };
 
   /**
@@ -102,13 +108,17 @@ const Notes: React.FC = () => {
 
     const content = editorRef.current.innerHTML;
     const plainText = editorRef.current.textContent || '';
-    const excerpt = plainText.substring(0, 100) + (plainText.length > 100 ? '...' : '');
+    
+    // Extract excerpt from first <p> tag
+    const firstParagraph = editorRef.current.querySelector('p');
+    const excerptText = firstParagraph ? firstParagraph.textContent || '' : plainText;
+    const excerpt = excerptText.substring(0, 100) + (excerptText.length > 100 ? '...' : '');
 
     const updatedNote = {
       ...currentNote,
       content,
       excerpt,
-      title: plainText.split('\n')[0] || 'Untitled Note',
+      title: noteTitle || 'Untitled Note',
       updatedAt: new Date(),
     };
 
@@ -125,15 +135,26 @@ const Notes: React.FC = () => {
    */
   const handleContentChange = () => {
     // Auto-save functionality could be implemented here
-    if (editorRef.current && currentNote) {
-      const content = editorRef.current.innerHTML;
-      const plainText = editorRef.current.textContent || '';
-      
-      // Update title based on first line
-      const firstLine = plainText.split('\n')[0];
-      if (firstLine && firstLine !== currentNote.title) {
-        setCurrentNote(prev => prev ? { ...prev, title: firstLine } : null);
-      }
+  };
+
+  /**
+   * Handle title changes
+   */
+  const handleTitleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setNoteTitle(e.target.value);
+    if (currentNote) {
+      setCurrentNote(prev => prev ? { ...prev, title: e.target.value } : null);
+    }
+  };
+
+  /**
+   * Handle file upload
+   */
+  const handleFileUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file && file.type.startsWith('image/')) {
+      // Handle image upload logic here
+      console.log('Uploading image:', file.name);
     }
   };
 
@@ -159,7 +180,7 @@ const Notes: React.FC = () => {
         />
         
         <div className={`flex-1 flex transition-all duration-300 ${
-          isSidebarOpen ? 'ml-[150px]' : 'ml-0'
+          isSidebarOpen ? 'ml-[250px]' : 'ml-0'
         }`}>
         {/* Main editor area */}
         <main className="flex-1 flex flex-col min-h-0">
@@ -187,46 +208,106 @@ const Notes: React.FC = () => {
                 <Button
                   variant="ghost"
                   size="sm"
-                  onClick={() => handleFormat('formatBlock', 'h1')}
-                  className="text-foreground hover:bg-accent"
-                >
-                  <Heading1 className="h-4 w-4" />
-                </Button>
-                <Button
-                  variant="ghost"
-                  size="sm"
                   onClick={() => handleFormat('formatBlock', 'h2')}
                   className="text-foreground hover:bg-accent"
                 >
                   <Heading2 className="h-4 w-4" />
                 </Button>
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={() => handleFormat('formatBlock', 'h3')}
+                  className="text-foreground hover:bg-accent"
+                >
+                  <Heading3 className="h-4 w-4" />
+                </Button>
+                <Separator orientation="vertical" className="h-6" />
+                <select 
+                  value={fontSize} 
+                  onChange={(e) => {
+                    setFontSize(e.target.value);
+                    handleFormat('fontSize', e.target.value);
+                  }}
+                  className="px-2 py-1 text-sm border rounded bg-background"
+                >
+                  <option value="12">12px</option>
+                  <option value="14">14px</option>
+                  <option value="16">16px</option>
+                  <option value="18">18px</option>
+                  <option value="20">20px</option>
+                  <option value="24">24px</option>
+                </select>
+                <input
+                  type="color"
+                  value={textColor}
+                  onChange={(e) => {
+                    setTextColor(e.target.value);
+                    handleFormat('foreColor', e.target.value);
+                  }}
+                  className="w-8 h-8 border rounded cursor-pointer"
+                />
               </div>
               
-              <Button
-                onClick={handleSave}
-                className="gradient-primary text-primary-foreground hover:opacity-90"
-                size="sm"
-              >
-                <Save className="h-4 w-4 mr-2" />
-                Save
-              </Button>
+              <div className="flex items-center gap-2">
+                <label htmlFor="file-upload">
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    className="gradient-primary text-primary-foreground hover:opacity-90 border-primary/20"
+                    asChild
+                  >
+                    <span className="cursor-pointer">
+                      <Upload className="h-4 w-4 mr-2" />
+                      Upload any Glaze Image
+                    </span>
+                  </Button>
+                </label>
+                <input
+                  id="file-upload"
+                  type="file"
+                  accept="image/*"
+                  onChange={handleFileUpload}
+                  className="hidden"
+                />
+                <Button
+                  onClick={handleSave}
+                  className="gradient-primary text-primary-foreground hover:opacity-90"
+                  size="sm"
+                >
+                  <Save className="h-4 w-4 mr-2" />
+                  Save
+                </Button>
+              </div>
             </div>
           </div>
 
           {/* Editor content */}
           <div className="flex-1 p-6 overflow-y-auto">
-            <div className="max-w-4xl mx-auto">
+            <div className="max-w-4xl mx-auto space-y-4">
               {currentNote ? (
-                <div
-                  ref={editorRef}
-                  contentEditable
-                  className="min-h-96 p-6 rounded-lg border border-border/40 bg-card text-card-foreground 
-                           focus:outline-none focus:ring-2 focus:ring-ring text-base leading-relaxed"
-                  style={{ minHeight: 'calc(100vh - 200px)' }}
-                  dangerouslySetInnerHTML={{ __html: currentNote.content }}
-                  onInput={handleContentChange}
-                  data-placeholder="Start writing your note..."
-                />
+                <>
+                  {/* Title Input */}
+                  <Input
+                    ref={titleRef}
+                    value={noteTitle}
+                    onChange={handleTitleChange}
+                    placeholder="Note title..."
+                    className="text-3xl font-bold border-none px-0 bg-transparent focus-visible:ring-0 text-foreground"
+                    style={{ fontSize: '32px', color: '#000000' }}
+                  />
+                  
+                  {/* Content Editor */}
+                  <div
+                    ref={editorRef}
+                    contentEditable
+                    className="min-h-96 p-6 rounded-lg border border-border/40 bg-card text-card-foreground 
+                             focus:outline-none focus:ring-2 focus:ring-ring text-base leading-relaxed"
+                    style={{ minHeight: 'calc(100vh - 300px)' }}
+                    dangerouslySetInnerHTML={{ __html: currentNote.content }}
+                    onInput={handleContentChange}
+                    data-placeholder="Start writing your note..."
+                  />
+                </>
               ) : (
                 <div className="flex flex-col items-center justify-center h-96 text-center">
                   <h2 className="text-2xl font-bold text-foreground mb-4">

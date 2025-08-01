@@ -32,6 +32,7 @@ const Index: React.FC = () => {
   // Sidebar state management
   const [isSidebarOpen, setIsSidebarOpen] = useState<boolean>(false);
   const [isNewChatModalOpen, setIsNewChatModalOpen] = useState<boolean>(false);
+  const [sidebarWidth, setSidebarWidth] = useState<number>(250);
   
   // Chat functionality from custom hook
   const {
@@ -167,12 +168,17 @@ const Index: React.FC = () => {
           isOpen={isSidebarOpen}
           onClose={handleCloseSidebar}
           onNewChat={() => setIsNewChatModalOpen(true)}
+          width={sidebarWidth}
         />
         
         {/* Main chat container with sidebar-aware layout */}
-        <main className={`flex-1 flex flex-col transition-all duration-300 ${
-          isSidebarOpen ? 'ml-[150px]' : 'ml-0'
-        }`} style={{ height: 'calc(100vh - 56px)' }}>
+        <main 
+          className="flex-1 flex flex-col transition-all duration-300"
+          style={{ 
+            height: 'calc(100vh - 56px)',
+            marginLeft: isSidebarOpen ? `${sidebarWidth}px` : '0'
+          }}
+        >
           {/* Chat messages area */}
           <ResponseArea
             messages={messages}

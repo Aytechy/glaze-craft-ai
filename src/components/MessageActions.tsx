@@ -1,18 +1,14 @@
-import React from 'react';
-import { Copy, Edit, MoreHorizontal } from 'lucide-react';
+import React, { useState } from 'react';
+import { Copy, Edit, Check, X } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-} from '@/components/ui/dropdown-menu';
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
+import { Input } from '@/components/ui/input';
 import { useToast } from '@/hooks/use-toast';
 
 interface MessageActionsProps {
   content: string;
   messageType: 'user' | 'ai';
-  onEdit?: (content: string) => void;
+  onEdit?: (newContent: string) => void;
   className?: string;
 }
 
@@ -23,6 +19,8 @@ export const MessageActions: React.FC<MessageActionsProps> = ({
   className = '',
 }) => {
   const { toast } = useToast();
+  const [isEditing, setIsEditing] = useState(false);
+  const [editValue, setEditValue] = useState(content);
 
   const handleCopy = async () => {
     try {
@@ -40,37 +38,108 @@ export const MessageActions: React.FC<MessageActionsProps> = ({
     }
   };
 
-  const handleEdit = () => {
-    if (onEdit) {
-      onEdit(content);
+  const handleEditClick = () => {
+    setIsEditing(true);
+    setEditValue(content);
+  };
+
+  const handleEditSave = () => {
+    if (onEdit && editValue.trim()) {
+      onEdit(editValue.trim());
+      setIsEditing(false);
+      toast({
+        title: "Message updated",
+        description: "Your message has been edited and resent.",
+      });
     }
   };
 
-  return (
-    <div className={`opacity-0 group-hover:opacity-100 transition-opacity ${className}`}>
-      <DropdownMenu>
-        <DropdownMenuTrigger asChild>
+  const handleEditCancel = () => {
+    setIsEditing(false);
+    setEditValue(content);
+  };
+
+  const handleKeyDown = (e: React.KeyboardEvent) => {
+    if (e.key === 'Enter' && !e.shiftKey) {
+      e.preventDefault();
+      handleEditSave();
+    } else if (e.key === 'Escape') {
+      handleEditCancel();
+    }
+  };
+
+  if (isEditing) {
+    return (
+      <div className={`mt-2 space-y-2 ${className}`}>
+        <Input
+          value={editValue}
+          onChange={(e) => setEditValue(e.target.value)}
+          onKeyDown={handleKeyDown}
+          className="w-full"
+          placeholder="Edit your message..."
+          autoFocus
+        />
+        <div className="flex gap-2">
           <Button
-            variant="ghost"
+            onClick={handleEditSave}
             size="sm"
-            className="h-6 w-6 p-0 text-muted-foreground hover:text-foreground"
+            className="gradient-primary text-primary-foreground hover:opacity-90"
           >
-            <MoreHorizontal className="h-3 w-3" />
+            <Check className="h-3 w-3 mr-1" />
+            Save
           </Button>
-        </DropdownMenuTrigger>
-        <DropdownMenuContent align="end" className="w-40">
-          <DropdownMenuItem onClick={handleCopy} className="cursor-pointer">
-            <Copy className="h-3 w-3 mr-2" />
-            Copy
-          </DropdownMenuItem>
-          {messageType === 'user' && (
-            <DropdownMenuItem onClick={handleEdit} className="cursor-pointer">
-              <Edit className="h-3 w-3 mr-2" />
-              Edit
-            </DropdownMenuItem>
-          )}
-        </DropdownMenuContent>
-      </DropdownMenu>
+          <Button
+            onClick={handleEditCancel}
+            variant="outline"
+            size="sm"
+          >
+            <X className="h-3 w-3 mr-1" />
+            Cancel
+          </Button>
+        </div>
+      </div>
+    );
+  }
+
+  return (
+    <div className={`flex gap-1 mt-2 ${className}`}>
+      <TooltipProvider>
+        <Tooltip>
+          <TooltipTrigger asChild>
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={handleCopy}
+              className="h-8 w-8 p-0 text-muted-foreground hover:text-foreground"
+            >
+              <Copy className="h-3 w-3" />
+            </Button>
+          </TooltipTrigger>
+          <TooltipContent>
+            <p>Copy message</p>
+          </TooltipContent>
+        </Tooltip>
+      </TooltipProvider>
+
+      {messageType === 'user' && (
+        <TooltipProvider>
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={handleEditClick}
+                className="h-8 w-8 p-0 text-muted-foreground hover:text-foreground"
+              >
+                <Edit className="h-3 w-3" />
+              </Button>
+            </TooltipTrigger>
+            <TooltipContent>
+              <p>Edit message</p>
+            </TooltipContent>
+          </Tooltip>
+        </TooltipProvider>
+      )}
     </div>
   );
 };

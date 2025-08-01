@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Menu, Crown, Settings } from 'lucide-react';
+import { AlignJustify, Crown, Settings } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { UpgradeModal } from '@/components/modals/UpgradeModal';
 import { SettingsModal } from '@/components/modals/SettingsModal';
@@ -45,10 +45,10 @@ const Header: React.FC<HeaderProps> = ({ onToggleSidebar }) => {
             variant="ghost"
             size="sm"
             onClick={onToggleSidebar}
-            className="text-foreground hover:bg-accent"
+            className="text-foreground hover:bg-accent ml-2"
             aria-label="Toggle sidebar"
           >
-            <Menu className="h-5 w-5" />
+            <AlignJustify className="h-5 w-5" />
           </Button>
         </div>
 
@@ -60,7 +60,7 @@ const Header: React.FC<HeaderProps> = ({ onToggleSidebar }) => {
         </div>
 
         {/* Right section with upgrade and settings buttons */}
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-2 mr-2">
           <Button
             variant="ghost"
             size="sm"
