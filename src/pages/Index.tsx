@@ -161,6 +161,14 @@ const Index: React.FC = () => {
       {/* Header with navigation and upgrade button */}
       <Header onToggleSidebar={handleToggleSidebar} />
       
+      {/* Backdrop blur for 767px screens */}
+      {isSidebarOpen && (
+        <div 
+          className="fixed inset-0 bg-black/20 backdrop-blur-sm z-40 md:hidden"
+          onClick={handleCloseSidebar}
+        />
+      )}
+      
       {/* Main content area */}
       <div className="flex-1 flex relative">
         {/* Sliding sidebar */}
@@ -171,21 +179,18 @@ const Index: React.FC = () => {
           width={sidebarWidth}
         />
         
-        {/* Main chat container with sidebar-aware layout */}
+        {/* Main chat container with responsive layout */}
         <div 
-          className="flex-1 flex flex-col transition-all duration-300 relative"
+          className={`flex-1 flex flex-col transition-all duration-300 relative ${
+            window.innerWidth >= 768 && isSidebarOpen ? `ml-[${sidebarWidth}px]` : ''
+          }`}
           style={{ 
             height: 'calc(100vh - 56px)',
-            marginLeft: window.innerWidth >= 768 ? (isSidebarOpen ? `${sidebarWidth}px` : '0') : '0'
+            marginLeft: window.innerWidth >= 768 && isSidebarOpen ? `${sidebarWidth}px` : '0'
           }}
         >
           {/* Chat messages area */}
-          <div 
-            className="flex-1 transition-all duration-300"
-            style={{
-              marginLeft: window.innerWidth >= 768 ? '0' : (isSidebarOpen ? `${sidebarWidth}px` : '0')
-            }}
-          >
+          <div className="flex-1 overflow-y-auto">
             <ResponseArea
               messages={messages}
               isTyping={isLoading}
@@ -195,12 +200,7 @@ const Index: React.FC = () => {
           </div>
           
           {/* Input prompt card - fixed at bottom */}
-          <div 
-            className="transition-all duration-300"
-            style={{
-              marginLeft: window.innerWidth >= 768 ? '0' : (isSidebarOpen ? `${sidebarWidth}px` : '0')
-            }}
-          >
+          <div className="flex-shrink-0">
             <PromptCard
               onSendMessage={handleSendMessage}
               isLoading={isLoading || !canSendMessage}

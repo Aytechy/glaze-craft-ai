@@ -205,12 +205,12 @@ const PromptCard: React.FC<PromptCardProps> = ({
   return (
     <div className={`transition-all duration-500 ${
       hasMessages 
-        ? 'sticky bottom-0 p-3 z-10' 
+        ? 'fixed bottom-0 left-0 right-0 p-3 z-10 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60' 
         : 'flex justify-center items-center min-h-[200px] w-full'
     }`} 
     style={{ 
       width: '100%',
-      height: hasMessages ? 'auto' : 'auto'
+      paddingBottom: hasMessages ? 'env(safe-area-inset-bottom)' : '0'
     }}>
       <div className="w-full max-w-4xl mx-auto px-4 md:px-6" style={{ width: hasMessages ? '90%' : '100%' }}>
         {/* Pro plan unlock notice - only show when no messages */}

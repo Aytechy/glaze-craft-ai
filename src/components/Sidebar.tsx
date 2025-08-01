@@ -228,20 +228,9 @@ const Sidebar: React.FC<SidebarProps> = ({ isOpen, onClose, onNewChat, width = 2
             </div>
           </div>
 
-          {/* Bottom section with settings and profile */}
-          <div className="border-t border-sidebar-border p-3 space-y-1">
-            {/* Settings Button */}
-            <Button
-              onClick={handleSettingsClick}
-              variant="ghost"
-              className="w-full justify-start text-sidebar-foreground hover:bg-sidebar-accent mb-2"
-              size="sm"
-            >
-              <Settings className="h-4 w-4 mr-3" />
-              Settings
-            </Button>
-
-            {/* User Profile Section */}
+          {/* Bottom section with profile and settings */}
+          <div className="border-t border-sidebar-border p-3 space-y-3">
+            {/* User Profile Section - Above Settings */}
             <div 
               onClick={handleProfileClick}
               className="flex items-center gap-2 p-2 rounded-lg hover:bg-sidebar-accent 
@@ -262,6 +251,17 @@ const Sidebar: React.FC<SidebarProps> = ({ isOpen, onClose, onNewChat, width = 2
                 </div>
               </div>
             </div>
+
+            {/* Settings Button - Below Profile */}
+            <Button
+              onClick={handleSettingsClick}
+              variant="ghost"
+              className="w-full justify-start text-sidebar-foreground hover:bg-sidebar-accent"
+              size="sm"
+            >
+              <Settings className="h-4 w-4 mr-3" />
+              Settings
+            </Button>
           </div>
         </div>
 
