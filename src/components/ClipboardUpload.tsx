@@ -47,11 +47,12 @@ export const ClipboardUpload: React.FC<ClipboardUploadProps> = ({ onImagePaste, 
         const sanitizedName = `pasted-image-${Date.now()}.${file.type.split('/')[1]}`;
         const sanitizedFile = new File([file], sanitizedName, { type: file.type });
 
+        // Instead of auto-sending, just paste to preview
         onImagePaste(sanitizedFile);
         
         toast({
           title: "Image pasted",
-          description: "Image has been added to your message",
+          description: "Image ready to send - press Send when ready",
         });
       }
     };

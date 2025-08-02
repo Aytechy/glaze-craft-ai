@@ -169,8 +169,15 @@ const Notes: React.FC = () => {
 
   return (
     <div className="min-h-screen w-full flex flex-col">
-      {/* Header */}
-      <Header onToggleSidebar={handleToggleSidebar} />
+      {/* Header - shifts with sidebar */}
+      <div 
+        className="transition-all duration-300"
+        style={{ 
+          marginLeft: isSidebarOpen && window.innerWidth >= 768 ? '250px' : '0'
+        }}
+      >
+        <Header onToggleSidebar={handleToggleSidebar} />
+      </div>
       
       {/* Backdrop blur for mobile */}
       {isSidebarOpen && (
@@ -188,9 +195,7 @@ const Notes: React.FC = () => {
           onClose={handleCloseSidebar}
         />
         
-        <div className={`flex-1 flex transition-all duration-300 ${
-          window.innerWidth >= 768 && isSidebarOpen ? 'ml-[250px]' : 'ml-0'
-        }`}
+        <div className="flex-1 flex transition-all duration-300"
         style={{
           marginLeft: window.innerWidth >= 768 && isSidebarOpen ? '250px' : '0'
         }}>

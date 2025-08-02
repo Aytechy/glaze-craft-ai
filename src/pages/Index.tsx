@@ -159,10 +159,17 @@ const Index: React.FC = () => {
 
   return (
     <div className="min-h-screen w-full flex flex-col">
-      {/* Header with navigation and upgrade button */}
-      <Header onToggleSidebar={handleToggleSidebar} />
+      {/* Header with navigation and upgrade button - shifts with sidebar */}
+      <div 
+        className="transition-all duration-300"
+        style={{ 
+          marginLeft: isSidebarOpen && window.innerWidth >= 768 ? `${sidebarWidth}px` : '0'
+        }}
+      >
+        <Header onToggleSidebar={handleToggleSidebar} />
+      </div>
       
-      {/* Backdrop blur for 767px screens */}
+      {/* Backdrop blur for mobile screens */}
       {isSidebarOpen && (
         <div 
           className="fixed inset-0 bg-black/20 backdrop-blur-sm z-40 md:hidden"
@@ -182,14 +189,19 @@ const Index: React.FC = () => {
         
         {/* Main content - full height with global scroll */}
         <div 
-          className="flex-1 flex flex-col relative"
+          className="flex-1 flex flex-col relative transition-all duration-300"
           style={{ 
             height: 'calc(100vh - 56px)',
-            marginLeft: window.innerWidth >= 768 && isSidebarOpen ? `${sidebarWidth}px` : '0',
-            transition: 'margin-left 0.3s ease'
+            marginLeft: isSidebarOpen && window.innerWidth >= 768 ? `${sidebarWidth}px` : '0'
           }}
         >
-          <ClipboardUpload onImagePaste={(file) => handleSendMessage("", file)}>
+          <ClipboardUpload onImagePaste={(file) => {
+            // Don't auto-send on paste, pass to PromptCard for preview
+            if (document.querySelector('[data-prompt-card]')) {
+              const event = new CustomEvent('pastedImage', { detail: file });
+              document.dispatchEvent(event);
+            }
+          }}>
             {/* Chat messages area - takes full space with proper scroll */}
             <div className="flex-1 min-h-0 overflow-y-auto">
               <ResponseArea

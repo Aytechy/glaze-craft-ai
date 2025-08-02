@@ -243,7 +243,7 @@ const Sidebar: React.FC<SidebarProps> = ({ isOpen, onClose, onNewChat, width = 2
           </div>
 
           {/* Bottom section with profile and settings */}
-          <div className="border-t border-sidebar-border p-3 space-y-2">
+          <div className="border-t border-sidebar-border p-3 space-y-3">
             {/* User Profile Section */}
             <div 
               onClick={handleProfileClick}

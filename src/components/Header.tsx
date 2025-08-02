@@ -53,7 +53,8 @@ const Header: React.FC<HeaderProps> = ({ onToggleSidebar }) => {
 
   return (
     <header className="sticky top-0 z-30 w-full border-b border-border/40 
-                     bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
+                     bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60
+                     transition-all duration-300">
       <div className="container flex h-14 items-center justify-between" style={{ paddingLeft: '10px', paddingRight: '10px' }}>
         {/* Left section with sidebar toggle */}
         <div className="flex items-center gap-4">

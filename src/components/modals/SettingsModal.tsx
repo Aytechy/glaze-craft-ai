@@ -90,12 +90,16 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({ isOpen, onClose })
         </DialogHeader>
 
         <Tabs defaultValue="profile" className="mt-6">
-          <TabsList className="grid w-full grid-cols-4">
-            <TabsTrigger value="profile">Profile</TabsTrigger>
-            <TabsTrigger value="notifications">Notifications</TabsTrigger>
-            <TabsTrigger value="appearance">Appearance</TabsTrigger>
-            <TabsTrigger value="privacy">Privacy</TabsTrigger>
-          </TabsList>
+          <div className="overflow-x-auto">
+            <TabsList className="grid w-full grid-cols-4 min-w-max">
+              <TabsTrigger value="profile" className="whitespace-nowrap">Profile</TabsTrigger>
+              <TabsTrigger value="notifications" className="whitespace-nowrap">Notifications</TabsTrigger>
+              <TabsTrigger value="appearance" className="whitespace-nowrap">Appearance</TabsTrigger>
+              <TabsTrigger value="privacy" className="whitespace-nowrap">Privacy</TabsTrigger>
+            </TabsList>
+            {/* Fade gradient indicator for overflow */}
+            <div className="absolute right-0 top-0 h-full w-8 bg-gradient-to-l from-background/80 to-transparent pointer-events-none sm:hidden" />
+          </div>
 
           <TabsContent value="profile" className="space-y-6">
             <Card>

@@ -75,7 +75,7 @@ const ResponseArea: React.FC<ResponseAreaProps> = ({ messages, isTyping, onSugge
   };
 
   return (
-    <div className="py-6 space-y-2 max-w-4xl mx-auto w-full px-4 md:px-6" style={{ paddingBottom: '70px' }}>
+    <div className="py-6 space-y-2 max-w-4xl mx-auto w-full px-4 md:px-6" style={{ paddingBottom: '100px' }}>
       {/* Welcome message when no messages exist */}
       {messages.length === 0 && !isTyping && (
         <div className="flex flex-col items-center justify-center h-full text-center max-w-2xl mx-auto">
@@ -122,7 +122,7 @@ const ResponseArea: React.FC<ResponseAreaProps> = ({ messages, isTyping, onSugge
         const showDateSeparator = shouldShowDateSeparator(message, previousMessage);
         
         return (
-          <React.Fragment key={message.id}>
+          <div key={message.id}>
             {/* Date separator for user messages only */}
             {showDateSeparator && (
               <div className="flex justify-center my-4">
@@ -163,12 +163,9 @@ const ResponseArea: React.FC<ResponseAreaProps> = ({ messages, isTyping, onSugge
                     
                     {/* Message text content */}
                     {message.type === 'ai' ? (
-                      <TypingMessage
-                        content={formatMessageContent(message.content)}
-                        speed={60} // Fast typing speed - adjustable
-                        delay={50} // Quick start - adjustable
-                        className="text-sm"
-                      />
+                      <div className="leading-relaxed whitespace-pre-wrap text-sm">
+                        {formatMessageContent(message.content)}
+                      </div>
                     ) : (
                       <div className="leading-relaxed whitespace-pre-wrap text-sm">
                         {formatMessageContent(message.content)}
@@ -197,7 +194,7 @@ const ResponseArea: React.FC<ResponseAreaProps> = ({ messages, isTyping, onSugge
                 </div>
               </div>
             </div>
-          </React.Fragment>
+          </div>
         );
       })}
 

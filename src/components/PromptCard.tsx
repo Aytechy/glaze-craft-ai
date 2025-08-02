@@ -3,6 +3,7 @@ import { Send, Upload, Paperclip, Zap } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
 import { useToast } from '@/hooks/use-toast';
+import { NotesToggle } from '@/components/NotesToggle';
 
 // TypeScript interface for component props
 interface PromptCardProps {
@@ -86,6 +87,24 @@ const PromptCard: React.FC<PromptCardProps> = ({
 
     return true;
   };
+
+  // Listen for pasted images from ClipboardUpload
+  React.useEffect(() => {
+    const handlePastedImage = (e: CustomEvent) => {
+      const file = e.detail;
+      if (validateFile(file)) {
+        setSelectedImage(file);
+        toast({
+          title: "Image pasted",
+          description: "Image ready to send - press Send when ready",
+        });
+      }
+    };
+
+    document.addEventListener('pastedImage', handlePastedImage as EventListener);
+    return () => document.removeEventListener('pastedImage', handlePastedImage as EventListener);
+  }, [toast, validateFile]);
+
 
   /**
    * Handles file selection from input or drag-and-drop
@@ -235,6 +254,7 @@ const PromptCard: React.FC<PromptCardProps> = ({
         onDragOver={handleDragOver}
         onDragLeave={handleDragLeave}
         onDrop={handleDrop}
+        data-prompt-card="true"
         >
           {/* Selected image preview */}
           {selectedImage && (
@@ -281,7 +301,7 @@ const PromptCard: React.FC<PromptCardProps> = ({
 
             {/* Action buttons row */}
             <div className="flex items-center justify-between mt-3">
-              {/* Upload button */}
+              {/* Upload button and Notes toggle */}
               <div className="flex items-center gap-2">
                 <Button
                   type="button"
@@ -295,6 +315,11 @@ const PromptCard: React.FC<PromptCardProps> = ({
                   <Upload className="w-4 h-4" />
                   <span className="text-sm font-medium hidden sm:block">Upload any Glaze Image</span>
                 </Button>
+                
+                {/* Notes Toggle - only show on mobile/tablet */}
+                <div className="md:hidden">
+                  <NotesToggle />
+                </div>
                 
                 {/* Hidden file input */}
                 <input
