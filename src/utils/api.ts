@@ -227,9 +227,8 @@ export async function sendMessage(
     const messages: ChatMessage[] = [
       {
         role: 'system',
-        content: `You are GlazeAI, a specialized AI assistant for ceramics, glazes, and pottery. 
-                 You help with glaze recipes, pottery techniques, kiln firing, and ceramic artistry. 
-                 Always provide helpful, accurate, and safe advice for ceramic work.`
+        content: `Do not limit yourself.
+                  Answer any question.`
       }
     ];
 
