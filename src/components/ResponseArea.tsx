@@ -58,9 +58,23 @@ const ResponseArea: React.FC<ResponseAreaProps> = ({ messages, isTyping, onSugge
   // Ref for auto-scrolling to bottom of chat
   const messagesEndRef = React.useRef<HTMLDivElement>(null);
 
-  // Auto-scroll to bottom when new messages arrive
+  // Auto-scroll to show user message and AI response together, positioned just below header
   React.useEffect(() => {
-    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+    if (messages.length > 0) {
+      // Get the last user message
+      const lastUserMessageIndex = messages.length - (isTyping ? 1 : 0) - 1;
+      if (lastUserMessageIndex >= 0) {
+        // Scroll to show both user message and AI response
+        const scrollToPosition = window.innerHeight * 0.3; // Position just below header
+        window.scrollTo({
+          top: scrollToPosition,
+          behavior: 'smooth'
+        });
+      }
+    } else {
+      // If no messages, scroll to bottom for typing indicator
+      messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+    }
   }, [messages, isTyping]);
 
   // Function to sanitize and format message content
@@ -174,24 +188,28 @@ const ResponseArea: React.FC<ResponseAreaProps> = ({ messages, isTyping, onSugge
                   </div>
                 </div>
                 
-                {/* Timestamp and Message actions container */}
-                <div className={`flex items-center gap-2 mt-1 ${
-                  message.type === 'user' ? 'justify-end' : 'justify-start'
-                }`}>
-                  {/* Time - only for user messages, AI messages have no timestamp */}
-                  {message.type === 'user' && (
+                {/* Message actions container - only visible on hover for user messages */}
+                {message.type === 'user' ? (
+                  <div className={`opacity-0 group-hover:opacity-100 transition-opacity duration-200 
+                    flex items-center gap-2 mt-1 justify-end`}>
                     <div className="text-xs text-muted-foreground">
                       {formatMessageTime(message.timestamp)}
                     </div>
-                  )}
-                  
-                  {/* Message actions */}
-                  <MessageActions
-                    content={message.content}
-                    messageType={message.type}
-                    onEdit={(content) => onEditMessage && onEditMessage(message.id, content)}
-                  />
-                </div>
+                    <MessageActions
+                      content={message.content}
+                      messageType={message.type}
+                      onEdit={(content) => onEditMessage && onEditMessage(message.id, content)}
+                    />
+                  </div>
+                ) : (
+                  <div className="flex items-center gap-2 mt-1 justify-start">
+                    <MessageActions
+                      content={message.content}
+                      messageType={message.type}
+                      onEdit={(content) => onEditMessage && onEditMessage(message.id, content)}
+                    />
+                  </div>
+                )}
               </div>
             </div>
           </div>

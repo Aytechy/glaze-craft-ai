@@ -242,13 +242,13 @@ const Sidebar: React.FC<SidebarProps> = ({ isOpen, onClose, onNewChat, width = 2
             </div>
           </div>
 
-          {/* Bottom section with profile and settings */}
-          <div className="border-t border-sidebar-border p-3 space-y-3">
-            {/* User Profile Section */}
+          {/* Bottom section with profile and settings - stacked vertically */}
+          <div className="border-t border-sidebar-border p-3">
+            {/* User Profile Section - on top */}
             <div 
               onClick={handleProfileClick}
               className="flex items-center gap-2 p-2 rounded-lg hover:bg-sidebar-accent 
-                        transition-colors cursor-pointer"
+                        transition-colors cursor-pointer mb-2"
             >
               <Avatar className="h-8 w-8">
                 <AvatarImage src={user.avatar} alt={user.name} />
@@ -266,11 +266,11 @@ const Sidebar: React.FC<SidebarProps> = ({ isOpen, onClose, onNewChat, width = 2
               </div>
             </div>
 
-            {/* Settings Button */}
+            {/* Settings Button - below profile with separation */}
             <Button
               onClick={handleSettingsClick}
               variant="ghost"
-              className="w-full justify-start text-sidebar-foreground hover:bg-sidebar-accent"
+              className="w-full justify-start text-sidebar-foreground hover:bg-sidebar-accent mt-2"
               size="sm"
             >
               <Settings className="h-4 w-4 mr-3" />

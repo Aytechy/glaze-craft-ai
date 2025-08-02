@@ -10,7 +10,7 @@
  */
 
 import React, { useState, useRef } from 'react';
-import { Bold, Italic, Heading2, Heading3, Save, Plus, Upload, Palette, Menu, X } from 'lucide-react';
+import { Bold, Italic, Heading2, Heading3, Save, Plus, Upload, Palette, Menu, X, FileText } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { Separator } from '@/components/ui/separator';
@@ -273,7 +273,8 @@ const Notes: React.FC = () => {
                   onClick={() => setIsNotesHistoryOpen(true)}
                   className="lg:hidden text-foreground hover:bg-accent"
                 >
-                  <Menu className="h-4 w-4" />
+                  <FileText className="h-4 w-4" />
+                  <span className="ml-2 hidden sm:inline">Notes</span>
                 </Button>
                 
                 <label htmlFor="file-upload">
