@@ -205,7 +205,7 @@ const PromptCard: React.FC<PromptCardProps> = ({
   return (
     <div className={`transition-all duration-500 ${
       hasMessages 
-        ? 'fixed bottom-0 left-0 right-0 p-3 z-10 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60' 
+        ? 'fixed bottom-0 left-0 right-0 p-3 z-10' 
         : 'flex justify-center items-center min-h-[200px] w-full'
     }`} 
     style={{ 
