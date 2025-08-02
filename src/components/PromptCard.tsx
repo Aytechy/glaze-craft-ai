@@ -228,7 +228,7 @@ const PromptCard: React.FC<PromptCardProps> = ({
         )}
 
         {/* Main input card */}
-        <div className={`relative ${hasMessages ? 'bg-transparent' : 'gradient-card'} border border-input-border rounded-xl 
+        <div className={`relative ${hasMessages ? 'bg-card border-border' : 'gradient-card border-input-border'} border rounded-xl 
                         shadow-moderate transition-all duration-200 ${
           isDragging ? 'border-primary shadow-glow' : ''
         }`}
@@ -272,7 +272,7 @@ const PromptCard: React.FC<PromptCardProps> = ({
               value={prompt}
               onChange={handleTextareaChange}
               onKeyDown={handleKeyDown}
-              placeholder="Ask me anything about ceramics, glazes, and pottery..."
+              placeholder={hasMessages ? "" : "Ask me anything about ceramics, glazes, and pottery..."}
               className="min-h-[60px] max-h-[120px] resize-none border-0 bg-transparent 
                        focus-visible:ring-0 focus-visible:ring-offset-0 text-base
                        placeholder:text-muted-foreground overflow-y-auto"

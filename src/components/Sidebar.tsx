@@ -5,6 +5,7 @@ import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Link, useLocation } from 'react-router-dom';
 import { ProfilePopup } from '@/components/ProfilePopup';
 import { SettingsModal } from '@/components/modals/SettingsModal';
+import { ChatHistoryModal } from '@/components/modals/ChatHistoryModal';
 
 // TypeScript interface for sidebar props - ensures type safety
 interface SidebarProps {
@@ -47,6 +48,7 @@ const Sidebar: React.FC<SidebarProps> = ({ isOpen, onClose, onNewChat, width = 2
   const location = useLocation();
   const [isProfilePopupOpen, setIsProfilePopupOpen] = useState(false);
   const [isSettingsModalOpen, setIsSettingsModalOpen] = useState(false);
+  const [isChatHistoryModalOpen, setIsChatHistoryModalOpen] = useState(false);
   const [sidebarWidth, setSidebarWidth] = useState(width);
   const [isResizing, setIsResizing] = useState(false);
   
@@ -100,8 +102,11 @@ const Sidebar: React.FC<SidebarProps> = ({ isOpen, onClose, onNewChat, width = 2
   const navigationItems = [
     { name: 'Home', path: '/', icon: Home },
     { name: 'Notes', path: '/notes', icon: FileText },
-    { name: 'Chat History', path: '/history', icon: History },
   ];
+
+  const handleChatHistoryClick = () => {
+    setIsChatHistoryModalOpen(true);
+  };
 
   // Handle new chat creation with security validation
   const handleNewChat = () => {
@@ -200,6 +205,15 @@ const Sidebar: React.FC<SidebarProps> = ({ isOpen, onClose, onNewChat, width = 2
                 </Link>
               );
             })}
+            
+            {/* Chat History Button */}
+            <button
+              onClick={handleChatHistoryClick}
+              className="flex items-center w-full justify-start px-3 py-2 rounded-lg text-sm font-medium transition-all duration-200 text-sidebar-foreground hover:bg-sidebar-accent hover:text-sidebar-accent-foreground"
+            >
+              <History className="h-4 w-4 mr-3" />
+              Chat History
+            </button>
           </nav>
 
           {/* Chat History Section */}
@@ -229,12 +243,12 @@ const Sidebar: React.FC<SidebarProps> = ({ isOpen, onClose, onNewChat, width = 2
           </div>
 
           {/* Bottom section with profile and settings */}
-          <div className="border-t border-sidebar-border p-3 space-y-3">
-            {/* User Profile Section - Above Settings */}
+          <div className="border-t border-sidebar-border p-3">
+            {/* User Profile Section */}
             <div 
               onClick={handleProfileClick}
               className="flex items-center gap-2 p-2 rounded-lg hover:bg-sidebar-accent 
-                        transition-colors cursor-pointer"
+                        transition-colors cursor-pointer mb-2"
             >
               <Avatar className="h-8 w-8">
                 <AvatarImage src={user.avatar} alt={user.name} />
@@ -252,7 +266,7 @@ const Sidebar: React.FC<SidebarProps> = ({ isOpen, onClose, onNewChat, width = 2
               </div>
             </div>
 
-            {/* Settings Button - Below Profile */}
+            {/* Settings Button */}
             <Button
               onClick={handleSettingsClick}
               variant="ghost"
@@ -283,6 +297,16 @@ const Sidebar: React.FC<SidebarProps> = ({ isOpen, onClose, onNewChat, width = 2
       <SettingsModal
         isOpen={isSettingsModalOpen}
         onClose={() => setIsSettingsModalOpen(false)}
+      />
+
+      {/* Chat History Modal */}
+      <ChatHistoryModal
+        isOpen={isChatHistoryModalOpen}
+        onClose={() => setIsChatHistoryModalOpen(false)}
+        onSelectChat={(chatId) => {
+          console.log('Selected chat:', chatId);
+          // Handle chat selection
+        }}
       />
     </>
   );

@@ -2,6 +2,7 @@ import React from 'react';
 import { User } from 'lucide-react';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import { MessageActions } from '@/components/MessageActions';
+import { TypingMessage } from '@/components/TypingMessage';
 
 // TypeScript interfaces for message structure
 interface Message {
@@ -73,7 +74,7 @@ const ResponseArea: React.FC<ResponseAreaProps> = ({ messages, isTyping, onSugge
   };
 
   return (
-    <div className="flex-1 overflow-y-auto py-6 space-y-4 max-w-4xl mx-auto w-full px-4 md:px-6" style={{ maxHeight: 'calc(100vh - 56px - 200px)', paddingBottom: '20px' }}>
+    <div className="py-6 space-y-4 max-w-4xl mx-auto w-full px-4 md:px-6" style={{ paddingBottom: '20px' }}>
       {/* Welcome message when no messages exist */}
       {messages.length === 0 && !isTyping && (
         <div className="flex flex-col items-center justify-center h-full text-center max-w-2xl mx-auto">
@@ -155,11 +156,18 @@ const ResponseArea: React.FC<ResponseAreaProps> = ({ messages, isTyping, onSugge
                 )}
                 
                 {/* Message text content */}
-                <div className={`leading-relaxed whitespace-pre-wrap ${
-                  message.type === 'ai' ? 'text-sm' : 'text-sm'
-                }`}>
-                  {formatMessageContent(message.content)}
-                </div>
+                {message.type === 'ai' ? (
+                  <TypingMessage
+                    content={formatMessageContent(message.content)}
+                    speed={60} // Fast typing speed - adjustable
+                    delay={50} // Quick start - adjustable
+                    className="text-sm"
+                  />
+                ) : (
+                  <div className="leading-relaxed whitespace-pre-wrap text-sm">
+                    {formatMessageContent(message.content)}
+                  </div>
+                )}
               </div>
               
             </div>
@@ -171,9 +179,11 @@ const ResponseArea: React.FC<ResponseAreaProps> = ({ messages, isTyping, onSugge
               {formatTimestamp(message.timestamp)}
             </div>
 
-            {/* Message actions - positioned beneath message */}
-            <div className={`mt-2 ${
-              message.type === 'user' ? 'flex justify-end' : 'flex justify-start'
+            {/* Message actions - positioned at message edge */}
+            <div className={`absolute ${
+              message.type === 'user' 
+                ? 'bottom-0 left-0 transform -translate-x-2' 
+                : 'bottom-0 right-0 transform translate-x-2'
             }`}>
               <MessageActions
                 content={message.content}

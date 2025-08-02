@@ -171,6 +171,14 @@ const Notes: React.FC = () => {
       {/* Header */}
       <Header onToggleSidebar={handleToggleSidebar} />
       
+      {/* Backdrop blur for mobile */}
+      {isSidebarOpen && (
+        <div 
+          className="fixed inset-0 bg-black/20 backdrop-blur-sm z-40 md:hidden"
+          onClick={handleCloseSidebar}
+        />
+      )}
+      
       {/* Main content area */}
       <div className="flex-1 flex relative">
         {/* Sidebar */}
@@ -180,19 +188,22 @@ const Notes: React.FC = () => {
         />
         
         <div className={`flex-1 flex transition-all duration-300 ${
-          isSidebarOpen ? 'ml-[250px]' : 'ml-0'
-        }`}>
+          window.innerWidth >= 768 && isSidebarOpen ? 'ml-[250px]' : 'ml-0'
+        }`}
+        style={{
+          marginLeft: window.innerWidth >= 768 && isSidebarOpen ? '250px' : '0'
+        }}>
         {/* Main editor area */}
         <main className="flex-1 flex flex-col min-h-0">
           {/* Toolbar */}
           <div className="border-b border-border/40 bg-background/95 backdrop-blur">
-            <div className="container flex h-14 items-center justify-between px-4">
-              <div className="flex items-center gap-2">
+            <div className="container flex h-14 items-center justify-between px-4 md:px-6 lg:px-8">
+              <div className="flex items-center gap-1 md:gap-2 overflow-x-auto">
                 <Button
                   variant="ghost"
                   size="sm"
                   onClick={() => handleFormat('bold')}
-                  className="text-foreground hover:bg-accent"
+                  className="text-foreground hover:bg-accent flex-shrink-0"
                 >
                   <Bold className="h-4 w-4" />
                 </Button>
@@ -228,7 +239,7 @@ const Notes: React.FC = () => {
                     setFontSize(e.target.value);
                     handleFormat('fontSize', e.target.value);
                   }}
-                  className="px-2 py-1 text-sm border rounded bg-background"
+                  className="px-2 py-1 text-sm border rounded bg-background hidden sm:block"
                 >
                   <option value="12">12px</option>
                   <option value="14">14px</option>
@@ -244,7 +255,7 @@ const Notes: React.FC = () => {
                     setTextColor(e.target.value);
                     handleFormat('foreColor', e.target.value);
                   }}
-                  className="w-8 h-8 border rounded cursor-pointer"
+                  className="w-8 h-8 border rounded cursor-pointer hidden sm:block"
                 />
               </div>
               
@@ -257,8 +268,8 @@ const Notes: React.FC = () => {
                     asChild
                   >
                     <span className="cursor-pointer">
-                      <Upload className="h-4 w-4 mr-2" />
-                      Upload any Glaze Image
+                      <Upload className="h-4 w-4 md:mr-2" />
+                      <span className="hidden md:inline">Upload any Glaze Image</span>
                     </span>
                   </Button>
                 </label>
@@ -274,15 +285,15 @@ const Notes: React.FC = () => {
                   className="gradient-primary text-primary-foreground hover:opacity-90"
                   size="sm"
                 >
-                  <Save className="h-4 w-4 mr-2" />
-                  Save
+                  <Save className="h-4 w-4 md:mr-2" />
+                  <span className="hidden md:inline">Save</span>
                 </Button>
               </div>
             </div>
           </div>
 
           {/* Editor content */}
-          <div className="flex-1 p-6 overflow-y-auto">
+          <div className="flex-1 p-4 md:p-6 overflow-y-auto">
             <div className="max-w-4xl mx-auto space-y-4">
               {currentNote ? (
                 <>
@@ -330,7 +341,7 @@ const Notes: React.FC = () => {
         </main>
 
         {/* Notes history sidebar */}
-        <aside className="w-80 border-l border-border/40 bg-background/50 backdrop-blur">
+        <aside className="w-80 lg:w-96 border-l border-border/40 bg-background/50 backdrop-blur hidden lg:block">
           <div className="p-4 border-b border-border/40">
             <div className="flex items-center justify-between">
               <h3 className="font-semibold text-foreground">Notes</h3>

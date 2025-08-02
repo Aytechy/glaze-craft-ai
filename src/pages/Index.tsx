@@ -179,18 +179,17 @@ const Index: React.FC = () => {
           width={sidebarWidth}
         />
         
-        {/* Main chat container with responsive layout */}
+        {/* Main content - full height with global scroll */}
         <div 
-          className={`flex-1 flex flex-col transition-all duration-300 relative ${
-            window.innerWidth >= 768 && isSidebarOpen ? `ml-[${sidebarWidth}px]` : ''
-          }`}
+          className="flex-1 flex flex-col relative overflow-y-auto"
           style={{ 
             height: 'calc(100vh - 56px)',
-            marginLeft: window.innerWidth >= 768 && isSidebarOpen ? `${sidebarWidth}px` : '0'
+            marginLeft: window.innerWidth >= 768 && isSidebarOpen ? `${sidebarWidth}px` : '0',
+            transition: 'margin-left 0.3s ease'
           }}
         >
-          {/* Chat messages area */}
-          <div className="flex-1 overflow-y-auto">
+          {/* Chat messages area - takes full space */}
+          <div className="flex-1 min-h-0">
             <ResponseArea
               messages={messages}
               isTyping={isLoading}
@@ -199,8 +198,14 @@ const Index: React.FC = () => {
             />
           </div>
           
-          {/* Input prompt card - fixed at bottom */}
-          <div className="flex-shrink-0">
+          {/* Input prompt card - shifts with sidebar */}
+          <div 
+            className="flex-shrink-0"
+            style={{
+              marginLeft: window.innerWidth >= 768 && isSidebarOpen ? '0' : '0',
+              transition: 'margin-left 0.3s ease'
+            }}
+          >
             <PromptCard
               onSendMessage={handleSendMessage}
               isLoading={isLoading || !canSendMessage}

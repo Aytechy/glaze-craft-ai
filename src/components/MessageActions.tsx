@@ -70,32 +70,39 @@ export const MessageActions: React.FC<MessageActionsProps> = ({
 
   if (isEditing) {
     return (
-      <div className={`mt-2 space-y-2 ${className}`}>
-        <Input
-          value={editValue}
-          onChange={(e) => setEditValue(e.target.value)}
-          onKeyDown={handleKeyDown}
-          className="w-full"
-          placeholder="Edit your message..."
-          autoFocus
-        />
-        <div className="flex gap-2">
-          <Button
-            onClick={handleEditSave}
-            size="sm"
-            className="gradient-primary text-primary-foreground hover:opacity-90"
-          >
-            <Check className="h-3 w-3 mr-1" />
-            Save
-          </Button>
-          <Button
-            onClick={handleEditCancel}
-            variant="outline"
-            size="sm"
-          >
-            <X className="h-3 w-3 mr-1" />
-            Cancel
-          </Button>
+      <div className={`fixed inset-0 z-50 bg-black/20 backdrop-blur-sm flex items-center justify-center p-4 ${className}`}>
+        <div className="bg-background border border-border rounded-lg shadow-elevated max-w-2xl w-full">
+          <div className="p-4 border-b border-border">
+            <h3 className="text-lg font-semibold">Edit Message</h3>
+          </div>
+          <div className="p-4">
+            <textarea
+              value={editValue}
+              onChange={(e) => setEditValue(e.target.value)}
+              onKeyDown={handleKeyDown}
+              className="w-full h-[400px] p-3 border border-border rounded-lg resize-none focus:outline-none focus:ring-2 focus:ring-primary"
+              placeholder="Edit your message..."
+              autoFocus
+            />
+            <div className="flex gap-2 mt-4">
+              <Button
+                onClick={handleEditSave}
+                size="sm"
+                className="gradient-primary text-primary-foreground hover:opacity-90"
+              >
+                <Check className="h-3 w-3 mr-1" />
+                Send
+              </Button>
+              <Button
+                onClick={handleEditCancel}
+                variant="outline"
+                size="sm"
+              >
+                <X className="h-3 w-3 mr-1" />
+                Cancel
+              </Button>
+            </div>
+          </div>
         </div>
       </div>
     );
