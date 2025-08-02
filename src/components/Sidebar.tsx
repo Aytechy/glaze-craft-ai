@@ -243,12 +243,12 @@ const Sidebar: React.FC<SidebarProps> = ({ isOpen, onClose, onNewChat, width = 2
           </div>
 
           {/* Bottom section with profile and settings */}
-          <div className="border-t border-sidebar-border p-3">
+          <div className="border-t border-sidebar-border p-3 space-y-2">
             {/* User Profile Section */}
             <div 
               onClick={handleProfileClick}
               className="flex items-center gap-2 p-2 rounded-lg hover:bg-sidebar-accent 
-                        transition-colors cursor-pointer mb-2"
+                        transition-colors cursor-pointer"
             >
               <Avatar className="h-8 w-8">
                 <AvatarImage src={user.avatar} alt={user.name} />

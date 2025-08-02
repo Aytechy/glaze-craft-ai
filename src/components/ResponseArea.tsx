@@ -3,6 +3,7 @@ import { User } from 'lucide-react';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import { MessageActions } from '@/components/MessageActions';
 import { TypingMessage } from '@/components/TypingMessage';
+import { getDateSeparatorText, shouldShowDateSeparator, formatMessageTime } from '@/utils/dateUtils';
 
 // TypeScript interfaces for message structure
 interface Message {
@@ -74,7 +75,7 @@ const ResponseArea: React.FC<ResponseAreaProps> = ({ messages, isTyping, onSugge
   };
 
   return (
-    <div className="py-6 space-y-4 max-w-4xl mx-auto w-full px-4 md:px-6" style={{ paddingBottom: '20px' }}>
+    <div className="py-6 space-y-2 max-w-4xl mx-auto w-full px-4 md:px-6" style={{ paddingBottom: '70px' }}>
       {/* Welcome message when no messages exist */}
       {messages.length === 0 && !isTyping && (
         <div className="flex flex-col items-center justify-center h-full text-center max-w-2xl mx-auto">
@@ -115,85 +116,90 @@ const ResponseArea: React.FC<ResponseAreaProps> = ({ messages, isTyping, onSugge
         </div>
       )}
 
-      {/* Chat messages */}
-      {messages.map((message) => (
-        <div key={message.id} className={`group flex gap-4 ${
-          message.type === 'user' ? 'flex-row-reverse' : 'flex-row'
-        }`}>
-          {/* Message avatar - only for user messages */}
-          {message.type === 'user' && (
-            <Avatar className="w-8 h-8 mt-1 flex-shrink-0">
-              <AvatarFallback className="bg-primary text-primary-foreground">
-                <User className="w-4 h-4" />
-              </AvatarFallback>
-            </Avatar>
-          )}
-
-          {/* Message content */}
-          <div className={`flex-1 max-w-3xl ${
-            message.type === 'user' ? 'text-right' : 'text-left'
-          }`}>
-            <div className="relative">
-              <div className={`inline-block px-4 py-3 rounded-2xl shadow-subtle ${
-                message.type === 'user'
-                  ? 'gradient-primary text-primary-foreground'
-                  : 'bg-card text-card-foreground border border-border/50'
-              }`}>
-                {/* Image attachment for user messages */}
-                {message.image && message.type === 'user' && (
-                  <div className="mb-3">
-                    <img
-                      src={message.image}
-                      alt="User uploaded content"
-                      className="max-w-xs rounded-lg shadow-subtle"
-                      onError={(e) => {
-                        // Handle broken image links securely
-                        const target = e.target as HTMLImageElement;
-                        target.style.display = 'none';
-                      }}
-                    />
-                  </div>
-                )}
-                
-                {/* Message text content */}
-                {message.type === 'ai' ? (
-                  <TypingMessage
-                    content={formatMessageContent(message.content)}
-                    speed={60} // Fast typing speed - adjustable
-                    delay={50} // Quick start - adjustable
-                    className="text-sm"
-                  />
-                ) : (
-                  <div className="leading-relaxed whitespace-pre-wrap text-sm">
-                    {formatMessageContent(message.content)}
-                  </div>
-                )}
+      {/* Chat messages with date separators */}
+      {messages.map((message, index) => {
+        const previousMessage = index > 0 ? messages[index - 1] : undefined;
+        const showDateSeparator = shouldShowDateSeparator(message, previousMessage);
+        
+        return (
+          <React.Fragment key={message.id}>
+            {/* Date separator for user messages only */}
+            {showDateSeparator && (
+              <div className="flex justify-center my-4">
+                <div className="bg-muted text-muted-foreground px-3 py-1 rounded-full text-xs font-medium">
+                  {getDateSeparatorText(message.timestamp)}
+                </div>
               </div>
-              
-            </div>
-            
-            {/* Timestamp */}
-            <div className={`text-xs text-muted-foreground mt-1 ${
-              message.type === 'user' ? 'text-right' : 'text-left'
-            }`}>
-              {formatTimestamp(message.timestamp)}
-            </div>
+            )}
 
-            {/* Message actions - positioned at message edge */}
-            <div className={`absolute ${
-              message.type === 'user' 
-                ? 'bottom-0 left-0 transform -translate-x-2' 
-                : 'bottom-0 right-0 transform translate-x-2'
-            }`}>
-              <MessageActions
-                content={message.content}
-                messageType={message.type}
-                onEdit={(content) => onEditMessage && onEditMessage(message.id, content)}
-              />
+            <div className={`group flex gap-4 ${
+              message.type === 'user' ? 'flex-row-reverse' : 'flex-row'
+            } mb-3`}>
+              {/* Message content */}
+              <div className={`flex-1 max-w-3xl ${
+                message.type === 'user' ? 'text-right' : 'text-left'
+              }`}>
+                <div className="relative">
+                  <div className={`inline-block px-4 py-3 rounded-2xl shadow-subtle ${
+                    message.type === 'user'
+                      ? 'gradient-primary text-primary-foreground'
+                      : 'bg-card text-card-foreground border border-border/50'
+                  }`}>
+                    {/* Image attachment for user messages */}
+                    {message.image && message.type === 'user' && (
+                      <div className="mb-3">
+                        <img
+                          src={message.image}
+                          alt="User uploaded content"
+                          className="max-w-xs rounded-lg shadow-subtle"
+                          onError={(e) => {
+                            // Handle broken image links securely
+                            const target = e.target as HTMLImageElement;
+                            target.style.display = 'none';
+                          }}
+                        />
+                      </div>
+                    )}
+                    
+                    {/* Message text content */}
+                    {message.type === 'ai' ? (
+                      <TypingMessage
+                        content={formatMessageContent(message.content)}
+                        speed={60} // Fast typing speed - adjustable
+                        delay={50} // Quick start - adjustable
+                        className="text-sm"
+                      />
+                    ) : (
+                      <div className="leading-relaxed whitespace-pre-wrap text-sm">
+                        {formatMessageContent(message.content)}
+                      </div>
+                    )}
+                  </div>
+                </div>
+                
+                {/* Timestamp and Message actions container */}
+                <div className={`flex items-center gap-2 mt-1 ${
+                  message.type === 'user' ? 'justify-end' : 'justify-start'
+                }`}>
+                  {/* Time - only for user messages, AI messages have no timestamp */}
+                  {message.type === 'user' && (
+                    <div className="text-xs text-muted-foreground">
+                      {formatMessageTime(message.timestamp)}
+                    </div>
+                  )}
+                  
+                  {/* Message actions */}
+                  <MessageActions
+                    content={message.content}
+                    messageType={message.type}
+                    onEdit={(content) => onEditMessage && onEditMessage(message.id, content)}
+                  />
+                </div>
+              </div>
             </div>
-          </div>
-        </div>
-      ))}
+          </React.Fragment>
+        );
+      })}
 
       {/* AI typing indicator */}
       {isTyping && (

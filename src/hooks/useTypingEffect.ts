@@ -43,25 +43,30 @@ export const useTypingEffect = (options: UseTypingEffectOptions = {}): UseTyping
     setIsTyping(true);
     currentIndexRef.current = 0;
 
+    // Ensure the component is mounted and text is available
+    if (!text) {
+      setIsTyping(false);
+      return;
+    }
+
     // Start typing after initial delay
     timeoutRef.current = setTimeout(() => {
       const interval = 1000 / speed; // Convert speed to interval in ms
       
       intervalRef.current = setInterval(() => {
-        setDisplayedText(prev => {
-          const nextIndex = currentIndexRef.current + 1;
-          const nextText = text.substring(0, nextIndex);
-          
-          if (nextIndex >= text.length) {
-            clearTimers();
-            setIsTyping(false);
-            onComplete?.();
-            return text;
-          }
-          
-          currentIndexRef.current = nextIndex;
-          return nextText;
-        });
+        const nextIndex = currentIndexRef.current + 1;
+        const nextText = text.substring(0, nextIndex);
+        
+        if (nextIndex >= text.length) {
+          clearTimers();
+          setIsTyping(false);
+          setDisplayedText(text); // Ensure full text is displayed
+          onComplete?.();
+          return;
+        }
+        
+        currentIndexRef.current = nextIndex;
+        setDisplayedText(nextText);
       }, interval);
     }, delay);
   };

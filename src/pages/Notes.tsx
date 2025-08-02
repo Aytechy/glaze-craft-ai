@@ -10,7 +10,7 @@
  */
 
 import React, { useState, useRef } from 'react';
-import { Bold, Italic, Heading2, Heading3, Save, Plus, Upload, Palette } from 'lucide-react';
+import { Bold, Italic, Heading2, Heading3, Save, Plus, Upload, Palette, Menu, X } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { Separator } from '@/components/ui/separator';
@@ -36,6 +36,7 @@ const Notes: React.FC = () => {
   // State management
   const [currentNote, setCurrentNote] = useState<Note | null>(null);
   const [isSidebarOpen, setIsSidebarOpen] = useState<boolean>(false);
+  const [isNotesHistoryOpen, setIsNotesHistoryOpen] = useState<boolean>(false);
   const [noteTitle, setNoteTitle] = useState<string>('');
   const [fontSize, setFontSize] = useState<string>('16');
   const [textColor, setTextColor] = useState<string>('#000000');
@@ -260,6 +261,16 @@ const Notes: React.FC = () => {
               </div>
               
               <div className="flex items-center gap-2">
+                {/* Notes history toggle button for mobile/tablet */}
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => setIsNotesHistoryOpen(true)}
+                  className="lg:hidden text-foreground hover:bg-accent"
+                >
+                  <Menu className="h-4 w-4" />
+                </Button>
+                
                 <label htmlFor="file-upload">
                   <Button
                     variant="outline"
@@ -340,7 +351,7 @@ const Notes: React.FC = () => {
           </div>
         </main>
 
-        {/* Notes history sidebar */}
+        {/* Notes history sidebar - hidden on mobile/tablet */}
         <aside className="w-80 lg:w-96 border-l border-border/40 bg-background/50 backdrop-blur hidden lg:block">
           <div className="p-4 border-b border-border/40">
             <div className="flex items-center justify-between">
@@ -382,6 +393,66 @@ const Notes: React.FC = () => {
             ))}
           </div>
         </aside>
+
+        {/* Mobile/Tablet Notes history overlay */}
+        {isNotesHistoryOpen && (
+          <div className="lg:hidden fixed inset-0 z-50 bg-black/20 backdrop-blur-sm">
+            <div className="fixed inset-y-0 right-0 w-80 bg-background border-l border-border shadow-elevated">
+              <div className="p-4 border-b border-border/40">
+                <div className="flex items-center justify-between">
+                  <h3 className="font-semibold text-foreground">Notes</h3>
+                  <div className="flex gap-2">
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      onClick={handleNewNote}
+                      className="text-foreground hover:bg-accent"
+                    >
+                      <Plus className="h-4 w-4" />
+                    </Button>
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      onClick={() => setIsNotesHistoryOpen(false)}
+                      className="text-foreground hover:bg-accent"
+                    >
+                      <X className="h-4 w-4" />
+                    </Button>
+                  </div>
+                </div>
+              </div>
+              
+              <div className="p-4 space-y-3 overflow-y-auto" style={{ maxHeight: 'calc(100vh - 120px)' }}>
+                {notes.map((note) => (
+                  <Card
+                    key={note.id}
+                    className={`cursor-pointer transition-all duration-200 hover:shadow-moderate ${
+                      currentNote?.id === note.id 
+                        ? 'bg-accent/50 border-primary/50 shadow-moderate' 
+                        : 'hover:bg-accent/20'
+                    }`}
+                    onClick={() => {
+                      handleSelectNote(note);
+                      setIsNotesHistoryOpen(false);
+                    }}
+                  >
+                    <CardContent className="p-4">
+                      <h4 className="font-medium text-foreground text-sm mb-2 line-clamp-1">
+                        {note.title}
+                      </h4>
+                      <p className="text-xs text-muted-foreground line-clamp-2 mb-2">
+                        {note.excerpt}
+                      </p>
+                      <div className="text-xs text-muted-foreground">
+                        {note.updatedAt.toLocaleDateString()}
+                      </div>
+                    </CardContent>
+                  </Card>
+                ))}
+              </div>
+            </div>
+          </div>
+        )}
         </div>
       </div>
     </div>

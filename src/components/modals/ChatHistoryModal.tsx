@@ -111,46 +111,48 @@ export const ChatHistoryModal: React.FC<ChatHistoryModalProps> = ({
           </DialogTitle>
         </DialogHeader>
 
-        <ScrollArea className="h-[500px] pr-4">
-          {isLoading ? (
-            <div className="flex items-center justify-center h-40">
-              <div className="w-6 h-6 border-2 border-primary border-t-transparent rounded-full animate-spin" />
-            </div>
-          ) : chatHistory.length === 0 ? (
-            <div className="flex flex-col items-center justify-center h-40 text-center">
-              <MessageSquare className="h-8 w-8 text-muted-foreground mb-2" />
-              <p className="text-muted-foreground">No chat history found</p>
-            </div>
-          ) : (
-            <div className="space-y-3">
-              {chatHistory.map((chat) => (
-                <Card
-                  key={chat.id}
-                  className="cursor-pointer transition-all duration-200 hover:shadow-moderate hover:bg-accent/20"
-                  onClick={() => handleSelectChat(chat.id)}
-                >
-                  <CardContent className="p-4">
-                    <div className="flex items-start justify-between mb-2">
-                      <h3 className="font-medium text-foreground line-clamp-1">
-                        {chat.title}
-                      </h3>
-                      <span className="text-xs text-muted-foreground whitespace-nowrap ml-2">
-                        {formatTimestamp(chat.timestamp)}
-                      </span>
-                    </div>
-                    <p className="text-sm text-muted-foreground line-clamp-2 mb-2">
-                      {chat.preview}
-                    </p>
-                    <div className="flex items-center text-xs text-muted-foreground">
-                      <MessageSquare className="h-3 w-3 mr-1" />
-                      {chat.messageCount} message{chat.messageCount === 1 ? '' : 's'}
-                    </div>
-                  </CardContent>
-                </Card>
-              ))}
-            </div>
-          )}
-        </ScrollArea>
+        <div className="h-[500px] overflow-hidden">
+          <ScrollArea className="h-full pr-4">
+            {isLoading ? (
+              <div className="flex items-center justify-center h-40">
+                <div className="w-6 h-6 border-2 border-primary border-t-transparent rounded-full animate-spin" />
+              </div>
+            ) : chatHistory.length === 0 ? (
+              <div className="flex flex-col items-center justify-center h-40 text-center">
+                <MessageSquare className="h-8 w-8 text-muted-foreground mb-2" />
+                <p className="text-muted-foreground">No chat history found</p>
+              </div>
+            ) : (
+              <div className="space-y-3 pb-4">
+                {chatHistory.map((chat) => (
+                  <Card
+                    key={chat.id}
+                    className="cursor-pointer transition-all duration-200 hover:shadow-moderate hover:bg-accent/20"
+                    onClick={() => handleSelectChat(chat.id)}
+                  >
+                    <CardContent className="p-4">
+                      <div className="flex items-start justify-between mb-2">
+                        <h3 className="font-medium text-foreground line-clamp-1">
+                          {chat.title}
+                        </h3>
+                        <span className="text-xs text-muted-foreground whitespace-nowrap ml-2">
+                          {formatTimestamp(chat.timestamp)}
+                        </span>
+                      </div>
+                      <p className="text-sm text-muted-foreground line-clamp-2 mb-2">
+                        {chat.preview}
+                      </p>
+                      <div className="flex items-center text-xs text-muted-foreground">
+                        <MessageSquare className="h-3 w-3 mr-1" />
+                        {chat.messageCount} message{chat.messageCount === 1 ? '' : 's'}
+                      </div>
+                    </CardContent>
+                  </Card>
+                ))}
+              </div>
+            )}
+          </ScrollArea>
+        </div>
       </DialogContent>
     </Dialog>
   );

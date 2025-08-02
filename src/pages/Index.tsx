@@ -22,6 +22,7 @@ import Sidebar from '@/components/Sidebar';
 import ResponseArea from '@/components/ResponseArea';
 import PromptCard from '@/components/PromptCard';
 import { NewChatModal } from '@/components/modals/NewChatModal';
+import { ClipboardUpload } from '@/components/ClipboardUpload';
 import { useChat } from '@/hooks/useChat';
 import { useToast } from '@/hooks/use-toast';
 
@@ -181,37 +182,39 @@ const Index: React.FC = () => {
         
         {/* Main content - full height with global scroll */}
         <div 
-          className="flex-1 flex flex-col relative overflow-y-auto"
+          className="flex-1 flex flex-col relative"
           style={{ 
             height: 'calc(100vh - 56px)',
             marginLeft: window.innerWidth >= 768 && isSidebarOpen ? `${sidebarWidth}px` : '0',
             transition: 'margin-left 0.3s ease'
           }}
         >
-          {/* Chat messages area - takes full space */}
-          <div className="flex-1 min-h-0">
-            <ResponseArea
-              messages={messages}
-              isTyping={isLoading}
-              onSuggestionSelect={handleSuggestionSelect}
-              onEditMessage={handleEditMessage}
-            />
-          </div>
-          
-          {/* Input prompt card - shifts with sidebar */}
-          <div 
-            className="flex-shrink-0"
-            style={{
-              marginLeft: window.innerWidth >= 768 && isSidebarOpen ? '0' : '0',
-              transition: 'margin-left 0.3s ease'
-            }}
-          >
-            <PromptCard
-              onSendMessage={handleSendMessage}
-              isLoading={isLoading || !canSendMessage}
-              hasMessages={messageCount > 0}
-            />
-          </div>
+          <ClipboardUpload onImagePaste={(file) => handleSendMessage("", file)}>
+            {/* Chat messages area - takes full space with proper scroll */}
+            <div className="flex-1 min-h-0 overflow-y-auto">
+              <ResponseArea
+                messages={messages}
+                isTyping={isLoading}
+                onSuggestionSelect={handleSuggestionSelect}
+                onEditMessage={handleEditMessage}
+              />
+            </div>
+            
+            {/* Input prompt card - properly positioned and shifts with sidebar */}
+            <div 
+              className="flex-shrink-0 relative z-10"
+              style={{
+                background: 'linear-gradient(to top, hsl(var(--background)) 80%, transparent)',
+                paddingTop: '20px'
+              }}
+            >
+              <PromptCard
+                onSendMessage={handleSendMessage}
+                isLoading={isLoading || !canSendMessage}
+                hasMessages={messageCount > 0}
+              />
+            </div>
+          </ClipboardUpload>
         </div>
       </div>
 

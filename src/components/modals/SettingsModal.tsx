@@ -44,6 +44,7 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({ isOpen, onClose })
     theme: 'system',
     fontSize: 'medium',
     messageFontSize: 'medium',
+    fontWeight: 'regular',
     animations: true,
   });
 
@@ -310,6 +311,27 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({ isOpen, onClose })
                           onClick={() => setAppearance(prev => ({ ...prev, messageFontSize: size.toLowerCase() }))}
                         >
                           {size}
+                        </Button>
+                      ))}
+                    </div>
+                  </div>
+
+                  <div className="flex items-center justify-between">
+                    <div>
+                      <Label>Font Weight</Label>
+                      <p className="text-sm text-muted-foreground">
+                        Choose font weight for chat messages
+                      </p>
+                    </div>
+                    <div className="flex gap-2">
+                      {['Regular', 'Medium', 'Bold'].map((weight) => (
+                        <Button
+                          key={weight}
+                          variant={appearance.fontWeight === weight.toLowerCase() ? 'default' : 'outline'}
+                          size="sm"
+                          onClick={() => setAppearance(prev => ({ ...prev, fontWeight: weight.toLowerCase() }))}
+                        >
+                          {weight}
                         </Button>
                       ))}
                     </div>

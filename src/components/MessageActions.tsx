@@ -109,7 +109,7 @@ export const MessageActions: React.FC<MessageActionsProps> = ({
   }
 
   return (
-    <div className={`flex gap-1 mt-2 ${className}`}>
+    <div className={`flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity duration-200 ${className}`}>
       <TooltipProvider>
         <Tooltip>
           <TooltipTrigger asChild>
@@ -117,7 +117,7 @@ export const MessageActions: React.FC<MessageActionsProps> = ({
               variant="ghost"
               size="sm"
               onClick={handleCopy}
-              className="h-8 w-8 p-0 text-muted-foreground hover:text-foreground"
+              className="h-7 w-7 p-0 text-muted-foreground hover:text-foreground"
             >
               <Copy className="h-3 w-3" />
             </Button>
@@ -136,7 +136,7 @@ export const MessageActions: React.FC<MessageActionsProps> = ({
                 variant="ghost"
                 size="sm"
                 onClick={handleEditClick}
-                className="h-8 w-8 p-0 text-muted-foreground hover:text-foreground"
+                className="h-7 w-7 p-0 text-muted-foreground hover:text-foreground"
               >
                 <Edit className="h-3 w-3" />
               </Button>
