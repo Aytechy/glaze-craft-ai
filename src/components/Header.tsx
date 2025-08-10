@@ -13,7 +13,7 @@ interface HeaderProps {
 }
 
 /**
- * Header Component - Top navigation bar for GlazeAI
+ * Header Component - Top navigation bar for GlazionStudio
  * 
  * Features:
  * - Responsive design
@@ -82,7 +82,7 @@ interface HeaderProps {
         {/* Center section - App title (hidden on mobile to save space) */}
         <div className="hidden md:flex items-center">
           <h1 className="text-xl font-bold font-heading text-foreground">
-            GlazeAI
+            GlazionStudio
           </h1>
         </div>
 
