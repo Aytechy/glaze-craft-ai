@@ -2,8 +2,8 @@
  * ResponseArea Component - Updated version with AI branding and response animation
  *
  * Enhancements:
- * - GlazeAI favicon with spinning effect during typing
- * - Shows "Glaze AI" label beside favicon
+ * - GlazionStudio favicon with spinning effect during typing
+ * - Shows "GlazionStudio" label beside favicon
  * - Typing animation for AI responses
  * - Timestamp hidden for AI messages; only copy button shown
  * - User messages retain timestamp and hover-based actions
@@ -155,9 +155,9 @@ const ResponseArea: React.FC<ResponseAreaProps> = (props) => {
                   {message.type === 'ai' && (
                     <div className="flex items-center gap-2 mb-1">
                       <div className={`w-7 h-7 rounded-full overflow-hidden ${isTyping ? 'animate-spin' : ''}`}>
-                        <img src="/favicon.ico" alt="Glaze AI" className="w-full h-full object-cover" />
+                        <img src="/favicon.ico" alt="GlazionStudio" className="w-full h-full object-cover" />
                       </div>
-                      <span className="text-sm font-semibold text-primary">Glaze AI</span>
+                      <span className="text-sm font-semibold text-primary">GlazionStudio</span>
                     </div>
                   )}
 
@@ -242,9 +242,9 @@ const ResponseArea: React.FC<ResponseAreaProps> = (props) => {
             <div className="flex-1 max-w-3xl">
               <div className="flex items-center gap-2 mb-1">
                 <div className="w-7 h-7 rounded-full overflow-hidden animate-spin">
-                  <img src="/favicon.ico" alt="Glaze AI" className="w-full h-full object-cover" />
+                  <img src="/favicon.ico" alt="GlazionStudio" className="w-full h-full object-cover" />
                 </div>
-                <span className="text-sm font-semibold text-primary">Glaze AI</span>
+                <span className="text-sm font-semibold text-primary">GlazionStudio</span>
               </div>
 
               <div className="pl-9">

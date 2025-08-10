@@ -1,7 +1,7 @@
 /**
- * Index Page - Main GlazeAI Chat Interface
+ * Index Page - Main GlazionStudio Chat Interface
  * 
- * This is the primary user interface for GlazeAI, featuring:
+ * This is the primary user interface for GlazionStudio, featuring:
  * - Responsive chat layout
  * - Sliding sidebar navigation
  * - Message display area
@@ -30,7 +30,7 @@ import { SidebarRail } from "@/components/SidebarRail";
 
 
 /**
- * Main Index Component - GlazeAI Chat Interface
+ * Main Index Component - GlazionStudio Chat Interface
  */
 const Index: React.FC = () => {
   // Sidebar state management
