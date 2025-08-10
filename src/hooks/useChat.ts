@@ -74,6 +74,8 @@ export function useChat(options: UseChatOptions = {}): UseChatReturn {
   const abortControllerRef = useRef<AbortController | null>(null);
   const lastMessageRef = useRef<{ content: string; image?: File } | null>(null);
 
+  
+
   // Toast for user notifications
   const { toast } = useToast();
 

@@ -49,9 +49,9 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({ isOpen, onClose })
   });
 
   const [profile, setProfile] = useState({
-    name: 'John Doe',
-    email: 'john.doe@example.com',
-    bio: 'Pottery enthusiast and ceramic artist',
+    name: 'RealDiamond',
+    email: 'realDiamonddigital@gmail.com',
+    bio: 'It is Just us and we aint relenting',
   });
 
   const handleSave = () => {

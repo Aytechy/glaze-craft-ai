@@ -1,39 +1,37 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useRef } from 'react';
 import { useTypingEffect } from '@/hooks/useTypingEffect';
 
 interface TypingMessageProps {
-  content: string;
-  onComplete?: () => void;
-  speed?: number; // Characters per second (default: 50 - fast typing)
-  delay?: number; // Initial delay before typing starts
-  className?: string;
+  content: string
+  speed?: number
+  delay?: number
+  onComplete?: () => void
+  className?: string
 }
 
 export const TypingMessage: React.FC<TypingMessageProps> = ({
   content,
+  speed,
+  delay,
   onComplete,
-  speed = 50, // Fast typing speed
-  delay = 100,
-  className = ''
+  className = '',
 }) => {
-  const { displayedText, isTyping, startTyping } = useTypingEffect({
-    speed,
-    delay,
-    onComplete
-  });
+  const { displayedText, isTyping, startTyping } = 
+    useTypingEffect({ speed, delay, onComplete });
+
+  const prevContent = useRef<string>('');
 
   useEffect(() => {
-    if (content) {
+    // only trigger the type effect when content goes from empty → new value
+    if (content && content !== prevContent.current) {
       startTyping(content);
+      prevContent.current = content;
     }
-  }, [content, startTyping]);
+  }, [content]);
 
   return (
     <div className={`leading-relaxed whitespace-pre-wrap ${className}`}>
-      {displayedText}
-      {isTyping && (
-        <span className="inline-block w-1 h-4 bg-current ml-1 animate-pulse" />
-      )}
+      {isTyping ? displayedText : content}
     </div>
   );
 };

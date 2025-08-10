@@ -15,7 +15,7 @@ interface UseTypingEffectReturn {
 }
 
 export const useTypingEffect = (options: UseTypingEffectOptions = {}): UseTypingEffectReturn => {
-  const { speed = 50, delay = 100, onComplete } = options;
+  const { speed = 800, delay = 0, onComplete } = options;
   
   const [displayedText, setDisplayedText] = useState('');
   const [isTyping, setIsTyping] = useState(false);

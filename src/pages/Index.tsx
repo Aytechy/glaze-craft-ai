@@ -25,6 +25,9 @@ import { NewChatModal } from '@/components/modals/NewChatModal';
 import { ClipboardUpload } from '@/components/ClipboardUpload';
 import { useChat } from '@/hooks/useChat';
 import { useToast } from '@/hooks/use-toast';
+import { SidebarRail } from "@/components/SidebarRail";
+
+
 
 /**
  * Main Index Component - GlazeAI Chat Interface
@@ -33,7 +36,7 @@ const Index: React.FC = () => {
   // Sidebar state management
   const [isSidebarOpen, setIsSidebarOpen] = useState<boolean>(false);
   const [isNewChatModalOpen, setIsNewChatModalOpen] = useState<boolean>(false);
-  const [sidebarWidth, setSidebarWidth] = useState<number>(250);
+  const [sidebarWidth, setSidebarWidth] = useState<number>(350);
   
   // Chat functionality from custom hook
   const {
@@ -51,6 +54,16 @@ const Index: React.FC = () => {
     autoSave: true,
   });
 
+  // Tracks the actual height of the PromptCard wrapper
+  const headerRef = React.useRef<HTMLElement | null>(null);
+  const [headerHeight, setHeaderHeight] = useState(40);
+  const [promptHeight, setPromptHeight] = useState(0);
+  const promptWrapRef = React.useRef<HTMLDivElement | null>(null);
+
+  const hasConversation = messageCount > 0;
+  const scrollRef = React.useRef<HTMLDivElement>(null);
+
+  
   // Toast for user notifications
   const { toast } = useToast();
 
@@ -102,6 +115,8 @@ const Index: React.FC = () => {
     }
   };
 
+  const RAIL_W = 64; // keep in sync with w-16 in SidebarRail.tsx
+
   /**
    * Handle new chat
    */
@@ -109,6 +124,13 @@ const Index: React.FC = () => {
     clearMessages();
     setIsNewChatModalOpen(false);
   };
+  const [isDesktop, setIsDesktop] = useState<boolean>(typeof window !== 'undefined' ? window.innerWidth >= 768 : false);
+
+  useEffect(() => {
+    const onResize = () => setIsDesktop(window.innerWidth >= 768);
+    window.addEventListener('resize', onResize);
+    return () => window.removeEventListener('resize', onResize);
+  }, []);
 
   /**
    * Handle keyboard shortcuts
@@ -157,17 +179,57 @@ const Index: React.FC = () => {
     }
   }, [error, toast]);
 
+  // Measure PromptCard height (guarded so it can't crash)
+  useEffect(() => {
+    const el = promptWrapRef.current;
+    if (!el) return;
+
+    // Older browsers: guard ResizeObserver
+    if (typeof window.ResizeObserver === 'undefined') {
+      // Fallback once on mount
+      setPromptHeight(el.getBoundingClientRect().height || 0);
+      return;
+    }
+
+    const ro = new ResizeObserver((entries) => {
+      for (const entry of entries) {
+        const h = Math.round(entry.contentRect.height);
+        if (!Number.isNaN(h)) setPromptHeight(h);
+      }
+    });
+
+    ro.observe(el);
+    return () => ro.disconnect();
+  }, []);
+
+  // Measure header height (updates if it changes)
+  useEffect(() => {
+    const el = headerRef.current;
+    if (!el) return;
+    const ro = new ResizeObserver((entries) => {
+      for (const entry of entries) {
+        const h = Math.round(entry.contentRect.height);
+        if (!Number.isNaN(h)) setHeaderHeight(h);
+      }
+    });
+    ro.observe(el);
+    return () => ro.disconnect();
+  }, []);
+
+  const leftOffset = isDesktop ? (isSidebarOpen ? sidebarWidth : RAIL_W) : 0;
+
   return (
-    <div className="min-h-screen w-full flex flex-col">
-      {/* Header with navigation and upgrade button - shifts with sidebar */}
-      <div 
-        className="transition-all duration-300"
-        style={{ 
-          marginLeft: isSidebarOpen && window.innerWidth >= 768 ? `${sidebarWidth}px` : '0'
-        }}
-      >
-        <Header onToggleSidebar={handleToggleSidebar} />
-      </div>
+    <div className="h-[100dvh] w-full flex flex-col overflow-hidden">
+      <Header
+        ref={headerRef}
+        onToggleSidebar={handleToggleSidebar}
+        isDesktop={isDesktop}
+        leftOffset={isDesktop ? (isSidebarOpen ? sidebarWidth : RAIL_W) : 0}
+      />
+
+      {/* Spacer so content doesn't sit under the fixed header */}
+      <div className="h-14" />
+
       
       {/* Backdrop blur for mobile screens */}
       {isSidebarOpen && (
@@ -176,25 +238,49 @@ const Index: React.FC = () => {
           onClick={handleCloseSidebar}
         />
       )}
+
+      {/* Mobile sidebar */}
+      {isSidebarOpen && !isDesktop && (
+        <div className="fixed top-0 left-0 z-50 h-screen w-64 bg-white shadow-lg md:hidden">
+          <Sidebar
+            isOpen={true}
+            onClose={handleCloseSidebar}
+            onNewChat={() => setIsNewChatModalOpen(true)}
+            width={256} // or match w-64
+          />
+        </div>
+      )}
       
       {/* Main content area */}
       <div className="flex-1 flex relative">
-        {/* Sliding sidebar */}
-        <Sidebar
-          isOpen={isSidebarOpen}
-          onClose={handleCloseSidebar}
-          onNewChat={() => setIsNewChatModalOpen(true)}
-          width={sidebarWidth}
-        />
-        
+        {/* Desktop sidebar shell with smooth width transition */}
+        <div
+          className="hidden md:block fixed top-0 left-0 z-40 h-screen overflow-hidden transition-[width] duration-300 ease-out"
+          style={{ width: isSidebarOpen ? `${sidebarWidth}px` : `${RAIL_W}px` }}
+        >
+          <div className="absolute inset-0">
+            {isSidebarOpen ? (
+              <Sidebar
+                isOpen={true}
+                onClose={handleCloseSidebar}
+                onNewChat={() => setIsNewChatModalOpen(true)}
+                width={sidebarWidth}
+              />
+            ) : (
+              <SidebarRail />
+            )}
+          </div>
+        </div>
+
         {/* Main content - full height with global scroll */}
-        <div 
-          className="flex-1 flex flex-col relative transition-all duration-300"
-          style={{ 
-            height: 'calc(100vh - 56px)',
-            marginLeft: isSidebarOpen && window.innerWidth >= 768 ? `${sidebarWidth}px` : '0'
+        <div
+          className="fixed bottom-0 right-0 flex flex-col transition-all duration-300 ease-out"
+          style={{
+            top: '56px', // h-14
+            left: leftOffset,
           }}
         >
+
           <ClipboardUpload onImagePaste={(file) => {
             // Don't auto-send on paste, pass to PromptCard for preview
             if (document.querySelector('[data-prompt-card]')) {
@@ -202,30 +288,50 @@ const Index: React.FC = () => {
               document.dispatchEvent(event);
             }
           }}>
-            {/* Chat messages area - takes full space with proper scroll */}
-            <div className="flex-1 min-h-0 overflow-y-auto">
-              <ResponseArea
-                messages={messages}
-                isTyping={isLoading}
-                onSuggestionSelect={handleSuggestionSelect}
-                onEditMessage={handleEditMessage}
-              />
+            {/* Chat messages area - flex column so child absolute scroller can fit */}
+            <div className="flex-1 min-h-0 relative">
+              <div
+                ref={scrollRef}
+                className={`absolute left-0 right-0 transition-all duration-300 ease-out touch-pan-y
+                            ${hasConversation ? 'overflow-y-scroll' : 'overflow-y-hidden'}`}
+                style={{
+                  top: 0,
+                  bottom: Math.max(0, (promptHeight || 96) - 40),
+                  ...(hasConversation ? { scrollbarGutter: 'stable both-edges' } : {}),
+                }}
+              >
+                <div className="w-full max-w-3xl md:mx-auto md:px-0 pl-0 pr-0">
+                  <ResponseArea
+                    messages={messages}
+                    isTyping={isLoading}
+                    onSuggestionSelect={handleSuggestionSelect}
+                    onEditMessage={handleEditMessage}
+                    bottomPadPx={0}
+                    scrollParentRef={scrollRef}   // <-- pass parent scroller
+                  />
+                </div>
+              </div>
+
             </div>
-            
+
             {/* Input prompt card - properly positioned and shifts with sidebar */}
-            <div 
-              className="flex-shrink-0 relative z-10"
+            <div
+              ref={promptWrapRef}
+              className="fixed bottom-0 z-30 mx-auto w-full max-w-3xl transition-all duration-300 ease-out"
               style={{
-                background: 'linear-gradient(to top, hsl(var(--background)) 80%, transparent)',
-                paddingTop: '20px'
+                left: leftOffset,
+                right: 0,
+                paddingBottom: 'calc(env(safe-area-inset-bottom) + 1px)',
               }}
             >
               <PromptCard
                 onSendMessage={handleSendMessage}
                 isLoading={isLoading || !canSendMessage}
+                isTyping={isLoading}
                 hasMessages={messageCount > 0}
               />
             </div>
+
           </ClipboardUpload>
         </div>
       </div>

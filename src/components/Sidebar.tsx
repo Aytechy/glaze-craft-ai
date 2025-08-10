@@ -49,9 +49,7 @@ const Sidebar: React.FC<SidebarProps> = ({ isOpen, onClose, onNewChat, width = 2
   const [isProfilePopupOpen, setIsProfilePopupOpen] = useState(false);
   const [isSettingsModalOpen, setIsSettingsModalOpen] = useState(false);
   const [isChatHistoryModalOpen, setIsChatHistoryModalOpen] = useState(false);
-  const [sidebarWidth, setSidebarWidth] = useState(width);
-  const [isResizing, setIsResizing] = useState(false);
-  
+
   // Mock user data - In production, this would come from secure authentication
   const user: UserProfile = {
     name: "John Doe",
@@ -64,39 +62,12 @@ const Sidebar: React.FC<SidebarProps> = ({ isOpen, onClose, onNewChat, width = 2
     { id: '1', title: 'Glaze Recipe Help', timestamp: '2 hours ago' },
     { id: '2', title: 'Pottery Techniques', timestamp: '1 day ago' },
     { id: '3', title: 'Kiln Temperature Guide', timestamp: '3 days ago' },
+    { id: '4', title: 'Kiln Temperature Guide', timestamp: '3 days ago' },
+    { id: '5', title: 'Kiln Temperature Guide', timestamp: '3 days ago' },
+    { id: '6', title: 'Drying Crack', timestamp: '3 days ago' },
+    { id: '7', title: 'Flux Temperature Guide', timestamp: '3 days ago' },
   ];
 
-  // Handle mouse down for resizing
-  const handleMouseDown = (e: React.MouseEvent) => {
-    setIsResizing(true);
-    e.preventDefault();
-  };
-
-  // Handle mouse move for resizing
-  React.useEffect(() => {
-    const handleMouseMove = (e: MouseEvent) => {
-      if (!isResizing) return;
-      
-      const newWidth = e.clientX;
-      if (newWidth >= 200 && newWidth <= 400) {
-        setSidebarWidth(newWidth);
-      }
-    };
-
-    const handleMouseUp = () => {
-      setIsResizing(false);
-    };
-
-    if (isResizing) {
-      document.addEventListener('mousemove', handleMouseMove);
-      document.addEventListener('mouseup', handleMouseUp);
-    }
-
-    return () => {
-      document.removeEventListener('mousemove', handleMouseMove);
-      document.removeEventListener('mouseup', handleMouseUp);
-    };
-  }, [isResizing]);
 
   // Navigation items with active state detection
   const navigationItems = [
@@ -146,12 +117,12 @@ const Sidebar: React.FC<SidebarProps> = ({ isOpen, onClose, onNewChat, width = 2
       {/* Sidebar container with smooth slide animation */}
       <div 
         className={`
-          fixed top-0 left-0 h-full bg-sidebar border-r border-sidebar-border
+          fixed top-0 left-0 flex flex-col h-full bg-sidebar border-r border-sidebar-border
           transform transition-transform duration-300 ease-in-out z-50
           shadow-elevated
           ${isOpen ? 'translate-x-0' : '-translate-x-full'}
         `}
-        style={{ width: `${sidebarWidth}px` }}
+        style={{ width }}
       >
         {/* Sidebar header with close button */}
         <div className="flex items-center justify-between p-4 border-b border-sidebar-border">
@@ -170,7 +141,7 @@ const Sidebar: React.FC<SidebarProps> = ({ isOpen, onClose, onNewChat, width = 2
         </div>
 
         {/* Sidebar content area */}
-        <div className="flex flex-col h-full">
+        <div className="flex-1 py-4 flex flex-col overflow-y-auto">
           {/* New Chat Button */}
           <div className="p-4">
             <Button
@@ -241,49 +212,43 @@ const Sidebar: React.FC<SidebarProps> = ({ isOpen, onClose, onNewChat, width = 2
               ))}
             </div>
           </div>
-
-          {/* Bottom section with profile and settings - stacked vertically */}
-          <div className="border-t border-sidebar-border p-3">
-            {/* User Profile Section - on top */}
-            <div 
-              onClick={handleProfileClick}
-              className="flex items-center gap-2 p-2 rounded-lg hover:bg-sidebar-accent 
-                        transition-colors cursor-pointer mb-2"
-            >
-              <Avatar className="h-8 w-8">
-                <AvatarImage src={user.avatar} alt={user.name} />
-                <AvatarFallback className="bg-primary text-primary-foreground text-xs">
-                  {user.name.split(' ').map(n => n[0]).join('')}
-                </AvatarFallback>
-              </Avatar>
-              <div className="flex-1 min-w-0">
-                <div className="text-sm font-medium text-sidebar-foreground truncate">
-                  {user.name}
-                </div>
-                <div className="text-xs text-sidebar-foreground/60 truncate">
-                  {user.email}
-                </div>
+        </div>
+        
+        {/* Bottom section with profile and settings - stacked vertically */}
+        <div className="border-t border-sidebar-border p-3">
+          {/* User Profile Section - on top */}
+          <div 
+            onClick={handleProfileClick}
+            className="flex items-center gap-2 p-2 rounded-lg hover:bg-sidebar-accent 
+                      transition-colors cursor-pointer mb-2"
+          >
+            <Avatar className="h-8 w-8">
+              <AvatarImage src={user.avatar} alt={user.name} />
+              <AvatarFallback className="bg-primary text-primary-foreground text-xs">
+                {user.name.split(' ').map(n => n[0]).join('')}
+              </AvatarFallback>
+            </Avatar>
+            <div className="flex-1 min-w-0">
+              <div className="text-sm font-medium text-sidebar-foreground truncate">
+                {user.name}
+              </div>
+              <div className="text-xs text-sidebar-foreground/60 truncate">
+                {user.email}
               </div>
             </div>
-
-            {/* Settings Button - below profile with separation */}
-            <Button
-              onClick={handleSettingsClick}
-              variant="ghost"
-              className="w-full justify-start text-sidebar-foreground hover:bg-sidebar-accent mt-2"
-              size="sm"
-            >
-              <Settings className="h-4 w-4 mr-3" />
-              Settings
-            </Button>
           </div>
-        </div>
 
-        {/* Resize handle */}
-        <div
-          className="absolute top-0 right-0 w-1 h-full cursor-ew-resize bg-border/50 hover:bg-border transition-colors"
-          onMouseDown={handleMouseDown}
-        />
+          {/* Settings Button - below profile with separation */}
+          <Button
+            onClick={handleSettingsClick}
+            variant="ghost"
+            className="w-full justify-start text-sidebar-foreground hover:bg-sidebar-accent mt-2"
+            size="sm"
+          >
+            <Settings className="h-4 w-4 mr-3" />
+            Settings
+          </Button>
+        </div>
       </div>
 
       {/* Profile Popup */}

@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, forwardRef } from 'react';
 import { AlignJustify, Crown, Settings, User } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { UpgradeModal } from '@/components/modals/UpgradeModal';
@@ -8,6 +8,8 @@ import { ProfilePopup } from '@/components/ProfilePopup';
 // TypeScript interface for header component props
 interface HeaderProps {
   onToggleSidebar: () => void; // Callback to toggle sidebar visibility
+  leftOffset?: number;  
+  isDesktop?: boolean;
 }
 
 /**
@@ -23,7 +25,7 @@ interface HeaderProps {
  * - Upgrade button would lead to secure payment processing
  * - No sensitive data exposed in header
  */
-const Header: React.FC<HeaderProps> = ({ onToggleSidebar }) => {
+  const Header = forwardRef<HTMLElement, HeaderProps>(({ onToggleSidebar, isDesktop = false, leftOffset = 0 }, ref) => {
   const [isUpgradeModalOpen, setIsUpgradeModalOpen] = useState(false);
   const [isSettingsModalOpen, setIsSettingsModalOpen] = useState(false);
   const [isProfilePopupOpen, setIsProfilePopupOpen] = useState(false);
@@ -52,17 +54,25 @@ const Header: React.FC<HeaderProps> = ({ onToggleSidebar }) => {
   };
 
   return (
-    <header className="sticky top-0 z-30 w-full border-b border-border/40 
-                     bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60
-                     transition-all duration-300">
-      <div className="container flex h-14 items-center justify-between" style={{ paddingLeft: '10px', paddingRight: '10px' }}>
+    <header
+      ref={ref}
+      className="fixed top-0 z-30 h-14 border-b border-border/40
+                bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60
+                transition-all duration-300"
+      style={{
+        left: isDesktop ? (leftOffset ?? 0) : 0,
+        right: 0
+      }}
+    >
+
+      <div className="w-full flex h-14 items-center justify-between pl-0 pr-5">
         {/* Left section with sidebar toggle */}
         <div className="flex items-center gap-4">
           <Button
             variant="ghost"
             size="sm"
             onClick={onToggleSidebar}
-            className="text-foreground hover:bg-accent ml-2"
+            className="text-foreground hover:bg-accent"
             aria-label="Toggle sidebar"
           >
             <AlignJustify className="h-5 w-5" />
@@ -128,6 +138,8 @@ const Header: React.FC<HeaderProps> = ({ onToggleSidebar }) => {
       />
     </header>
   );
-};
+});
+
+Header.displayName = 'Header';
 
 export default Header;
