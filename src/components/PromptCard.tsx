@@ -169,23 +169,23 @@ const PromptCard: React.FC<PromptCardProps> = ({
       <div className="w-full max-w-4xl mx-auto">
         <div className="relative bg-card border rounded-xl shadow-moderate">
           <div className="p-4">
-            <Textarea
-              ref={textareaRef}
-              value={prompt}
-              onChange={handleTextareaChange}
-              onKeyDown={handleKeyDown}
-              placeholder="Ask me anything about ceramics, glazes, and pottery..."
-              className="min-h-[60px] max-h-[120px] resize-none border-0 bg-transparent 
-                         focus-visible:ring-0 focus-visible:ring-offset-0 text-base
-                         placeholder:text-muted-foreground overflow-y-auto"
-              disabled={isLoading}
-            />
+            <div className="flex items-end gap-3">
+              <Textarea
+                ref={textareaRef}
+                value={prompt}
+                onChange={handleTextareaChange}
+                onKeyDown={handleKeyDown}
+                placeholder="Ask me anything about ceramics, glazes, and pottery..."
+                className="flex-1 min-h-[48px] max-h-[120px] resize-none border-0 bg-transparent 
+                           focus-visible:ring-0 focus-visible:ring-offset-0 text-base
+                           placeholder:text-muted-foreground overflow-y-auto"
+                disabled={isLoading}
+              />
 
-            <div className="flex items-center justify-end mt-3">
               <Button
                 onClick={handleSubmit}
                 disabled={isTyping || isLoading || !prompt.trim()}
-                className="gradient-primary text-primary-foreground hover:opacity-90 disabled:opacity-50 transition-all duration-200"
+                className="gradient-primary text-primary-foreground hover:opacity-90 disabled:opacity-50 transition-all duration-200 flex-shrink-0"
                 size="sm"
               >
                 {isLoading ? (

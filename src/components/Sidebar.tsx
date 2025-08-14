@@ -118,7 +118,7 @@ const Sidebar: React.FC<SidebarProps> = ({ isOpen, onClose, onNewChat, width = 2
       <div 
         className={`
           fixed top-0 left-0 flex flex-col h-full bg-sidebar border-r border-sidebar-border
-          transform transition-transform duration-300 ease-in-out z-50
+          transform transition-transform duration-300 ease-in-out z-[200]
           shadow-elevated
           ${isOpen ? 'translate-x-0' : '-translate-x-full'}
         `}
