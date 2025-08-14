@@ -170,9 +170,9 @@ const PromptCard: React.FC<PromptCardProps> = ({
   return (
     <div className="w-full px-4">
       <div className="w-full max-w-4xl mx-auto">
-        <div className="flex items-center gap-3 bg-card border rounded-full px-4 py-2 shadow-sm transition-all duration-200 ease-out">
+        <div className="relative bg-card border rounded-2xl px-4 py-3 shadow-sm transition-all duration-200 ease-out">
           {/* Left action buttons */}
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-2 mb-3">
             <Button
               onClick={handleUploadClick}
               variant="ghost"
@@ -186,44 +186,51 @@ const PromptCard: React.FC<PromptCardProps> = ({
             <Button
               variant="ghost"
               size="sm"
-              className="h-8 w-8 rounded-full p-0 hover:bg-muted/80 flex-shrink-0"
+              className="h-auto px-3 py-1 rounded-full text-sm hover:bg-muted/80 flex items-center gap-2"
             >
-              <Paperclip className="w-4 h-4" />
-              <span className="sr-only">Attach file</span>
-            </Button>
-          </div>
-
-          {/* Main input area */}
-          <Textarea
-            ref={textareaRef}
-            value={prompt}
-            onChange={handleTextareaChange}
-            onKeyDown={handleKeyDown}
-            placeholder="Ask Lovable..."
-            className="flex-1 min-h-[40px] max-h-[120px] resize-none border-0 bg-transparent 
-                       focus-visible:ring-0 focus-visible:ring-offset-0 text-base
-                       placeholder:text-muted-foreground overflow-y-auto transition-all duration-200
-                       leading-relaxed py-1"
-            disabled={isLoading}
-            rows={1}
-            style={{ height: '40px' }}
-          />
-
-          {/* Right action buttons */}
-          <div className="flex items-center gap-2">
-            <Button
-              variant="ghost"
-              size="sm"
-              className="h-8 w-8 rounded-full p-0 hover:bg-muted/80 flex-shrink-0"
-            >
-              <Zap className="w-4 h-4" />
-              <span className="sr-only">Quick actions</span>
+              <div className="w-4 h-4 rounded-full bg-muted-foreground/20 flex items-center justify-center">
+                <div className="w-2 h-2 rounded-full bg-muted-foreground/60" />
+              </div>
+              Public
             </Button>
             
             <Button
+              variant="ghost"
+              size="sm"
+              className="h-auto px-3 py-1 rounded-full text-sm hover:bg-muted/80 flex items-center gap-2"
+            >
+              <div className="w-4 h-4 rounded bg-green-500 flex items-center justify-center">
+                <Zap className="w-3 h-3 text-white" />
+              </div>
+              Supabase
+              <svg className="w-3 h-3 ml-1" fill="currentColor" viewBox="0 0 20 20">
+                <path fillRule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clipRule="evenodd" />
+              </svg>
+            </Button>
+          </div>
+
+          {/* Main input area with send button positioned at bottom right */}
+          <div className="relative">
+            <Textarea
+              ref={textareaRef}
+              value={prompt}
+              onChange={handleTextareaChange}
+              onKeyDown={handleKeyDown}
+              placeholder="Ask Lovable to create a dashboard to..."
+              className="w-full min-h-[40px] max-h-[120px] resize-none border-0 bg-transparent 
+                         focus-visible:ring-0 focus-visible:ring-offset-0 text-base
+                         placeholder:text-muted-foreground overflow-y-auto transition-all duration-200
+                         leading-relaxed py-1 pr-12"
+              disabled={isLoading}
+              rows={1}
+              style={{ height: '40px' }}
+            />
+            
+            {/* Send button positioned at bottom right */}
+            <Button
               onClick={handleSubmit}
               disabled={isTyping || isLoading || !prompt.trim()}
-              className="h-8 w-8 rounded-full p-0 bg-primary hover:bg-primary/90 disabled:opacity-50 flex-shrink-0 transition-all duration-200"
+              className="absolute bottom-1 right-1 h-8 w-8 rounded-full p-0 bg-primary hover:bg-primary/90 disabled:opacity-50 transition-all duration-200"
               size="sm"
             >
               {isLoading ? (
