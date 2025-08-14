@@ -170,13 +170,36 @@ const PromptCard: React.FC<PromptCardProps> = ({
   return (
     <div className="w-full px-4">
       <div className="w-full max-w-4xl mx-auto">
-        <div className="flex items-end bg-card border rounded-2xl px-4 py-3 shadow-sm transition-all duration-200 ease-out">
+        <div className="flex items-center gap-3 bg-card border rounded-full px-4 py-2 shadow-sm transition-all duration-200 ease-out">
+          {/* Left action buttons */}
+          <div className="flex items-center gap-2">
+            <Button
+              onClick={handleUploadClick}
+              variant="ghost"
+              size="sm"
+              className="h-8 w-8 rounded-full p-0 hover:bg-muted/80 flex-shrink-0"
+            >
+              <Upload className="w-4 h-4" />
+              <span className="sr-only">Upload image</span>
+            </Button>
+            
+            <Button
+              variant="ghost"
+              size="sm"
+              className="h-8 w-8 rounded-full p-0 hover:bg-muted/80 flex-shrink-0"
+            >
+              <Paperclip className="w-4 h-4" />
+              <span className="sr-only">Attach file</span>
+            </Button>
+          </div>
+
+          {/* Main input area */}
           <Textarea
             ref={textareaRef}
             value={prompt}
             onChange={handleTextareaChange}
             onKeyDown={handleKeyDown}
-            placeholder="Ask anything"
+            placeholder="Ask Lovable..."
             className="flex-1 min-h-[40px] max-h-[120px] resize-none border-0 bg-transparent 
                        focus-visible:ring-0 focus-visible:ring-offset-0 text-base
                        placeholder:text-muted-foreground overflow-y-auto transition-all duration-200
@@ -186,19 +209,40 @@ const PromptCard: React.FC<PromptCardProps> = ({
             style={{ height: '40px' }}
           />
 
-          <Button
-            onClick={handleSubmit}
-            disabled={isTyping || isLoading || !prompt.trim()}
-            className="ml-3 h-8 w-8 rounded-full p-0 bg-primary hover:bg-primary/90 disabled:opacity-50 flex-shrink-0 transition-all duration-200"
-            size="sm"
-          >
-            {isLoading ? (
-              <div className="w-4 h-4 border-2 border-current border-t-transparent rounded-full animate-spin" />
-            ) : (
-              <Send className="w-4 h-4" />
-            )}
-            <span className="sr-only">Send message</span>
-          </Button>
+          {/* Right action buttons */}
+          <div className="flex items-center gap-2">
+            <Button
+              variant="ghost"
+              size="sm"
+              className="h-8 w-8 rounded-full p-0 hover:bg-muted/80 flex-shrink-0"
+            >
+              <Zap className="w-4 h-4" />
+              <span className="sr-only">Quick actions</span>
+            </Button>
+            
+            <Button
+              onClick={handleSubmit}
+              disabled={isTyping || isLoading || !prompt.trim()}
+              className="h-8 w-8 rounded-full p-0 bg-primary hover:bg-primary/90 disabled:opacity-50 flex-shrink-0 transition-all duration-200"
+              size="sm"
+            >
+              {isLoading ? (
+                <div className="w-4 h-4 border-2 border-current border-t-transparent rounded-full animate-spin" />
+              ) : (
+                <Send className="w-4 h-4" />
+              )}
+              <span className="sr-only">Send message</span>
+            </Button>
+          </div>
+
+          {/* Hidden file input */}
+          <input
+            ref={fileInputRef}
+            type="file"
+            onChange={handleFileInputChange}
+            accept="image/*"
+            className="hidden"
+          />
         </div>
       </div>
     </div>
