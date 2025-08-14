@@ -87,9 +87,12 @@ const PromptCard: React.FC<PromptCardProps> = ({
 
   const handleTextareaChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
     setPrompt(e.target.value);
+    
+    // Auto-resize textarea
     const textarea = e.target;
     textarea.style.height = 'auto';
-    textarea.style.height = `${Math.min(textarea.scrollHeight, 200)}px`;
+    const newHeight = Math.min(Math.max(textarea.scrollHeight, 40), 120);
+    textarea.style.height = `${newHeight}px`;
   };
 
   const handleSubmit = () => {
@@ -167,24 +170,26 @@ const PromptCard: React.FC<PromptCardProps> = ({
   return (
     <div className="w-full px-4">
       <div className="w-full max-w-4xl mx-auto">
-        <div className="flex items-center bg-card border rounded-full px-4 py-2 shadow-sm">
+        <div className="flex items-end bg-card border rounded-2xl px-4 py-3 shadow-sm transition-all duration-200 ease-out">
           <Textarea
             ref={textareaRef}
             value={prompt}
             onChange={handleTextareaChange}
             onKeyDown={handleKeyDown}
             placeholder="Ask anything"
-            className="flex-1 min-h-[40px] max-h-[40px] resize-none border-0 bg-transparent 
+            className="flex-1 min-h-[40px] max-h-[120px] resize-none border-0 bg-transparent 
                        focus-visible:ring-0 focus-visible:ring-offset-0 text-base
-                       placeholder:text-muted-foreground overflow-hidden leading-[40px] py-0"
+                       placeholder:text-muted-foreground overflow-y-auto transition-all duration-200
+                       leading-relaxed py-1"
             disabled={isLoading}
             rows={1}
+            style={{ height: '40px' }}
           />
 
           <Button
             onClick={handleSubmit}
             disabled={isTyping || isLoading || !prompt.trim()}
-            className="ml-2 h-8 w-8 rounded-full p-0 bg-primary hover:bg-primary/90 disabled:opacity-50 flex-shrink-0"
+            className="ml-3 h-8 w-8 rounded-full p-0 bg-primary hover:bg-primary/90 disabled:opacity-50 flex-shrink-0 transition-all duration-200"
             size="sm"
           >
             {isLoading ? (
