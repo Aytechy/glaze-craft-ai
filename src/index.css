@@ -111,6 +111,7 @@
     background: var(--background-gradient);
     font-family: var(--font-body);
     font-feature-settings: "rlig" 1, "calt" 1;
+    overflow: hidden;
   }
 
   /* Custom scrollbar for better UX */

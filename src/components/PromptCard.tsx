@@ -178,7 +178,7 @@ const PromptCard: React.FC<PromptCardProps> = ({
               value={prompt}
               onChange={handleTextareaChange}
               onKeyDown={handleKeyDown}
-              placeholder="Ask Lovable to create a dashboard to..."
+              placeholder="Ask Glazion anything"
               className="w-full min-h-[40px] max-h-[150px] resize-none border-0 bg-transparent 
                          focus-visible:ring-0 focus-visible:ring-offset-0 text-base
                          placeholder:text-muted-foreground overflow-y-auto transition-all duration-200

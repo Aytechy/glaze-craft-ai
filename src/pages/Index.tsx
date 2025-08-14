@@ -291,6 +291,7 @@ const Index: React.FC = () => {
           style={{
             top: '56px', // h-14
             left: leftOffset,
+            bottom: 0,
           }}
         >
 
@@ -309,7 +310,7 @@ const Index: React.FC = () => {
                             ${hasConversation ? 'overflow-y-scroll' : 'overflow-y-hidden'}`}
                 style={{
                   top: 0,
-                  bottom: Math.max(0, (promptHeight || 96) - 40),
+                  bottom: Math.max(80, promptHeight + 20),
                   ...(hasConversation ? { scrollbarGutter: 'stable both-edges' } : {}),
                 }}
               >
