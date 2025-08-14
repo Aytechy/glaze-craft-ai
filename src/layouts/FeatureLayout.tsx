@@ -43,17 +43,15 @@ export default function FeatureLayout() {
     return () => window.removeEventListener('storage', handleStorageChange);
   }, []);
 
-  const sidebarWidth = 250;
   const railWidth = 64;
-  const leftOffset = isDesktop ? (isSidebarOpen ? sidebarWidth : railWidth) : 0;
 
   return (
     <div className="relative">
       <Outlet />
       <nav 
-        className="fixed bottom-0 z-50 border-t bg-card/90 backdrop-blur supports-[backdrop-filter]:bg-card/60 transition-all duration-300"
+        className="fixed bottom-0 z-50 border-t bg-card/90 backdrop-blur supports-[backdrop-filter]:bg-card/60"
         style={{
-          left: leftOffset,
+          left: isDesktop ? railWidth : 0,
           right: 0
         }}
       >

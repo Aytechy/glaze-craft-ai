@@ -165,132 +165,41 @@ const PromptCard: React.FC<PromptCardProps> = ({
 
   
   return (
-    <>
-      {/* Global overlay when dragging files */}
-      {isDragging && (
-        <div className="fixed inset-0 z-50 bg-primary/10 border-2 border-dashed border-primary rounded-xl flex items-center justify-center pointer-events-none">
-          <div className="text-center">
-            <Upload className="w-8 h-8 text-primary mx-auto mb-2" />
-            <div className="text-primary font-medium">Drop your image here</div>
-          </div>
-        </div>
-      )}
+    <div className="w-full p-3">
+      <div className="w-full max-w-4xl mx-auto">
+        <div className="relative bg-card border rounded-xl shadow-moderate">
+          <div className="p-4">
+            <Textarea
+              ref={textareaRef}
+              value={prompt}
+              onChange={handleTextareaChange}
+              onKeyDown={handleKeyDown}
+              placeholder="Ask me anything about ceramics, glazes, and pottery..."
+              className="min-h-[60px] max-h-[120px] resize-none border-0 bg-transparent 
+                         focus-visible:ring-0 focus-visible:ring-offset-0 text-base
+                         placeholder:text-muted-foreground overflow-y-auto"
+              disabled={isLoading}
+            />
 
-      {/* Prompt area wrapper */}
-      <div className={`w-full transition-all duration-500 ${hasMessages ? 'bottom-0 left-0 right-0 p-3 z-10' : 'flex justify-center items-center min-h-[200px]'}`}>
-        <div className="w-full max-w-4xl mx-auto px-0 md:px-0">
-          
-          {/* Upsell link — centered, with top padding only before conversation starts */}
-          <div className={`${hasMessages ? "pt-0" : "pt-1"} text-center`}>
-            <a
-              href="#upgrade"
-              className="inline-flex items-center justify-center gap-2 text-sm text-muted-foreground hover:text-foreground transition-colors"
-            >
-              <Zap className="w-4 h-4" />
-              Unlock more features with the pro plan
-            </a>
-          </div>
-
-          {/* Input card */}
-          <div
-            className={`relative ${hasMessages ? 'bg-card border-border' : 'gradient-card border-input-border'} 
-                       border rounded-xl shadow-moderate transition-all duration-200`}
-          >
-            {/* Selected image preview */}
-            {selectedImage && (
-              <div className="p-4 border-b border-border/50">
-                <div className="flex items-center gap-3">
-                  <img
-                    src={URL.createObjectURL(selectedImage)}
-                    alt="Selected"
-                    className="w-12 h-12 rounded-lg object-cover shadow-subtle"
-                  />
-                  <div className="flex-1">
-                    <div className="text-sm font-medium text-foreground">{selectedImage.name}</div>
-                    <div className="text-xs text-muted-foreground">{(selectedImage.size / 1024 / 1024).toFixed(2)} MB</div>
-                  </div>
-                  <Button
-                    variant="ghost"
-                    size="sm"
-                    onClick={handleRemoveImage}
-                    className="text-muted-foreground hover:text-destructive"
-                  >
-                    Remove
-                  </Button>
-                </div>
-              </div>
-            )}
-
-            {/* Text input */}
-            <div className="p-4">
-              <Textarea
-                ref={textareaRef}
-                value={prompt}
-                onChange={handleTextareaChange}
-                onKeyDown={handleKeyDown}
-                placeholder="Ask me anything about ceramics, glazes, and pottery..."
-                className="min-h-[60px] max-h-[120px] resize-none border-0 bg-transparent 
-                           focus-visible:ring-0 focus-visible:ring-offset-0 text-base
-                           placeholder:text-muted-foreground overflow-y-auto"
-                disabled={isLoading}
-              />
-
-              {/* Bottom row: Upload + Notes + Send */}
-              <div className="flex items-center justify-between mt-3">
-                <div className="flex items-center gap-2">
-                  <Button
-                    type="button"
-                    variant="outline"
-                    size="sm"
-                    onClick={handleUploadClick}
-                    disabled={isLoading}
-                    className="flex items-center gap-2 border-primary/20 text-primary 
-                             hover:bg-primary/5 hover:border-primary/30 transition-all duration-200"
-                  >
-                    <Upload className="w-4 h-4" />
-                    <span className="text-sm font-medium hidden sm:block">Upload any Glaze Image</span>
-                  </Button>
-
-                  <div className="md:hidden">
-                    <NotesToggle />
-                  </div>
-
-                  <input
-                    ref={fileInputRef}
-                    type="file"
-                    accept={ALLOWED_IMAGE_TYPES.join(',')}
-                    onChange={handleFileInputChange}
-                    className="hidden"
-                    aria-label="Upload image file"
-                  />
-                </div>
-
-                {/* Send Button - disabled only during typing */}
-                <Button
-                  onClick={handleSubmit}
-                  disabled={isTyping || isLoading || (!prompt.trim() && !selectedImage)}
-                  className="gradient-primary text-primary-foreground hover:opacity-90 disabled:opacity-50 transition-all duration-200"
-                  size="sm"
-                >
-                  {isLoading ? (
-                    <div className="w-4 h-4 border-2 border-current border-t-transparent rounded-full animate-spin" />
-                  ) : (
-                    <Send className="w-4 h-4" />
-                  )}
-                  <span className="sr-only">Send message</span>
-                </Button>
-              </div>
+            <div className="flex items-center justify-end mt-3">
+              <Button
+                onClick={handleSubmit}
+                disabled={isTyping || isLoading || !prompt.trim()}
+                className="gradient-primary text-primary-foreground hover:opacity-90 disabled:opacity-50 transition-all duration-200"
+                size="sm"
+              >
+                {isLoading ? (
+                  <div className="w-4 h-4 border-2 border-current border-t-transparent rounded-full animate-spin" />
+                ) : (
+                  <Send className="w-4 h-4" />
+                )}
+                <span className="sr-only">Send message</span>
+              </Button>
             </div>
           </div>
-
-          {/* Keyboard shortcut hint */}
-          <p className="hidden md:block text-xs text-muted-foreground mt-1 text-center">
-            Press Enter to send, Shift+Enter for new line
-          </p>
-
         </div>
       </div>
-    </>
+    </div>
   );
 };
 
