@@ -91,7 +91,7 @@ const PromptCard: React.FC<PromptCardProps> = ({
     // Auto-resize textarea
     const textarea = e.target;
     textarea.style.height = 'auto';
-    const newHeight = Math.min(Math.max(textarea.scrollHeight, 40), 120);
+    const newHeight = Math.min(Math.max(textarea.scrollHeight, 40), 150);
     textarea.style.height = `${newHeight}px`;
   };
 
@@ -179,7 +179,7 @@ const PromptCard: React.FC<PromptCardProps> = ({
               onChange={handleTextareaChange}
               onKeyDown={handleKeyDown}
               placeholder="Ask Lovable to create a dashboard to..."
-              className="w-full min-h-[40px] max-h-[120px] resize-none border-0 bg-transparent 
+              className="w-full min-h-[40px] max-h-[150px] resize-none border-0 bg-transparent 
                          focus-visible:ring-0 focus-visible:ring-offset-0 text-base
                          placeholder:text-muted-foreground overflow-y-auto transition-all duration-200
                          leading-relaxed py-1 pr-12"
