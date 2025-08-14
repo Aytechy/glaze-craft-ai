@@ -41,7 +41,7 @@ export default function UMFCalculator() {
           <p className="text-muted-foreground text-sm">Enter oxide molar amounts. Fluxes normalize to unity.</p>
         </header>
 
-        <div className="grid md:grid-cols-3 gap-6">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 transition-all duration-300">
           {(['Flux','Intermediate','Former'] as const).map(group => (
             <section key={group} className="bg-card rounded-xl border border-border p-6 shadow-subtle">
               <h2 className="font-semibold text-foreground mb-4 text-lg">{group}s</h2>

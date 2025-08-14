@@ -12,38 +12,37 @@ const tabs = [
 
 export default function FeatureLayout() {
   const { pathname } = useLocation();
-  const [isDesktop, setIsDesktop] = useState(false);
+  const [isDesktop, setIsDesktop] = useState(window.innerWidth >= 768);
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
-  
-  // Detect desktop screen size
+
   useEffect(() => {
-    const checkDesktop = () => {
+    const handleResize = () => {
       setIsDesktop(window.innerWidth >= 768);
     };
-    
-    checkDesktop();
-    window.addEventListener('resize', checkDesktop);
-    return () => window.removeEventListener('resize', checkDesktop);
-  }, []);
 
-  // Read sidebar state from localStorage
-  useEffect(() => {
-    const sidebarState = localStorage.getItem('sidebar-open');
-    setIsSidebarOpen(sidebarState === 'true');
-  }, []);
-
-  // Listen for sidebar state changes
-  useEffect(() => {
-    const handleStorageChange = () => {
-      const sidebarState = localStorage.getItem('sidebar-open');
-      setIsSidebarOpen(sidebarState === 'true');
+    const handleSidebarChange = () => {
+      const sidebar = document.querySelector('[data-sidebar="true"]');
+      setIsSidebarOpen(sidebar?.classList.contains('translate-x-0') || false);
     };
+
+    window.addEventListener('resize', handleResize);
+    window.addEventListener('storage', handleSidebarChange);
     
-    window.addEventListener('storage', handleStorageChange);
-    return () => window.removeEventListener('storage', handleStorageChange);
+    // Listen for sidebar state changes
+    const observer = new MutationObserver(handleSidebarChange);
+    const sidebar = document.querySelector('[data-sidebar="true"]');
+    if (sidebar) {
+      observer.observe(sidebar, { attributes: true, attributeFilter: ['class'] });
+    }
+
+    return () => {
+      window.removeEventListener('resize', handleResize);
+      window.removeEventListener('storage', handleSidebarChange);
+      observer.disconnect();
+    };
   }, []);
 
-  const railWidth = 64;
+  const railWidth = isDesktop && isSidebarOpen ? 280 : 0;
 
   return (
     <div className="relative">
@@ -51,7 +50,7 @@ export default function FeatureLayout() {
       <nav 
         className="fixed bottom-0 z-50 border-t bg-card/90 backdrop-blur supports-[backdrop-filter]:bg-card/60"
         style={{
-          left: isDesktop ? railWidth : 0,
+          left: railWidth,
           right: 0
         }}
       >

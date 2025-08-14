@@ -14,7 +14,7 @@ import { SidebarRail } from '@/components/SidebarRail';
 export default function AppShell() {
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const [isDesktop, setIsDesktop] = useState(false);
-  const sidebarWidth = 250;
+  const sidebarWidth = 280;
   const railWidth = 64;
   const location = useLocation();
 

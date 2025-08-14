@@ -30,8 +30,8 @@ export default function RecipesToImage() {
   }
 
   return (
-    <div className="container mx-auto max-w-7xl px-4 py-6">
-      <div className="grid grid-cols-1 lg:grid-cols-[minmax(0,1fr)_420px] gap-6 items-start">
+    <div className="container mx-auto max-w-7xl px-4 py-6 transition-all duration-300">
+      <div className="grid grid-cols-1 lg:grid-cols-[2fr_3fr] gap-6 items-start">
         {/* Left: Form */}
         <form onSubmit={handleGenerate} className="grid gap-6">
           <header>

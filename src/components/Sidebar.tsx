@@ -5,7 +5,6 @@ import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Link, useLocation } from 'react-router-dom';
 import { ProfilePopup } from '@/components/ProfilePopup';
 import { SettingsModal } from '@/components/modals/SettingsModal';
-import { ChatHistoryModal } from '@/components/modals/ChatHistoryModal';
 
 // TypeScript interface for sidebar props - ensures type safety
 interface SidebarProps {
@@ -48,7 +47,6 @@ const Sidebar: React.FC<SidebarProps> = ({ isOpen, onClose, onNewChat, width = 2
   const location = useLocation();
   const [isProfilePopupOpen, setIsProfilePopupOpen] = useState(false);
   const [isSettingsModalOpen, setIsSettingsModalOpen] = useState(false);
-  const [isChatHistoryModalOpen, setIsChatHistoryModalOpen] = useState(false);
 
   // Mock user data - In production, this would come from secure authentication
   const user: UserProfile = {
@@ -76,7 +74,8 @@ const Sidebar: React.FC<SidebarProps> = ({ isOpen, onClose, onNewChat, width = 2
   ];
 
   const handleChatHistoryClick = () => {
-    setIsChatHistoryModalOpen(true);
+    window.location.href = '/history';
+    onClose();
   };
 
   // Handle new chat creation with security validation
@@ -116,6 +115,7 @@ const Sidebar: React.FC<SidebarProps> = ({ isOpen, onClose, onNewChat, width = 2
       
       {/* Sidebar container with smooth slide animation */}
       <div 
+        data-sidebar="true"
         className={`
           fixed top-0 left-0 flex flex-col h-full bg-sidebar border-r border-sidebar-border
           transform transition-transform duration-300 ease-in-out z-[200]
@@ -264,15 +264,6 @@ const Sidebar: React.FC<SidebarProps> = ({ isOpen, onClose, onNewChat, width = 2
         onClose={() => setIsSettingsModalOpen(false)}
       />
 
-      {/* Chat History Modal */}
-      <ChatHistoryModal
-        isOpen={isChatHistoryModalOpen}
-        onClose={() => setIsChatHistoryModalOpen(false)}
-        onSelectChat={(chatId) => {
-          // TODO: Handle chat selection
-          // Handle chat selection
-        }}
-      />
     </>
   );
 };
