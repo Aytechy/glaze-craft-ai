@@ -310,8 +310,8 @@ const Index: React.FC = () => {
                             ${hasConversation ? 'overflow-y-scroll' : 'overflow-y-hidden'}`}
                 style={{
                   top: 0,
-                  bottom: Math.max(80, promptHeight + 20),
-                  ...(hasConversation ? { scrollbarGutter: 'stable both-edges' } : {}),
+                  bottom: Math.max(80, promptHeight + 10),
+                  ...(hasConversation ? { scrollbarGutter: 'stable' } : {}),
                 }}
               >
                 <div className="w-full max-w-3xl md:mx-auto md:px-0 pl-0 pr-0">

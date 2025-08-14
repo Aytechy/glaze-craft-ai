@@ -95,7 +95,7 @@ const ResponseArea: React.FC<ResponseAreaProps> = (props) => {
   return (
     <div
       ref={scrollContainerRef}
-      className="h-full overflow-y-scroll px-4"
+      className="h-full overflow-y-scroll pl-0 md:px-4"
       style={{
         paddingBottom: `calc(env(safe-area-inset-bottom) + ${bottomPadPx}px)`,
         scrollbarGutter: 'stable',
