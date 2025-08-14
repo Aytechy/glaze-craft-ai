@@ -21,6 +21,7 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import Index from "./pages/Index";
 import Notes from "./pages/Notes";
+import History from "./pages/History";
 import NotFound from "./pages/NotFound";
 import AppShell from './layouts/AppShell';
 import FeatureLayout from './layouts/FeatureLayout';
@@ -128,16 +129,14 @@ const App: React.FC = () => {
                   <Route path="/image-to-recipes" element={<ImageToRecipes />} />
                   <Route path="/umf-calculator" element={<UMFCalculator />} />
                 </Route>
+                
+                {/* Pages with AppShell but no tabs */}
+                <Route path="/notes" element={<Notes />} />
+                <Route path="/history" element={<History />} />
               </Route>
-              {/* Main chat interface */}
-              <Route path="/" element={<Index />} />
-              
-              {/* Notes interface */}
-              <Route path="/notes" element={<Notes />} />
               
               {/* Future routes can be added here */}
               {/* <Route path="/settings" element={<Settings />} /> */}
-              {/* <Route path="/history" element={<History />} /> */}
               
               {/* Catch-all route for 404 handling */}
               <Route path="*" element={<NotFound />} />

@@ -10,14 +10,11 @@
  */
 
 import React, { useState, useRef } from 'react';
-import { Bold, Italic, Heading2, Heading3, Save, Plus, Upload, Palette, Menu, X, FileText } from 'lucide-react';
+import { Bold, Italic, Heading2, Heading3, Save, Plus, Upload, FileText, X } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { Separator } from '@/components/ui/separator';
 import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
-import Header from '@/components/Header';
-import Sidebar from '@/components/Sidebar';
 
 // TypeScript interfaces
 interface Note {
@@ -35,7 +32,7 @@ interface Note {
 const Notes: React.FC = () => {
   // State management
   const [currentNote, setCurrentNote] = useState<Note | null>(null);
-  const [isSidebarOpen, setIsSidebarOpen] = useState<boolean>(false);
+  
   const [isNotesHistoryOpen, setIsNotesHistoryOpen] = useState<boolean>(false);
   const [noteTitle, setNoteTitle] = useState<string>('');
   const [fontSize, setFontSize] = useState<string>('16');
@@ -155,50 +152,13 @@ const Notes: React.FC = () => {
     const file = e.target.files?.[0];
     if (file && file.type.startsWith('image/')) {
       // Handle image upload logic here
-      console.log('Uploading image:', file.name);
+      // TODO: Implement image upload logic
     }
   };
 
-  const handleToggleSidebar = () => {
-    setIsSidebarOpen(prev => !prev);
-  };
-
-  const handleCloseSidebar = () => {
-    setIsSidebarOpen(false);
-  };
-
   return (
-    <div className="min-h-screen w-full flex flex-col">
-      {/* Header - shifts with sidebar */}
-      <div 
-        className="transition-all duration-300"
-        style={{ 
-          marginLeft: isSidebarOpen && window.innerWidth >= 768 ? '250px' : '0'
-        }}
-      >
-        <Header onToggleSidebar={handleToggleSidebar} />
-      </div>
-      
-      {/* Backdrop blur for mobile */}
-      {isSidebarOpen && (
-        <div 
-          className="fixed inset-0 bg-black/20 backdrop-blur-sm z-40 md:hidden"
-          onClick={handleCloseSidebar}
-        />
-      )}
-      
-      {/* Main content area */}
-      <div className="flex-1 flex relative">
-        {/* Sidebar */}
-        <Sidebar
-          isOpen={isSidebarOpen}
-          onClose={handleCloseSidebar}
-        />
-        
-        <div className="flex-1 flex transition-all duration-300"
-        style={{
-          marginLeft: window.innerWidth >= 768 && isSidebarOpen ? '250px' : '0'
-        }}>
+    <div className="min-h-screen bg-background">
+      <div className="flex flex-col lg:flex-row h-screen">
         {/* Main editor area */}
         <main className="flex-1 flex flex-col min-h-0">
           {/* Toolbar */}
@@ -459,7 +419,6 @@ const Notes: React.FC = () => {
             </div>
           </div>
         )}
-        </div>
       </div>
     </div>
   );

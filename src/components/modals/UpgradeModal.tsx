@@ -70,7 +70,7 @@ export const UpgradeModal: React.FC<UpgradeModalProps> = ({ isOpen, onClose }) =
 
   const handleUpgrade = (planName: string) => {
     // In production, this would integrate with payment processing
-    console.log(`Upgrading to ${planName} plan`);
+    // TODO: Integrate with payment processing
   };
 
   return (

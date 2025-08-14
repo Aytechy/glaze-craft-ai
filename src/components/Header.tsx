@@ -25,7 +25,7 @@ interface HeaderProps {
  * - Upgrade button would lead to secure payment processing
  * - No sensitive data exposed in header
  */
-  const Header = forwardRef<HTMLElement, HeaderProps>(({ onToggleSidebar, isDesktop = false, leftOffset = 0 }, ref) => {
+const Header = forwardRef<HTMLElement, HeaderProps>(({ onToggleSidebar, isDesktop = false, leftOffset = 0 }, ref) => {
   const [isUpgradeModalOpen, setIsUpgradeModalOpen] = useState(false);
   const [isSettingsModalOpen, setIsSettingsModalOpen] = useState(false);
   const [isProfilePopupOpen, setIsProfilePopupOpen] = useState(false);

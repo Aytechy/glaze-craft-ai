@@ -15,28 +15,28 @@ export default function FeatureLayout() {
   return (
     <div className="relative">
       <Outlet />
-      <nav className="fixed bottom-0 inset-x-0 z-50 border-t bg-card/90 backdrop-blur">
-        <ul className="grid grid-cols-4">
-          {tabs.map(({ to, label, icon: Icon }) => {
-            const active = pathname === to;
-            return (
-              <li key={to}>
-                <Link
-                  to={to}
-                  className={[
-                    'flex flex-col items-center justify-center py-3 gap-1',
-                    active ? 'text-primary' : 'text-muted-foreground hover:text-foreground'
-                  ].join(' ')}
-                  aria-current={active ? 'page' : undefined}
-                >
-                  <Icon className="h-5 w-5" />
-                  <span className="text-xs font-medium">{label}</span>
-                </Link>
-              </li>
-            );
-          })}
-        </ul>
-      </nav>
+          <nav className="fixed bottom-0 inset-x-0 z-50 border-t bg-card/90 backdrop-blur supports-[backdrop-filter]:bg-card/60">
+            <ul className="grid grid-cols-4 px-2 safe-area-padding-bottom">
+              {tabs.map(({ to, label, icon: Icon }) => {
+                const active = pathname === to;
+                return (
+                  <li key={to}>
+                    <Link
+                      to={to}
+                      className={[
+                        'flex flex-col items-center justify-center py-3 px-2 gap-1 rounded-lg transition-colors min-h-[60px]',
+                        active ? 'text-primary bg-primary/10' : 'text-muted-foreground hover:text-foreground hover:bg-accent/50'
+                      ].join(' ')}
+                      aria-current={active ? 'page' : undefined}
+                    >
+                      <Icon className="h-5 w-5 flex-shrink-0" />
+                      <span className="text-xs font-medium text-center leading-tight line-clamp-1">{label}</span>
+                    </Link>
+                  </li>
+                );
+              })}
+            </ul>
+          </nav>
     </div>
   );
 }

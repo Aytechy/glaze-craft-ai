@@ -95,7 +95,7 @@ const Sidebar: React.FC<SidebarProps> = ({ isOpen, onClose, onNewChat, width = 2
   // Handle chat history item selection with input sanitization
   const handleChatSelect = (chatId: string) => {
     // In production: validate chatId, ensure user owns this chat
-    console.log(`Loading chat: ${chatId}`);
+    // TODO: Load specific chat session
     // Navigate to fresh homepage
     window.location.href = '/';
     onClose(); // Close sidebar after selection
@@ -269,7 +269,7 @@ const Sidebar: React.FC<SidebarProps> = ({ isOpen, onClose, onNewChat, width = 2
         isOpen={isChatHistoryModalOpen}
         onClose={() => setIsChatHistoryModalOpen(false)}
         onSelectChat={(chatId) => {
-          console.log('Selected chat:', chatId);
+          // TODO: Handle chat selection
           // Handle chat selection
         }}
       />
