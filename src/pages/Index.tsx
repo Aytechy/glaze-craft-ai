@@ -71,7 +71,11 @@ const Index: React.FC = () => {
    * Toggle sidebar visibility
    */
   const handleToggleSidebar = () => {
-    setIsSidebarOpen(prev => !prev);
+    setIsSidebarOpen(prev => {
+      const newState = !prev;
+      localStorage.setItem('sidebar-open', String(newState));
+      return newState;
+    });
   };
 
   /**
@@ -79,6 +83,7 @@ const Index: React.FC = () => {
    */
   const handleCloseSidebar = () => {
     setIsSidebarOpen(false);
+    localStorage.setItem('sidebar-open', 'false');
   };
 
   /**
@@ -130,6 +135,14 @@ const Index: React.FC = () => {
     const onResize = () => setIsDesktop(window.innerWidth >= 768);
     window.addEventListener('resize', onResize);
     return () => window.removeEventListener('resize', onResize);
+  }, []);
+
+  // Initialize sidebar state from localStorage
+  useEffect(() => {
+    const sidebarState = localStorage.getItem('sidebar-open');
+    if (sidebarState !== null) {
+      setIsSidebarOpen(sidebarState === 'true');
+    }
   }, []);
 
   /**
@@ -317,10 +330,11 @@ const Index: React.FC = () => {
             {/* Input prompt card - properly positioned and shifts with sidebar */}
             <div
               ref={promptWrapRef}
-              className="fixed bottom-0 z-30 mx-auto w-full max-w-3xl transition-all duration-300 ease-out"
+              className="fixed z-30 mx-auto w-full max-w-3xl transition-all duration-300 ease-out"
               style={{
                 left: leftOffset,
                 right: 0,
+                bottom: '96px', // 96px to sit above the bottom tabs
                 paddingBottom: 'calc(env(safe-area-inset-bottom) + 1px)',
               }}
             >
