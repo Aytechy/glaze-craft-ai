@@ -22,6 +22,13 @@ import { BrowserRouter, Routes, Route } from "react-router-dom";
 import Index from "./pages/Index";
 import Notes from "./pages/Notes";
 import NotFound from "./pages/NotFound";
+import AppShell from './layouts/AppShell';
+import FeatureLayout from './layouts/FeatureLayout';
+import Assistant from './pages/Assistant';
+import RecipesToImage from './pages/RecipesToImage';
+import ImageToRecipes from './pages/ImageToRecipes';
+import UMFCalculator from './pages/UMFCalculator';
+import { Navigate } from 'react-router-dom';
 
 // Configure React Query client with security-focused settings
 const queryClient = new QueryClient({
@@ -110,6 +117,18 @@ const App: React.FC = () => {
           {/* Router configuration */}
           <BrowserRouter>
             <Routes>
+              {/* Default redirect */}
+              <Route path="/" element={<Navigate to="/assistant" replace />} />
+
+              {/* AppShell + Tabs */}
+              <Route element={<AppShell />}>
+                <Route element={<FeatureLayout />}>
+                  <Route path="/assistant" element={<Assistant />} />
+                  <Route path="/recipes-to-image" element={<RecipesToImage />} />
+                  <Route path="/image-to-recipes" element={<ImageToRecipes />} />
+                  <Route path="/umf-calculator" element={<UMFCalculator />} />
+                </Route>
+              </Route>
               {/* Main chat interface */}
               <Route path="/" element={<Index />} />
               
