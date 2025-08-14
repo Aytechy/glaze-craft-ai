@@ -165,38 +165,35 @@ const PromptCard: React.FC<PromptCardProps> = ({
 
   
   return (
-    <div className="w-full p-3">
+    <div className="w-full px-4">
       <div className="w-full max-w-4xl mx-auto">
-        <div className="relative bg-card border rounded-xl shadow-moderate">
-          <div className="p-4">
-            <div className="flex items-end gap-3">
-              <Textarea
-                ref={textareaRef}
-                value={prompt}
-                onChange={handleTextareaChange}
-                onKeyDown={handleKeyDown}
-                placeholder="Ask me anything about ceramics, glazes, and pottery..."
-                className="flex-1 min-h-[48px] max-h-[120px] resize-none border-0 bg-transparent 
-                           focus-visible:ring-0 focus-visible:ring-offset-0 text-base
-                           placeholder:text-muted-foreground overflow-y-auto"
-                disabled={isLoading}
-              />
+        <div className="flex items-center bg-card border rounded-full px-4 py-2 shadow-sm">
+          <Textarea
+            ref={textareaRef}
+            value={prompt}
+            onChange={handleTextareaChange}
+            onKeyDown={handleKeyDown}
+            placeholder="Ask anything"
+            className="flex-1 min-h-[40px] max-h-[40px] resize-none border-0 bg-transparent 
+                       focus-visible:ring-0 focus-visible:ring-offset-0 text-base
+                       placeholder:text-muted-foreground overflow-hidden leading-[40px] py-0"
+            disabled={isLoading}
+            rows={1}
+          />
 
-              <Button
-                onClick={handleSubmit}
-                disabled={isTyping || isLoading || !prompt.trim()}
-                className="gradient-primary text-primary-foreground hover:opacity-90 disabled:opacity-50 transition-all duration-200 flex-shrink-0"
-                size="sm"
-              >
-                {isLoading ? (
-                  <div className="w-4 h-4 border-2 border-current border-t-transparent rounded-full animate-spin" />
-                ) : (
-                  <Send className="w-4 h-4" />
-                )}
-                <span className="sr-only">Send message</span>
-              </Button>
-            </div>
-          </div>
+          <Button
+            onClick={handleSubmit}
+            disabled={isTyping || isLoading || !prompt.trim()}
+            className="ml-2 h-8 w-8 rounded-full p-0 bg-primary hover:bg-primary/90 disabled:opacity-50 flex-shrink-0"
+            size="sm"
+          >
+            {isLoading ? (
+              <div className="w-4 h-4 border-2 border-current border-t-transparent rounded-full animate-spin" />
+            ) : (
+              <Send className="w-4 h-4" />
+            )}
+            <span className="sr-only">Send message</span>
+          </Button>
         </div>
       </div>
     </div>
