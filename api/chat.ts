@@ -22,7 +22,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     const referer =
       (req.headers.origin as string) ||
       process.env.PUBLIC_URL ||
-      'https://your-app.vercel.app';
+      'https://glazeon-craft-ai.vercel.app/'; 
 
     const r = await fetch('https://openrouter.ai/api/v1/chat/completions', {
       method: 'POST',
@@ -30,12 +30,12 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
         Authorization: `Bearer ${apiKey}`,
         'Content-Type': 'application/json',
         'HTTP-Referer': referer,
-        'X-Title': 'Glaze Craft AI',
+        'X-Title': 'Master Ceramics', 
       },
       body: JSON.stringify({
         model: model || 'openai/gpt-3.5-turbo',
         messages: [
-          { role: 'system', content: 'You are Glaze Craft AI.' },
+          { role: 'system', content: 'You are Master Ceramics, the AI assistant for GlazionStudio. You help with ceramics, glaze recipes, and pottery techniques.' }, 
           { role: 'user', content: message || '' },
           ...(imageBase64 ? [{ role: 'user', content: `Image:\n${imageBase64}` }] : []),
         ],
