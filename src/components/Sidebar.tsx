@@ -1,161 +1,168 @@
 import React, { useState } from 'react';
-import { X, Home, History, Settings, User, Plus, FileText } from 'lucide-react';
+import { X, Home, History, Settings, User, Plus, FileText, ChevronLeft, ChevronRight } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Link, useLocation } from 'react-router-dom';
 import { ProfilePopup } from '@/components/ProfilePopup';
 import { SettingsModal } from '@/components/modals/SettingsModal';
 
-// TypeScript interface for sidebar props - ensures type safety
+// TypeScript interface for sidebar props
 interface SidebarProps {
-  isOpen: boolean; // Controls sidebar visibility state
-  onClose: () => void; // Callback function to close sidebar
-  onNewChat?: () => void; // Optional callback for new chat
-  width?: number; // Adjustable sidebar width
+  isOpen: boolean;
+  onClose: () => void;
+  onNewChat?: () => void;
+  isCollapsed: boolean; // NEW: collapsed state
+  onToggleCollapsed: () => void; // NEW: toggle function
+  width?: number;
+  collapsedWidth?: number; // NEW: collapsed width
 }
 
-// TypeScript interface for chat history items
+// ... other interfaces remain the same
 interface ChatHistoryItem {
   id: string;
   title: string;
   timestamp: string;
 }
 
-// TypeScript interface for user profile data
 interface UserProfile {
   name: string;
   email: string;
   avatar?: string;
 }
 
-/**
- * Sidebar Component - Sliding navigation panel for GlazeAI
- * 
- * Features:
- * - Smooth slide-in/out animation
- * - Chat history management
- * - User profile display
- * - Navigation links
- * - Settings access
- * 
- * Security considerations:
- * - User data is properly typed
- * - No sensitive information exposed in localStorage
- * - Sanitized user input display
- */
-const Sidebar: React.FC<SidebarProps> = ({ isOpen, onClose, onNewChat, width = 250 }) => {
+const Sidebar: React.FC<SidebarProps> = ({ 
+  isOpen, 
+  onClose, 
+  onNewChat, 
+  isCollapsed,
+  onToggleCollapsed,
+  width = 250,
+  collapsedWidth = 64
+}) => {
   const location = useLocation();
   const [isProfilePopupOpen, setIsProfilePopupOpen] = useState(false);
   const [isSettingsModalOpen, setIsSettingsModalOpen] = useState(false);
 
-  // Mock user data - In production, this would come from secure authentication
+  // Mock data remains the same
   const user: UserProfile = {
     name: "John Doe",
     email: "john.doe@example.com",
-    avatar: undefined // Will fallback to initials
+    avatar: undefined
   };
 
-  // Mock chat history - In production, this would come from secure API
   const chatHistory: ChatHistoryItem[] = [
     { id: '1', title: 'Glaze Recipe Help', timestamp: '2 hours ago' },
     { id: '2', title: 'Pottery Techniques', timestamp: '1 day ago' },
     { id: '3', title: 'Kiln Temperature Guide', timestamp: '3 days ago' },
-    { id: '4', title: 'Kiln Temperature Guide', timestamp: '3 days ago' },
-    { id: '5', title: 'Kiln Temperature Guide', timestamp: '3 days ago' },
-    { id: '6', title: 'Drying Crack', timestamp: '3 days ago' },
-    { id: '7', title: 'Flux Temperature Guide', timestamp: '3 days ago' },
+    // ... more items
   ];
 
-
-  // Navigation items with active state detection
   const navigationItems = [
     { name: 'Home', path: '/', icon: Home },
     { name: 'Notes', path: '/notes', icon: FileText },
   ];
 
+  // Event handlers remain mostly the same
   const handleChatHistoryClick = () => {
     window.location.href = '/history';
-    onClose();
+    if (!isCollapsed) onClose();
   };
 
-  // Handle new chat creation with security validation
   const handleNewChat = () => {
     if (onNewChat) {
-      onNewChat(); // Use callback if provided
+      onNewChat();
     } else {
-      // Fallback for other pages
       if (location.pathname !== '/') {
-        window.location.href = '/'; // Navigate to fresh chat
+        window.location.href = '/';
       }
     }
-    onClose(); // Close sidebar after action
+    if (!isCollapsed) onClose();
   };
 
-  // Handle chat history item selection with input sanitization
-  const handleChatSelect = (chatId: string) => {
-    // In production: validate chatId, ensure user owns this chat
-    // TODO: Load specific chat session
-    // Navigate to fresh homepage
-    window.location.href = '/';
-    onClose(); // Close sidebar after selection
-  };
-
-  // Handle profile popup
   const handleProfileClick = () => {
     setIsProfilePopupOpen(true);
   };
 
-  // Handle settings
   const handleSettingsClick = () => {
     setIsSettingsModalOpen(true);
   };
 
+  // Determine current width based on collapsed state
+  const currentWidth = isCollapsed ? collapsedWidth : width;
+
   return (
     <>
-      
-      {/* Sidebar container with smooth slide animation */}
+      {/* Sidebar container */}
       <div 
         data-sidebar="true"
         className={`
           fixed top-0 left-0 flex flex-col h-full bg-sidebar border-r border-sidebar-border
-          transform transition-transform duration-300 ease-in-out z-[200]
+          transform transition-all duration-300 ease-in-out z-[200]
           shadow-elevated
           ${isOpen ? 'translate-x-0' : '-translate-x-full'}
         `}
-        style={{ width }}
+        style={{ width: currentWidth }}
       >
-        {/* Sidebar header with close button */}
+        {/* Sidebar header */}
         <div className="flex items-center justify-between p-4 border-b border-sidebar-border">
-          <h2 className="text-lg font-semibold text-sidebar-foreground font-heading">
-            GlazeAI
-          </h2>
-          <Button
-            variant="ghost"
-            size="sm"
-            onClick={onClose}
-            className="text-sidebar-foreground hover:bg-sidebar-accent"
-            aria-label="Close sidebar"
-          >
-            <X className="h-4 w-4" />
-          </Button>
+          {!isCollapsed ? (
+            <>
+              <h2 className="text-lg font-semibold text-sidebar-foreground font-heading">
+                GlazeAI
+              </h2>
+              <div className="flex items-center gap-1">
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={onToggleCollapsed}
+                  className="text-sidebar-foreground hover:bg-sidebar-accent"
+                  aria-label="Collapse sidebar"
+                >
+                  <ChevronLeft className="h-4 w-4" />
+                </Button>
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={onClose}
+                  className="text-sidebar-foreground hover:bg-sidebar-accent md:hidden"
+                  aria-label="Close sidebar"
+                >
+                  <X className="h-4 w-4" />
+                </Button>
+              </div>
+            </>
+          ) : (
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={onToggleCollapsed}
+              className="text-sidebar-foreground hover:bg-sidebar-accent mx-auto"
+              aria-label="Expand sidebar"
+            >
+              <ChevronRight className="h-4 w-4" />
+            </Button>
+          )}
         </div>
 
-        {/* Sidebar content area */}
-        <div className="flex-1 py-4 flex flex-col overflow-y-auto">
+        {/* Sidebar content */}
+        <div className="flex-1 py-4 flex flex-col overflow-hidden">
           {/* New Chat Button */}
-          <div className="p-4">
+          <div className="px-4">
             <Button
               onClick={handleNewChat}
-              className="w-full gradient-primary text-primary-foreground hover:opacity-90 transition-opacity"
+              className={`w-full gradient-primary text-primary-foreground hover:opacity-90 transition-opacity ${
+                isCollapsed ? 'px-0' : ''
+              }`}
               size="sm"
+              title={isCollapsed ? "New Chat" : undefined}
             >
-              <Plus className="h-4 w-4 mr-2" />
-              New Chat
+              <Plus className="h-4 w-4" />
+              {!isCollapsed && <span className="ml-2">New Chat</span>}
             </Button>
           </div>
 
           {/* Navigation Links */}
-          <nav className="px-4 space-y-2">
+          <nav className="px-4 space-y-2 mt-4">
             {navigationItems.map((item) => {
               const isActive = location.pathname === item.path;
               const Icon = item.icon;
@@ -164,15 +171,18 @@ const Sidebar: React.FC<SidebarProps> = ({ isOpen, onClose, onNewChat, width = 2
                 <Link
                   key={item.path}
                   to={item.path}
-                  onClick={onClose}
-                  className={`flex items-center w-full justify-start px-3 py-2 rounded-lg text-sm font-medium transition-all duration-200 ${
+                  onClick={() => !isCollapsed && onClose()}
+                  title={isCollapsed ? item.name : undefined}
+                  className={`flex items-center w-full ${
+                    isCollapsed ? 'justify-center px-0' : 'justify-start px-3'
+                  } py-2 rounded-lg text-sm font-medium transition-all duration-200 ${
                     isActive 
                       ? 'bg-accent/50 text-primary border border-primary/20 shadow-sm' 
                       : 'text-sidebar-foreground hover:bg-sidebar-accent hover:text-sidebar-accent-foreground'
                   }`}
                 >
-                  <Icon className="h-4 w-4 mr-3" />
-                  {item.name}
+                  <Icon className="h-4 w-4" />
+                  {!isCollapsed && <span className="ml-3">{item.name}</span>}
                 </Link>
               );
             })}
@@ -180,90 +190,101 @@ const Sidebar: React.FC<SidebarProps> = ({ isOpen, onClose, onNewChat, width = 2
             {/* Chat History Button */}
             <button
               onClick={handleChatHistoryClick}
-              className="flex items-center w-full justify-start px-3 py-2 rounded-lg text-sm font-medium transition-all duration-200 text-sidebar-foreground hover:bg-sidebar-accent hover:text-sidebar-accent-foreground"
+              title={isCollapsed ? "Chat History" : undefined}
+              className={`flex items-center w-full ${
+                isCollapsed ? 'justify-center px-0' : 'justify-start px-3'
+              } py-2 rounded-lg text-sm font-medium transition-all duration-200 text-sidebar-foreground hover:bg-sidebar-accent hover:text-sidebar-accent-foreground`}
             >
-              <History className="h-4 w-4 mr-3" />
-              Chat History
+              <History className="h-4 w-4" />
+              {!isCollapsed && <span className="ml-3">Chat History</span>}
             </button>
           </nav>
 
-          {/* Chat History Section */}
-          <div className="flex-1 px-4 py-4 overflow-y-auto">
-            <h3 className="text-sm font-medium text-sidebar-foreground mb-3">
-              Recent Chats
-            </h3>
-            <div className="space-y-2">
-              {chatHistory.map((chat) => (
-                <Link
-                  key={chat.id}
-                  to="/"
-                  onClick={onClose}
-                  className="block w-full text-left p-3 rounded-lg hover:bg-sidebar-accent 
-                           transition-colors group"
-                >
-                  <div className="text-sm font-medium text-sidebar-foreground mb-1 
-                                truncate group-hover:text-sidebar-accent-foreground">
-                    {chat.title}
-                  </div>
-                  <div className="text-xs text-sidebar-foreground/60">
-                    {chat.timestamp}
-                  </div>
-                </Link>
-              ))}
+          {/* Chat History Section - only show when expanded */}
+          {!isCollapsed && (
+            <div className="flex-1 px-4 py-4 overflow-y-auto">
+              <h3 className="text-sm font-medium text-sidebar-foreground mb-3">
+                Recent Chats
+              </h3>
+              <div className="space-y-2">
+                {chatHistory.map((chat) => (
+                  <Link
+                    key={chat.id}
+                    to="/"
+                    onClick={onClose}
+                    className="block w-full text-left p-3 rounded-lg hover:bg-sidebar-accent 
+                             transition-colors group"
+                  >
+                    <div className="text-sm font-medium text-sidebar-foreground mb-1 
+                                  truncate group-hover:text-sidebar-accent-foreground">
+                      {chat.title}
+                    </div>
+                    <div className="text-xs text-sidebar-foreground/60">
+                      {chat.timestamp}
+                    </div>
+                  </Link>
+                ))}
+              </div>
             </div>
-          </div>
+          )}
         </div>
         
-        {/* Bottom section with profile and settings - stacked vertically */}
+        {/* Bottom section */}
         <div className="border-t border-sidebar-border p-3">
-          {/* User Profile Section - on top */}
+          {/* User Profile Section */}
           <div 
             onClick={handleProfileClick}
-            className="flex items-center gap-2 p-2 rounded-lg hover:bg-sidebar-accent 
-                      transition-colors cursor-pointer mb-2"
+            title={isCollapsed ? user.name : undefined}
+            className={`flex items-center gap-2 p-2 rounded-lg hover:bg-sidebar-accent 
+                      transition-colors cursor-pointer mb-2 ${
+                        isCollapsed ? 'justify-center' : ''
+                      }`}
           >
-            <Avatar className="h-8 w-8">
+            <Avatar className="h-8 w-8 flex-shrink-0">
               <AvatarImage src={user.avatar} alt={user.name} />
               <AvatarFallback className="bg-primary text-primary-foreground text-xs">
                 {user.name.split(' ').map(n => n[0]).join('')}
               </AvatarFallback>
             </Avatar>
-            <div className="flex-1 min-w-0">
-              <div className="text-sm font-medium text-sidebar-foreground truncate">
-                {user.name}
+            {!isCollapsed && (
+              <div className="flex-1 min-w-0">
+                <div className="text-sm font-medium text-sidebar-foreground truncate">
+                  {user.name}
+                </div>
+                <div className="text-xs text-sidebar-foreground/60 truncate">
+                  {user.email}
+                </div>
               </div>
-              <div className="text-xs text-sidebar-foreground/60 truncate">
-                {user.email}
-              </div>
-            </div>
+            )}
           </div>
 
-          {/* Settings Button - below profile with separation */}
+          {/* Settings Button */}
           <Button
             onClick={handleSettingsClick}
             variant="ghost"
-            className="w-full justify-start text-sidebar-foreground hover:bg-sidebar-accent mt-2"
+            className={`w-full ${
+              isCollapsed ? 'justify-center px-0' : 'justify-start'
+            } text-sidebar-foreground hover:bg-sidebar-accent mt-2`}
             size="sm"
+            title={isCollapsed ? "Settings" : undefined}
           >
-            <Settings className="h-4 w-4 mr-3" />
-            Settings
+            <Settings className="h-4 w-4" />
+            {!isCollapsed && <span className="ml-3">Settings</span>}
           </Button>
         </div>
       </div>
 
-      {/* Profile Popup */}
+      {/* Modals remain the same */}
       <ProfilePopup
         isOpen={isProfilePopupOpen}
         onClose={() => setIsProfilePopupOpen(false)}
         user={user}
       />
 
-      {/* Settings Modal */}
       <SettingsModal
         isOpen={isSettingsModalOpen}
         onClose={() => setIsSettingsModalOpen(false)}
       />
-
     </>
   );
 };
