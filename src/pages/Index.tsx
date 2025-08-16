@@ -158,7 +158,7 @@ const Index: React.FC = () => {
 
             {/* Fixed PromptCard at bottom */}
             <div 
-              className="fixed bottom-0 z-30 bg-background/95 backdrop-blur border-t"
+              className="fixed bottom-0 inset-x-0 mx-auto z-30 bg-background/95 backdrop-blur border-t"
             >
               <PromptCard
                 onSendMessage={handleSendMessage}
