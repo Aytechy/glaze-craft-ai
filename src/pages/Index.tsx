@@ -157,7 +157,7 @@ const Index: React.FC = () => {
   }, []);
 
   return (
-    <div className="flex flex-col relative min-h-[calc(100vh-56px)]">
+    <div className="flex flex-col relative min-h-[calc(100vh-56px)] overflow-hidden">
       <ClipboardUpload onImagePaste={(file) => {
         // Don't auto-send on paste, pass to PromptCard for preview
         if (document.querySelector('[data-prompt-card]')) {
