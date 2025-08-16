@@ -46,10 +46,6 @@ const Index: React.FC = () => {
     autoSave: true,
   });
 
-  // Tracks the actual height of the PromptCard wrapper
-  const [promptHeight, setPromptHeight] = useState(80);
-  const promptWrapRef = React.useRef<HTMLDivElement | null>(null);
-
   const hasConversation = messageCount > 0;
   const scrollRef = React.useRef<HTMLDivElement>(null);
 
@@ -134,31 +130,8 @@ const Index: React.FC = () => {
     }
   }, [error, toast]);
 
-  // Measure PromptCard height (guarded so it can't crash)
-  useEffect(() => {
-    const el = promptWrapRef.current;
-    if (!el) return;
-
-    // Older browsers: guard ResizeObserver
-    if (typeof window.ResizeObserver === 'undefined') {
-      // Fallback once on mount
-      setPromptHeight(el.getBoundingClientRect().height || 80);
-      return;
-    }
-
-    const ro = new ResizeObserver((entries) => {
-      for (const entry of entries) {
-        const h = Math.round(entry.contentRect.height);
-        if (!Number.isNaN(h) && h > 0) setPromptHeight(h);
-      }
-    });
-
-    ro.observe(el);
-    return () => ro.disconnect();
-  }, []);
-
   return (
-    <div className="h-full relative bg-background">
+    <div className="h-full flex flex-col">
       <ClipboardUpload onImagePaste={(file) => {
         // Don't auto-send on paste, pass to PromptCard for preview
         if (document.querySelector('[data-prompt-card]')) {
@@ -167,71 +140,54 @@ const Index: React.FC = () => {
         }
       }}>
         
-        {/* When no messages: Center everything vertically */}
-        {!hasConversation ? (
-          <div className="h-full flex flex-col">
-            {/* Welcome area takes most space */}
-            <div className="flex-1 flex items-center justify-center px-4">
-              <div className="w-full max-w-4xl">
-                <ResponseArea
-                  messages={messages}
-                  isTyping={isLoading}
-                  onSuggestionSelect={handleSuggestionSelect}
-                  onEditMessage={handleEditMessage}
-                  bottomPadPx={0}
-                />
-              </div>
-            </div>
-            
-            {/* Centered prompt card */}
-            <div className="pb-24 px-4"> {/* 96px for tabs */}
-              <div ref={promptWrapRef} className="w-full max-w-4xl mx-auto">
-                <PromptCard
-                  onSendMessage={handleSendMessage}
-                  isLoading={isLoading || !canSendMessage}
-                  isTyping={isLoading}
-                  hasMessages={messageCount > 0}
-                />
-              </div>
+        {/* Messages area - always present, takes remaining space */}
+        <div className="flex-1 min-h-0">
+          <div
+            ref={scrollRef}
+            className="h-full overflow-y-auto touch-pan-y px-4"
+            style={{ 
+              scrollbarGutter: hasConversation ? 'stable' : 'auto',
+              paddingBottom: hasConversation ? '120px' : '0px' // Space for fixed prompt when chatting
+            }}
+          >
+            <div className="w-full max-w-4xl mx-auto">
+              <ResponseArea
+                messages={messages}
+                isTyping={isLoading}
+                onSuggestionSelect={handleSuggestionSelect}
+                onEditMessage={handleEditMessage}
+                bottomPadPx={0}
+                scrollParentRef={scrollRef}
+              />
             </div>
           </div>
-        ) : (
-          /* When has messages: Normal layout with fixed prompt at bottom */
-          <div className="h-full flex flex-col">
-            {/* Chat messages area - takes remaining space */}
-            <div className="flex-1 min-h-0 relative">
-              <div
-                ref={scrollRef}
-                className="absolute inset-0 overflow-y-scroll touch-pan-y"
-                style={{ 
-                  scrollbarGutter: 'stable',
-                  paddingBottom: `${promptHeight + 96 + 20}px` // prompt height + tabs + buffer
-                }}
-              >
-                <ResponseArea
-                  messages={messages}
-                  isTyping={isLoading}
-                  onSuggestionSelect={handleSuggestionSelect}
-                  onEditMessage={handleEditMessage}
-                  bottomPadPx={0}
-                  scrollParentRef={scrollRef}
-                />
-              </div>
-            </div>
+        </div>
 
-            {/* Fixed prompt card at bottom */}
-            <div
-              ref={promptWrapRef}
-              className="absolute bottom-0 left-0 right-0 z-30 bg-background/95 backdrop-blur"
-              style={{
-                paddingBottom: 'calc(env(safe-area-inset-bottom) + 96px)', // 96px for bottom tabs
-              }}
-            >
+        {/* Prompt Card - conditional positioning */}
+        {hasConversation ? (
+          /* Fixed at bottom when chatting */
+          <div 
+            className="sticky bottom-0 z-30 bg-background border-t"
+            style={{
+              paddingBottom: 'calc(env(safe-area-inset-bottom) + 96px)', // 96px for bottom tabs
+            }}
+          >
+            <PromptCard
+              onSendMessage={handleSendMessage}
+              isLoading={isLoading || !canSendMessage}
+              isTyping={isLoading}
+              hasMessages={hasConversation}
+            />
+          </div>
+        ) : (
+          /* Centered when no messages - positioned absolutely within the messages area */
+          <div className="absolute inset-0 flex items-center justify-center px-4 pb-24">
+            <div className="w-full max-w-4xl">
               <PromptCard
                 onSendMessage={handleSendMessage}
                 isLoading={isLoading || !canSendMessage}
                 isTyping={isLoading}
-                hasMessages={messageCount > 0}
+                hasMessages={hasConversation}
               />
             </div>
           </div>

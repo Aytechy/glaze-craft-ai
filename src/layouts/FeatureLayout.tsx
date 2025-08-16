@@ -27,44 +27,39 @@ export default function FeatureLayout() {
         return;
       }
 
-      // Check AppShell's sidebar state by looking at main content margin
-      const main = document.querySelector('main');
-      if (main) {
-        const marginLeft = parseInt(window.getComputedStyle(main).marginLeft) || 0;
-        const isOpen = marginLeft >= sidebarWidth;
-        setSidebarOpen(isOpen);
+      // Check if there's a desktop sidebar container
+      const sidebarContainer = document.querySelector('.hidden.md\\:block.fixed.top-0.left-0');
+      if (sidebarContainer) {
+        const width = sidebarContainer.getBoundingClientRect().width;
+        setSidebarOpen(width > railWidth + 10); // Add buffer for animations
       }
     };
 
     // Initial check with a small delay to ensure DOM is ready
-    setTimeout(checkSidebarState, 100);
+    const timer = setTimeout(checkSidebarState, 100);
 
     window.addEventListener('resize', handleResize);
     
-    // Listen for main content margin changes
-    const observer = new MutationObserver(checkSidebarState);
-    const main = document.querySelector('main');
-    if (main) {
-      observer.observe(main, { 
+    // Listen for sidebar state changes with MutationObserver
+    const observer = new MutationObserver(() => {
+      setTimeout(checkSidebarState, 50); // Small delay for transition completion
+    });
+    
+    const sidebarContainer = document.querySelector('.hidden.md\\:block.fixed.top-0.left-0');
+    if (sidebarContainer) {
+      observer.observe(sidebarContainer, { 
         attributes: true, 
-        attributeFilter: ['style']
-      });
-    }
-
-    // Also listen for sidebar changes as fallback
-    const sidebar = document.querySelector('[data-sidebar="true"]');
-    if (sidebar) {
-      observer.observe(sidebar, { 
-        attributes: true, 
-        attributeFilter: ['style']
+        attributeFilter: ['style'],
+        subtree: true
       });
     }
 
     return () => {
+      clearTimeout(timer);
       window.removeEventListener('resize', handleResize);
       observer.disconnect();
     };
-  }, [isDesktop, sidebarWidth]);
+  }, [isDesktop, railWidth]);
 
   const leftOffset = isDesktop ? (sidebarOpen ? sidebarWidth : railWidth) : 0;
 
