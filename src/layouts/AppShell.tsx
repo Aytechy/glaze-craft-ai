@@ -2,12 +2,10 @@ import React, { useState, useEffect } from 'react';
 import { Outlet, useLocation } from 'react-router-dom';
 import Header from '@/components/Header';
 import Sidebar from '@/components/Sidebar';
-import { SidebarRail } from '@/components/SidebarRail';
 
 /**
  * AppShell - Main layout component with sidebar functionality
- * - Uses existing Header and Sidebar components
- * - Shows SidebarRail when sidebar is collapsed
+ * - Uses existing Header and Sidebar components with collapse/expand functionality
  * - Responsive layout that adapts to screen size
  * - Proper spacing for fixed header and bottom tabs
  */
@@ -47,15 +45,37 @@ export default function AppShell() {
         isDesktop={isDesktop} 
       />
 
-      {/* Sidebar Rail (always visible on desktop when sidebar is closed) */}
-      {isDesktop && !isSidebarOpen && <SidebarRail />}
+      {/* Single Sidebar that handles both expanded and collapsed states */}
+      <div
+        className="hidden md:block fixed top-0 left-0 z-40 h-screen overflow-hidden transition-[width] duration-300 ease-out"
+        style={{ width: isSidebarOpen ? sidebarWidth : railWidth }}
+      >
+        <Sidebar 
+          isOpen={true}
+          onClose={() => setIsSidebarOpen(false)}
+          isCollapsed={!isSidebarOpen}
+          onToggleCollapsed={() => setIsSidebarOpen(prev => !prev)}
+          width={sidebarWidth}
+          collapsedWidth={railWidth}
+        />
+      </div>
 
-      {/* Full Sidebar (overlay on mobile, fixed on desktop) */}
-      <Sidebar 
-        isOpen={isSidebarOpen} 
-        onClose={() => setIsSidebarOpen(false)} 
-        width={sidebarWidth}
-      />
+      {/* Mobile Sidebar Overlay */}
+      {isSidebarOpen && !isDesktop && (
+        <>
+          <div 
+            className="fixed inset-0 bg-black/20 backdrop-blur-sm z-40"
+            onClick={() => setIsSidebarOpen(false)}
+          />
+          <div className="fixed top-0 left-0 z-50 h-screen w-64">
+            <Sidebar 
+              isOpen={true} 
+              onClose={() => setIsSidebarOpen(false)} 
+              width={256}
+            />
+          </div>
+        </>
+      )}
 
       {/* Main Content Area */}
       <main 
