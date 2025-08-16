@@ -108,7 +108,7 @@ const Index: React.FC = () => {
           /* No conversation: Center everything vertically */
           <div className="fixed inset-x-0 mx-auto">
             <div className="flex-1 flex flex-col items-center justify-center">
-            <div className="w-full max-w-4xl space-y-8">
+            <div className="w-full max-w-4xl space-y-1">
               {/* Welcome area - ResponseArea with welcome screen */}
               <div>
                 <ResponseArea
