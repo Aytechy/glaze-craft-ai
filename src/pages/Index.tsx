@@ -96,7 +96,7 @@ const Index: React.FC = () => {
   }, [error, toast]);
 
   return (
-    <div className="h-full overflow-hidden flex flex-col relative">
+    <div className="fixed inset-0 overflow-hidden flex flex-col" style={{ paddingTop: '56px' }}>
       <ClipboardUpload onImagePaste={(file) => {
         if (document.querySelector('[data-prompt-card]')) {
           const event = new CustomEvent('pastedImage', { detail: file });
@@ -105,7 +105,7 @@ const Index: React.FC = () => {
       }}>
         
         {!hasConversation && !isLoading ? (
-          /* No conversation: Center everything vertically within the available remaining space */
+          /* No conversation: Center everything vertically within the available space */
           <div className="flex-1 flex flex-col items-center justify-center px-4">
             <div className="w-full max-w-4xl space-y-8">
               {/* Welcome area - ResponseArea with welcome screen */}
@@ -158,9 +158,9 @@ const Index: React.FC = () => {
               </div>
             </div>
 
-            {/* Fixed PromptCard at bottom - positioned relative to the remaining content area */}
+            {/* Fixed PromptCard at bottom - positioned relative to viewport but accounting for header */}
             <div 
-              className="absolute bottom-0 inset-x-0 z-30 bg-background/95 backdrop-blur px-4"
+              className="fixed bottom-0 inset-x-0 z-30 bg-background/95 backdrop-blur px-4"
               style={{
                 paddingBottom: 'calc(env(safe-area-inset-bottom) + 16px)',
               }}
