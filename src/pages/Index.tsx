@@ -104,7 +104,7 @@ const Index: React.FC = () => {
         }
       }}>
         
-        {!hasConversation ? (
+        {!hasConversation && !isLoading ? (
           /* No conversation: Center everything vertically */
           <div className="flex-1 flex flex-col items-center justify-center px-4 pb-24">
             <div className="w-full max-w-4xl space-y-8">
@@ -131,7 +131,7 @@ const Index: React.FC = () => {
             </div>
           </div>
         ) : (
-          /* Has conversation: ResponseArea takes space, PromptCard at bottom */
+          /* Has conversation OR is loading: ResponseArea takes space, PromptCard at bottom */
           <>
             {/* Messages area - scrollable, takes remaining space */}
             <div className="flex-1 min-h-0">
