@@ -60,14 +60,8 @@ const Sidebar: React.FC<SidebarProps> = ({
   const navigationItems = [
     { name: 'Home', path: '/', icon: Home },
     { name: 'Notes', path: '/notes', icon: FileText },
-    { name: 'History', path: '/history', icon: History },
+    { name: 'Chat History', path: '/history', icon: History },
   ];
-
-  // Event handlers remain mostly the same
-  const handleChatHistoryClick = () => {
-    window.location.href = '/history';
-    if (!isCollapsed) onClose();
-  };
 
   const handleNewChat = () => {
     if (onNewChat) {
@@ -187,18 +181,6 @@ const Sidebar: React.FC<SidebarProps> = ({
                 </Link>
               );
             })}
-            
-            {/* Chat History Button */}
-            <button
-              onClick={handleChatHistoryClick}
-              title={isCollapsed ? "Chat History" : undefined}
-              className={`flex items-center w-full ${
-                isCollapsed ? 'justify-center px-0' : 'justify-start px-3'
-              } py-2 rounded-lg text-sm font-medium transition-all duration-200 text-sidebar-foreground hover:bg-sidebar-accent hover:text-sidebar-accent-foreground`}
-            >
-              <History className="h-4 w-4" />
-              {!isCollapsed && <span className="ml-3">Chat History</span>}
-            </button>
           </nav>
 
           {/* Chat History Section - only show when expanded */}
