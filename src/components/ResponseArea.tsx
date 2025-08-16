@@ -108,7 +108,7 @@ const ResponseArea: React.FC<ResponseAreaProps> = (props) => {
           <div className="flex flex-col items-center justify-center h-full text-center max-w-2xl mx-auto">
             <div className="mb-6">
               <div className="w-16 h-16 rounded-2xl gradient-subtle flex items-center justify-center shadow-moderate">
-                <img src="/favicon.ico" alt="GlazionStudio" className="w-full h-full object-cover" />
+                <img src="/favicon.ico" alt="GlazionStudio" />
               </div>
             </div>
             <h2 className="text-2xl font-bold text-foreground mb-2 font-heading">Good to See You!</h2>
