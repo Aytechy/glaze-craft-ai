@@ -94,9 +94,9 @@ export default function AppShell() {
         className="transition-all duration-300 ease-in-out overflow-hidden"
         style={{
           marginLeft: isDesktop ? (isSidebarOpen ? sidebarWidth : railWidth) : 0,
-          paddingTop: '4.5rem',         // header is fixed, keep visual spacing if you want
+          paddingTop: '3.5rem',         // header is fixed, keep visual spacing if you want
           paddingBottom: 0,             // remove extra 6rem padding that made root taller
-          height: 'calc(100svh - 90px)' // 56px header height
+          height: 'calc(100svh - 56px)' // 56px header height
         }}
       >
         <Outlet />
