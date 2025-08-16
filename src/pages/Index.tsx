@@ -2,9 +2,10 @@
  * Index Page - Main GlazionStudio Chat Interface
  * 
  * Layout behavior:
+ * - Fixed body that doesn't scroll
+ * - Full-width ResponseArea with centered content
  * - PromptCard starts centered under ResponseArea welcome screen
  * - When conversation starts, PromptCard sticks to bottom, ResponseArea takes remaining space
- * - Clean, intuitive UX similar to ChatGPT/Claude
  */
 
 import React, { useState, useEffect } from 'react';
@@ -96,7 +97,11 @@ const Index: React.FC = () => {
   }, [error, toast]);
 
   return (
-    <div className="h-full flex flex-col">
+    // Fixed container that takes full viewport height minus header and tabs
+    <div className="fixed inset-0 flex flex-col" style={{ 
+      top: '104px', // 56px header + 52px tabs - adjusted in HybridLayout
+      bottom: 0 
+    }}>
       <ClipboardUpload onImagePaste={(file) => {
         if (document.querySelector('[data-prompt-card]')) {
           const event = new CustomEvent('pastedImage', { detail: file });
@@ -106,9 +111,8 @@ const Index: React.FC = () => {
         
         {!hasConversation && !isLoading ? (
           /* No conversation: Center everything vertically */
-          <div className="fixed inset-x-0 mx-auto">
-            <div className="flex flex-col items-center justify-center">
-            <div className="w-full max-w-4xl">
+          <div className="flex-1 flex items-center justify-center px-4">
+            <div className="w-full max-w-4xl space-y-8">
               {/* Welcome area - ResponseArea with welcome screen */}
               <div>
                 <ResponseArea
@@ -130,47 +134,32 @@ const Index: React.FC = () => {
                 />
               </div>
             </div>
-            </div>
           </div>
         ) : (
           /* Has conversation OR is loading: ResponseArea takes space, PromptCard at bottom */
           <>
             {/* Messages area - scrollable, takes remaining space */}
-            <div className="flex-1 min-h-0">
-              <div
-                ref={scrollRef}
-                className="h-full overflow-y-auto px-4"
-                style={{ 
-                  scrollbarGutter: 'stable',
-                  paddingBottom: '120px' // Space for fixed prompt
-                }}
-              >
-                <div className="w-full max-w-4xl mx-auto">
-                  <ResponseArea
-                    messages={messages}
-                    isTyping={isLoading}
-                    onSuggestionSelect={handleSuggestionSelect}
-                    onEditMessage={handleEditMessage}
-                    bottomPadPx={0}
-                    scrollParentRef={scrollRef}
-                  />
-                </div>
-              </div>
+            <div className="flex-1 min-h-0 overflow-hidden">
+              <ResponseArea
+                messages={messages}
+                isTyping={isLoading}
+                onSuggestionSelect={handleSuggestionSelect}
+                onEditMessage={handleEditMessage}
+                bottomPadPx={140} // Space for fixed prompt
+                scrollParentRef={scrollRef}
+              />
             </div>
 
             {/* Fixed PromptCard at bottom */}
-            <div 
-              className="fixed bottom-0 inset-x-0 mx-auto z-30 bg-background/95 backdrop-blur"
-              style={{
-                paddingBottom: 'calc(env(safe-area-inset-bottom) + 16px)',
-              }}
-            >
-              <PromptCard
-                onSendMessage={handleSendMessage}
-                isLoading={isLoading || !canSendMessage}
-                isTyping={isLoading}
-                hasMessages={hasConversation}
-              />
+            <div className="flex-shrink-0 bg-background border-t border-border/40">
+              <div className="max-w-4xl mx-auto">
+                <PromptCard
+                  onSendMessage={handleSendMessage}
+                  isLoading={isLoading || !canSendMessage}
+                  isTyping={isLoading}
+                  hasMessages={hasConversation}
+                />
+              </div>
             </div>
           </>
         )}
