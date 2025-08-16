@@ -6,6 +6,12 @@
 /* All colors MUST be HSL format */
 
 @layer base {
+  html, body, #root {
+    height: 100%;
+    overflow: hidden;              /* kill root scroll */
+    overscroll-behavior-y: none;   /* prevent pull-to-refresh/chain */
+    touch-action: manipulation;    /* smoother touch */
+  }
   :root {
     /* Core Background System */
     --background: 0 0% 100%;

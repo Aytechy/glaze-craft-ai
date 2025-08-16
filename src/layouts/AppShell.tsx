@@ -47,7 +47,7 @@ export default function AppShell() {
   const hasBottomTabs = ['/', '/recipes-to-image', '/image-to-recipes', '/umf-calculator'].includes(location.pathname);
 
   return (
-    <div className="min-h-screen bg-background text-foreground">
+    <div className="h-[100svh] overflow-hidden bg-background text-foreground">
       {/* Fixed Header */}
       <Header 
         onToggleSidebar={() => setIsSidebarOpen(prev => !prev)} 
@@ -90,12 +90,13 @@ export default function AppShell() {
       )}
 
       {/* Main Content Area */}
-      <main 
-        className="transition-all duration-300 ease-in-out"
+      <main
+        className="transition-all duration-300 ease-in-out overflow-hidden"
         style={{
           marginLeft: isDesktop ? (isSidebarOpen ? sidebarWidth : railWidth) : 0,
-          paddingTop: '3.5rem', // 56px for fixed header
-          paddingBottom: hasBottomTabs ? '6rem' : '1.5rem', // 96px for bottom tabs, 24px otherwise
+          paddingTop: '3.5rem',         // header is fixed, keep visual spacing if you want
+          paddingBottom: 0,             // remove extra 6rem padding that made root taller
+          height: 'calc(100svh - 56px)' // 56px header height
         }}
       >
         <Outlet />
