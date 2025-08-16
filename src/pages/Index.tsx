@@ -280,7 +280,15 @@ const Index: React.FC = () => {
                 width={sidebarWidth}
               />
             ) : (
-              <SidebarRail />
+              <Sidebar
+                isOpen={true}
+                onClose={handleCloseSidebar}
+                onNewChat={() => setIsNewChatModalOpen(true)}
+                isCollapsed={true}
+                onToggleCollapsed={() => setIsSidebarOpen(true)}
+                width={sidebarWidth}
+                collapsedWidth={RAIL_W}
+              />
             )}
           </div>
         </div>
