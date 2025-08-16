@@ -1,104 +1,303 @@
-import React, { useState, useEffect } from 'react';
-import { Outlet, useLocation, Link } from 'react-router-dom';
-import { MessageSquare, Image as ImgIcon, FlaskConical, Calculator } from 'lucide-react';
+import React, { useState } from 'react';
+import { X, Home, History, Settings, User, Plus, FileText, ChevronLeft, ChevronRight, MessageSquare, Image as ImgIcon, FlaskConical, Calculator } from 'lucide-react';
+import { Button } from '@/components/ui/button';
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
+import { Link, useLocation } from 'react-router-dom';
+import { ProfilePopup } from '@/components/ProfilePopup';
+import { SettingsModal } from '@/components/modals/SettingsModal';
 
-const tabs = [
-  { to: '/', label: 'Chat Assistant', icon: MessageSquare },
-  { to: '/recipes-to-image', label: 'Recipes → Image', icon: FlaskConical },
-  { to: '/image-to-recipes', label: 'Image → Recipes', icon: ImgIcon },
-  { to: '/umf-calculator', label: 'UMF Calculator', icon: Calculator },
-];
+interface EnhancedSidebarProps {
+  isOpen: boolean;
+  onClose: () => void;
+  onNewChat?: () => void;
+  isCollapsed?: boolean;
+  onToggleCollapsed?: () => void;
+  width?: number;
+  collapsedWidth?: number;
+}
 
-export default function TopTabLayout() {
-  const { pathname } = useLocation();
-  const [isDesktop, setIsDesktop] = useState(window.innerWidth >= 768);
-  const [sidebarOpen, setSidebarOpen] = useState(false);
-  const sidebarWidth = 280;
-  const railWidth = 64;
+interface ChatHistoryItem {
+  id: string;
+  title: string;
+  timestamp: string;
+}
 
-  useEffect(() => {
-    const handleResize = () => {
-      setIsDesktop(window.innerWidth >= 768);
-    };
+interface UserProfile {
+  name: string;
+  email: string;
+  avatar?: string;
+}
 
-    const checkSidebarState = () => {
-      if (!isDesktop) {
-        setSidebarOpen(false);
-        return;
+const EnhancedSidebar: React.FC<EnhancedSidebarProps> = ({ 
+  isOpen, 
+  onClose, 
+  onNewChat, 
+  isCollapsed = false,
+  onToggleCollapsed,
+  width = 280,
+  collapsedWidth = 64
+}) => {
+  const location = useLocation();
+  const [isProfilePopupOpen, setIsProfilePopupOpen] = useState(false);
+  const [isSettingsModalOpen, setIsSettingsModalOpen] = useState(false);
+
+  const user: UserProfile = {
+    name: "John Doe",
+    email: "john.doe@example.com",
+    avatar: undefined
+  };
+
+  const chatHistory: ChatHistoryItem[] = [
+    { id: '1', title: 'Glaze Recipe Help', timestamp: '2 hours ago' },
+    { id: '2', title: 'Pottery Techniques', timestamp: '1 day ago' },
+    { id: '3', title: 'Kiln Temperature Guide', timestamp: '3 days ago' },
+  ];
+
+  // Enhanced navigation with feature sections
+  const mainFeatures = [
+    { name: 'Chat Assistant', path: '/', icon: MessageSquare },
+    { name: 'Recipes → Image', path: '/recipes-to-image', icon: FlaskConical },
+    { name: 'Image → Recipes', path: '/image-to-recipes', icon: ImgIcon },
+    { name: 'UMF Calculator', path: '/umf-calculator', icon: Calculator },
+  ];
+
+  const utilityPages = [
+    { name: 'Notes', path: '/notes', icon: FileText },
+    { name: 'History', path: '/history', icon: History },
+  ];
+
+  const handleNewChat = () => {
+    if (onNewChat) {
+      onNewChat();
+    } else {
+      if (location.pathname !== '/') {
+        window.location.href = '/';
       }
-      const sidebarContainer = document.querySelector('.hidden.md\\:block.fixed.top-0.left-0');
-      if (sidebarContainer) {
-        const width = sidebarContainer.getBoundingClientRect().width;
-        setSidebarOpen(width > railWidth + 10);
-      }
-    };
-
-    const timer = setTimeout(checkSidebarState, 100);
-    window.addEventListener('resize', handleResize);
-    
-    const observer = new MutationObserver(() => {
-      setTimeout(checkSidebarState, 50);
-    });
-    
-    const sidebarContainer = document.querySelector('.hidden.md\\:block.fixed.top-0.left-0');
-    if (sidebarContainer) {
-      observer.observe(sidebarContainer, { 
-        attributes: true, 
-        attributeFilter: ['style'],
-        subtree: true
-      });
     }
+    if (!isCollapsed) onClose();
+  };
 
-    return () => {
-      clearTimeout(timer);
-      window.removeEventListener('resize', handleResize);
-      observer.disconnect();
-    };
-  }, [isDesktop, railWidth]);
-
-  const leftOffset = isDesktop ? (sidebarOpen ? sidebarWidth : railWidth) : 0;
+  const currentWidth = isCollapsed ? collapsedWidth : width;
 
   return (
-    <div className="relative">
-      {/* Top Tab Bar */}
+    <>
       <div 
-        className="fixed top-14 z-40 border-b bg-background/95 backdrop-blur"
-        style={{
-          left: leftOffset,
-          right: 0,
-          height: '48px'
-        }}
+        data-sidebar="true"
+        className={`
+          fixed top-0 left-0 flex flex-col h-full bg-sidebar border-r border-sidebar-border
+          transform transition-all duration-300 ease-in-out z-[200]
+          shadow-elevated
+          ${isOpen ? 'translate-x-0' : '-translate-x-full'}
+        `}
+        style={{ width: currentWidth }}
       >
-        <nav className="h-full px-4">
-          <ul className="flex h-full items-center gap-1">
-            {tabs.map(({ to, label, icon: Icon }) => {
-              const active = pathname === to;
+        {/* Header */}
+        <div className="flex items-center justify-between p-4 border-b border-sidebar-border">
+          {!isCollapsed ? (
+            <>
+              <h2 className="text-lg font-semibold text-sidebar-foreground font-heading">
+                GlazionStudio
+              </h2>
+              <div className="flex items-center gap-1">
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={onToggleCollapsed}
+                  className="text-sidebar-foreground hover:bg-sidebar-accent"
+                  aria-label="Collapse sidebar"
+                >
+                  <ChevronLeft className="h-4 w-4" />
+                </Button>
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={onClose}
+                  className="text-sidebar-foreground hover:bg-sidebar-accent md:hidden"
+                  aria-label="Close sidebar"
+                >
+                  <X className="h-4 w-4" />
+                </Button>
+              </div>
+            </>
+          ) : (
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={onToggleCollapsed}
+              className="text-sidebar-foreground hover:bg-sidebar-accent mx-auto"
+              aria-label="Expand sidebar"
+            >
+              <ChevronRight className="h-4 w-4" />
+            </Button>
+          )}
+        </div>
+
+        {/* Content */}
+        <div className="flex-1 py-4 flex flex-col overflow-hidden">
+          {/* New Chat Button */}
+          <div className="px-4 mb-6">
+            <Button
+              onClick={handleNewChat}
+              className={`w-full gradient-primary text-primary-foreground hover:opacity-90 transition-opacity ${
+                isCollapsed ? 'px-0' : ''
+              }`}
+              size="sm"
+              title={isCollapsed ? "New Chat" : undefined}
+            >
+              <Plus className="h-4 w-4" />
+              {!isCollapsed && <span className="ml-2">New Chat</span>}
+            </Button>
+          </div>
+
+          {/* Main Features Section */}
+          <nav className="px-4 space-y-1 mb-6">
+            {!isCollapsed && (
+              <h3 className="text-xs font-semibold text-sidebar-foreground/60 uppercase tracking-wider mb-2">
+                Features
+              </h3>
+            )}
+            {mainFeatures.map((item) => {
+              const isActive = location.pathname === item.path;
+              const Icon = item.icon;
+              
               return (
-                <li key={to}>
-                  <Link
-                    to={to}
-                    className={[
-                      'flex items-center gap-2 px-4 py-2 rounded-lg transition-colors text-sm font-medium',
-                      active 
-                        ? 'text-primary bg-primary/10 border border-primary/20' 
-                        : 'text-muted-foreground hover:text-foreground hover:bg-accent/50'
-                    ].join(' ')}
-                    aria-current={active ? 'page' : undefined}
-                  >
-                    <Icon className="h-4 w-4 flex-shrink-0" />
-                    <span className="hidden sm:inline">{label}</span>
-                  </Link>
-                </li>
+                <Link
+                  key={item.path}
+                  to={item.path}
+                  onClick={() => !isCollapsed && onClose()}
+                  title={isCollapsed ? item.name : undefined}
+                  className={`flex items-center w-full ${
+                    isCollapsed ? 'justify-center px-2' : 'justify-start px-3'
+                  } py-2.5 rounded-lg text-sm font-medium transition-all duration-200 ${
+                    isActive 
+                      ? 'bg-primary text-primary-foreground shadow-sm' 
+                      : 'text-sidebar-foreground hover:bg-sidebar-accent hover:text-sidebar-accent-foreground'
+                  }`}
+                >
+                  <Icon className="h-4 w-4" />
+                  {!isCollapsed && <span className="ml-3">{item.name}</span>}
+                </Link>
               );
             })}
-          </ul>
-        </nav>
+          </nav>
+
+          {/* Utility Pages */}
+          <nav className="px-4 space-y-1 mb-6">
+            {!isCollapsed && (
+              <h3 className="text-xs font-semibold text-sidebar-foreground/60 uppercase tracking-wider mb-2">
+                Tools
+              </h3>
+            )}
+            {utilityPages.map((item) => {
+              const isActive = location.pathname === item.path;
+              const Icon = item.icon;
+              
+              return (
+                <Link
+                  key={item.path}
+                  to={item.path}
+                  onClick={() => !isCollapsed && onClose()}
+                  title={isCollapsed ? item.name : undefined}
+                  className={`flex items-center w-full ${
+                    isCollapsed ? 'justify-center px-2' : 'justify-start px-3'
+                  } py-2.5 rounded-lg text-sm font-medium transition-all duration-200 ${
+                    isActive 
+                      ? 'bg-accent/50 text-primary border border-primary/20 shadow-sm' 
+                      : 'text-sidebar-foreground hover:bg-sidebar-accent hover:text-sidebar-accent-foreground'
+                  }`}
+                >
+                  <Icon className="h-4 w-4" />
+                  {!isCollapsed && <span className="ml-3">{item.name}</span>}
+                </Link>
+              );
+            })}
+          </nav>
+
+          {/* Chat History Section */}
+          {!isCollapsed && (
+            <div className="flex-1 px-4 py-4 overflow-y-auto">
+              <h3 className="text-xs font-semibold text-sidebar-foreground/60 uppercase tracking-wider mb-3">
+                Recent Chats
+              </h3>
+              <div className="space-y-1">
+                {chatHistory.map((chat) => (
+                  <Link
+                    key={chat.id}
+                    to="/"
+                    onClick={onClose}
+                    className="block w-full text-left p-2.5 rounded-lg hover:bg-sidebar-accent 
+                             transition-colors group"
+                  >
+                    <div className="text-sm font-medium text-sidebar-foreground mb-1 
+                                  truncate group-hover:text-sidebar-accent-foreground">
+                      {chat.title}
+                    </div>
+                    <div className="text-xs text-sidebar-foreground/60">
+                      {chat.timestamp}
+                    </div>
+                  </Link>
+                ))}
+              </div>
+            </div>
+          )}
+        </div>
+        
+        {/* Bottom section */}
+        <div className="border-t border-sidebar-border p-3">
+          <div 
+            onClick={() => setIsProfilePopupOpen(true)}
+            title={isCollapsed ? user.name : undefined}
+            className={`flex items-center gap-2 p-2 rounded-lg hover:bg-sidebar-accent 
+                      transition-colors cursor-pointer mb-2 ${
+                        isCollapsed ? 'justify-center' : ''
+                      }`}
+          >
+            <Avatar className="h-8 w-8 flex-shrink-0">
+              <AvatarImage src={user.avatar} alt={user.name} />
+              <AvatarFallback className="bg-primary text-primary-foreground text-xs">
+                {user.name.split(' ').map(n => n[0]).join('')}
+              </AvatarFallback>
+            </Avatar>
+            {!isCollapsed && (
+              <div className="flex-1 min-w-0">
+                <div className="text-sm font-medium text-sidebar-foreground truncate">
+                  {user.name}
+                </div>
+                <div className="text-xs text-sidebar-foreground/60 truncate">
+                  {user.email}
+                </div>
+              </div>
+            )}
+          </div>
+
+          <Button
+            onClick={() => setIsSettingsModalOpen(true)}
+            variant="ghost"
+            className={`w-full ${
+              isCollapsed ? 'justify-center px-0' : 'justify-start'
+            } text-sidebar-foreground hover:bg-sidebar-accent`}
+            size="sm"
+            title={isCollapsed ? "Settings" : undefined}
+          >
+            <Settings className="h-4 w-4" />
+            {!isCollapsed && <span className="ml-3">Settings</span>}
+          </Button>
+        </div>
       </div>
 
-      {/* Content with proper spacing */}
-      <div style={{ paddingTop: '48px' }}>
-        <Outlet />
-      </div>
-    </div>
+      {/* Modals */}
+      <ProfilePopup
+        isOpen={isProfilePopupOpen}
+        onClose={() => setIsProfilePopupOpen(false)}
+        user={user}
+      />
+
+      <SettingsModal
+        isOpen={isSettingsModalOpen}
+        onClose={() => setIsSettingsModalOpen(false)}
+      />
+    </>
   );
-}
+};
+
+export default EnhancedSidebar;
