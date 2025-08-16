@@ -192,7 +192,7 @@ const Index: React.FC = () => {
         {/* Input prompt card - positioned at bottom */}
         <div
           ref={promptWrapRef}
-          className="fixed bottom-0 z-30 pb-24 "
+          className="sticky bottom-0 z-30 pb-24 "
           style={{
             paddingBottom: 'calc(env(safe-area-inset-bottom) + 96px)', // 96px for bottom tabs
           }}
