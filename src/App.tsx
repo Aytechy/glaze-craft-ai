@@ -24,7 +24,7 @@ import Notes from "./pages/Notes";
 import History from "./pages/History";
 import NotFound from "./pages/NotFound";
 import AppShell from './layouts/AppShell';
-import FeatureLayout from './layouts/FeatureLayout';
+import HybridLayout from './layouts/HybridLayout';
 import RecipesToImage from './pages/RecipesToImage';
 import ImageToRecipes from './pages/ImageToRecipes';
 import UMFCalculator from './pages/UMFCalculator';
@@ -119,7 +119,7 @@ const App: React.FC = () => {
             <Routes>
               {/* AppShell + Tabs */}
               <Route element={<AppShell />}>
-                <Route element={<FeatureLayout />}>
+                <Route element={<HybridLayout />}>
                   <Route path="/" element={<Index />} />
                   <Route path="/recipes-to-image" element={<RecipesToImage />} />
                   <Route path="/image-to-recipes" element={<ImageToRecipes />} />
@@ -144,4 +144,4 @@ const App: React.FC = () => {
   );
 };
 
-export default App;
+export default App; 
