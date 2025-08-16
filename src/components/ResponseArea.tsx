@@ -113,14 +113,14 @@ const ResponseArea: React.FC<ResponseAreaProps> = (props) => {
             </div>
             <h2 className="text-2xl font-bold text-foreground mb-2 font-heading">Good to See You!</h2>
             <h3 className="text-xl text-foreground mb-4 font-heading">How Can I be an Assistance?</h3>
-            {/* <p className="text-muted-foreground max-w-md">
+            <p className="text-muted-foreground max-w-md">
               I'm available 24/7 for you, ask me anything about ceramics, glazes, and pottery techniques.
             </p>
             <div className="mt-8 flex flex-wrap gap-3 justify-center">
               <SuggestionButton text="Any advice for me?" onSelect={(text) => onSuggestionSelect && onSuggestionSelect(text)} />
               <SuggestionButton text="Some glaze recipe ideas" onSelect={(text) => onSuggestionSelect && onSuggestionSelect(text)} />
               <SuggestionButton text="Kiln firing techniques" onSelect={(text) => onSuggestionSelect && onSuggestionSelect(text)} />
-            </div> */}
+            </div>
           </div>
         )}
 
