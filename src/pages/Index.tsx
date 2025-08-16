@@ -96,7 +96,7 @@ const Index: React.FC = () => {
   }, [error, toast]);
 
   return (
-    <div className="fixed inset-0 flex flex-col">
+    <div className="h-[100dvh] overflow-hidden flex flex-col">
       <ClipboardUpload onImagePaste={(file) => {
         if (document.querySelector('[data-prompt-card]')) {
           const event = new CustomEvent('pastedImage', { detail: file });
