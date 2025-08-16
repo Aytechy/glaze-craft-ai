@@ -90,15 +90,17 @@ export default function AppShell() {
       )}
 
       {/* Main Content Area */}
-      <main 
-        className="transition-all duration-300 ease-in-out"
+      <main
+        className="transition-all duration-300 ease-in-out flex flex-col min-h-screen"
         style={{
           marginLeft: isDesktop ? (isSidebarOpen ? sidebarWidth : railWidth) : 0,
-          paddingTop: '3.5rem', // 56px for fixed header
-          paddingBottom: hasBottomTabs ? '6rem' : '1.5rem', // 96px for bottom tabs, 24px otherwise
+          paddingTop: '3.5rem',                    // fixed header (56px)
+          paddingBottom: hasBottomTabs ? '6rem' : '1.5rem',
         }}
       >
-        <Outlet />
+        <div className="flex-1 min-h-0">
+          <Outlet />
+        </div>
       </main>
     </div>
   );
