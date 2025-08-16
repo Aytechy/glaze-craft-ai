@@ -96,7 +96,7 @@ const Index: React.FC = () => {
   }, [error, toast]);
 
   return (
-    <div className="h-full overflow-hidden flex flex-col relative">
+    <div className="fixed inset-0 overflow-hidden flex flex-col">
       <ClipboardUpload onImagePaste={(file) => {
         if (document.querySelector('[data-prompt-card]')) {
           const event = new CustomEvent('pastedImage', { detail: file });
@@ -105,9 +105,10 @@ const Index: React.FC = () => {
       }}>
         
         {!hasConversation && !isLoading ? (
-          /* No conversation: Center everything vertically within the available space */
-          <div className="flex-1 flex flex-col items-center justify-center px-4">
-            <div className="w-full max-w-4xl space-y-8">
+          /* No conversation: Center everything vertically */
+          <div className="fixed inset-x-0 mx-auto">
+            <div className="flex flex-col items-center justify-center">
+            <div className="w-full max-w-4xl">
               {/* Welcome area - ResponseArea with welcome screen */}
               <div>
                 <ResponseArea
@@ -128,6 +129,7 @@ const Index: React.FC = () => {
                   hasMessages={hasConversation}
                 />
               </div>
+            </div>
             </div>
           </div>
         ) : (
@@ -156,21 +158,19 @@ const Index: React.FC = () => {
               </div>
             </div>
 
-            {/* Fixed PromptCard at bottom - positioned relative to the main content area */}
+            {/* Fixed PromptCard at bottom */}
             <div 
-              className="absolute bottom-0 inset-x-0 z-30 bg-background/95 backdrop-blur px-4"
+              className="fixed bottom-0 inset-x-0 mx-auto z-30 bg-background/95 backdrop-blur"
               style={{
                 paddingBottom: 'calc(env(safe-area-inset-bottom) + 16px)',
               }}
             >
-              <div className="w-full max-w-4xl mx-auto">
-                <PromptCard
-                  onSendMessage={handleSendMessage}
-                  isLoading={isLoading || !canSendMessage}
-                  isTyping={isLoading}
-                  hasMessages={hasConversation}
-                />
-              </div>
+              <PromptCard
+                onSendMessage={handleSendMessage}
+                isLoading={isLoading || !canSendMessage}
+                isTyping={isLoading}
+                hasMessages={hasConversation}
+              />
             </div>
           </>
         )}
