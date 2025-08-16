@@ -1,19 +1,8 @@
 /**
  * Index Page - Main GlazionStudio Chat Interface
  * 
- * This is the primary user interface for GlazionStudio, featuring:
- * - Responsive chat layout
- * - Sliding sidebar navigation
- * - Message display area
- * - Interactive prompt input
- * - Real-time AI responses
- * 
- * Security features:
- * - Input validation and sanitization
- * - File upload restrictions
- * - Rate limiting
- * - Error boundary protection
- * - XSS prevention
+ * This component detects if it's running within AppShell layout
+ * and adjusts accordingly to avoid duplicate headers/sidebars
  */
 
 import React, { useState, useEffect } from 'react';
@@ -25,15 +14,12 @@ import { NewChatModal } from '@/components/modals/NewChatModal';
 import { ClipboardUpload } from '@/components/ClipboardUpload';
 import { useChat } from '@/hooks/useChat';
 import { useToast } from '@/hooks/use-toast';
-// import { SidebarRail } from "@/components/SidebarRail";
 
-
-
-/**
- * Main Index Component - GlazionStudio Chat Interface
- */
 const Index: React.FC = () => {
-  // Sidebar state management
+  // Detect if we're running inside AppShell by checking for existing header
+  const [isInAppShell, setIsInAppShell] = useState(false);
+  
+  // Sidebar state management (only used if not in AppShell)
   const [isSidebarOpen, setIsSidebarOpen] = useState<boolean>(false);
   const [isNewChatModalOpen, setIsNewChatModalOpen] = useState<boolean>(false);
   const [sidebarWidth, setSidebarWidth] = useState<number>(350);
@@ -63,9 +49,33 @@ const Index: React.FC = () => {
   const hasConversation = messageCount > 0;
   const scrollRef = React.useRef<HTMLDivElement>(null);
 
-  
-  // Toast for user notifications
   const { toast } = useToast();
+
+  // Detect if we're inside AppShell by checking for existing headers
+  useEffect(() => {
+    const checkAppShell = () => {
+      // Look for existing header in the DOM (from AppShell)
+      const existingHeader = document.querySelector('header');
+      const isWrapped = existingHeader && !headerRef.current;
+      setIsInAppShell(isWrapped);
+    };
+    
+    // Check immediately and after a short delay
+    checkAppShell();
+    const timer = setTimeout(checkAppShell, 100);
+    
+    return () => clearTimeout(timer);
+  }, []);
+
+  // Listen for new chat requests from AppShell
+  useEffect(() => {
+    const handleNewChatRequest = () => {
+      clearMessages();
+    };
+    
+    window.addEventListener('newChatRequested', handleNewChatRequest);
+    return () => window.removeEventListener('newChatRequested', handleNewChatRequest);
+  }, [clearMessages]);
 
   /**
    * Toggle sidebar visibility
@@ -94,7 +104,6 @@ const Index: React.FC = () => {
       await sendUserMessage(content, image);
     } catch (error) {
       console.error('Error sending message:', error);
-      // Error is already handled by the useChat hook
     }
   };
 
@@ -120,7 +129,7 @@ const Index: React.FC = () => {
     }
   };
 
-  const RAIL_W = 64; // keep in sync with w-16 in SidebarRail.tsx
+  const RAIL_W = 64;
 
   /**
    * Handle new chat
@@ -129,6 +138,7 @@ const Index: React.FC = () => {
     clearMessages();
     setIsNewChatModalOpen(false);
   };
+
   const [isDesktop, setIsDesktop] = useState<boolean>(typeof window !== 'undefined' ? window.innerWidth >= 768 : false);
 
   useEffect(() => {
@@ -137,25 +147,27 @@ const Index: React.FC = () => {
     return () => window.removeEventListener('resize', onResize);
   }, []);
 
-  // Initialize sidebar state from localStorage
+  // Initialize sidebar state from localStorage (only if not in AppShell)
   useEffect(() => {
-    const sidebarState = localStorage.getItem('sidebar-open');
-    if (sidebarState !== null) {
-      setIsSidebarOpen(sidebarState === 'true');
+    if (!isInAppShell) {
+      const sidebarState = localStorage.getItem('sidebar-open');
+      if (sidebarState !== null) {
+        setIsSidebarOpen(sidebarState === 'true');
+      }
     }
-  }, []);
+  }, [isInAppShell]);
 
   /**
-   * Handle keyboard shortcuts
+   * Handle keyboard shortcuts (only if not in AppShell)
    */
   useEffect(() => {
+    if (isInAppShell) return; // AppShell handles this
+    
     const handleKeyDown = (event: KeyboardEvent) => {
-      // Escape key to close sidebar
       if (event.key === 'Escape' && isSidebarOpen) {
         setIsSidebarOpen(false);
       }
       
-      // Ctrl/Cmd + K to toggle sidebar
       if ((event.ctrlKey || event.metaKey) && event.key === 'k') {
         event.preventDefault();
         handleToggleSidebar();
@@ -164,7 +176,7 @@ const Index: React.FC = () => {
 
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [isSidebarOpen]);
+  }, [isSidebarOpen, isInAppShell]);
 
   /**
    * Show rate limit notifications
@@ -192,14 +204,12 @@ const Index: React.FC = () => {
     }
   }, [error, toast]);
 
-  // Measure PromptCard height (guarded so it can't crash)
+  // Measure PromptCard height
   useEffect(() => {
     const el = promptWrapRef.current;
     if (!el) return;
 
-    // Older browsers: guard ResizeObserver
     if (typeof window.ResizeObserver === 'undefined') {
-      // Fallback once on mount
       setPromptHeight(el.getBoundingClientRect().height || 0);
       return;
     }
@@ -215,8 +225,10 @@ const Index: React.FC = () => {
     return () => ro.disconnect();
   }, []);
 
-  // Measure header height (updates if it changes)
+  // Measure header height (only if we have our own header)
   useEffect(() => {
+    if (isInAppShell) return; // Don't measure AppShell's header
+    
     const el = headerRef.current;
     if (!el) return;
     const ro = new ResizeObserver((entries) => {
@@ -227,10 +239,78 @@ const Index: React.FC = () => {
     });
     ro.observe(el);
     return () => ro.disconnect();
-  }, []);
+  }, [isInAppShell]);
 
-  const leftOffset = isDesktop ? (isSidebarOpen ? sidebarWidth : RAIL_W) : 0;
+  // Calculate layout offsets
+  const leftOffset = !isInAppShell && isDesktop ? (isSidebarOpen ? sidebarWidth : RAIL_W) : 0;
 
+  // If running inside AppShell, render simplified chat-only version
+  if (isInAppShell) {
+    return (
+      <div className="h-full flex flex-col relative">
+        <ClipboardUpload onImagePaste={(file) => {
+          if (document.querySelector('[data-prompt-card]')) {
+            const event = new CustomEvent('pastedImage', { detail: file });
+            document.dispatchEvent(event);
+          }
+        }}>
+          {/* Chat messages area */}
+          <div className="flex-1 min-h-0 relative">
+            <div
+              ref={scrollRef}
+              className={`absolute inset-0 transition-all duration-300 ease-out touch-pan-y
+                          ${hasConversation ? 'overflow-y-scroll' : 'overflow-y-hidden'}`}
+              style={{
+                bottom: Math.max(80, promptHeight + 20),
+                ...(hasConversation ? { scrollbarGutter: 'stable' } : {}),
+              }}
+            >
+              <ResponseArea
+                messages={messages}
+                isTyping={isLoading}
+                onSuggestionSelect={handleSuggestionSelect}
+                onEditMessage={handleEditMessage}
+                bottomPadPx={0}
+                scrollParentRef={scrollRef}
+              />
+            </div>
+          </div>
+
+          {/* Input prompt card */}
+          <div
+            ref={promptWrapRef}
+            className="absolute bottom-0 left-0 right-0 z-10 pb-4"
+            style={{
+              paddingBottom: 'calc(env(safe-area-inset-bottom) + 1rem)',
+            }}
+          >
+            <PromptCard
+              onSendMessage={handleSendMessage}
+              isLoading={isLoading || !canSendMessage}
+              isTyping={isLoading}
+              hasMessages={messageCount > 0}
+            />
+          </div>
+        </ClipboardUpload>
+
+        {/* New Chat Modal */}
+        <NewChatModal
+          isOpen={isNewChatModalOpen}
+          onClose={() => setIsNewChatModalOpen(false)}
+          onNewChat={handleNewChat}
+        />
+
+        {/* Accessibility announcements */}
+        <div className="sr-only" aria-live="polite" aria-atomic="true">
+          {isLoading && "AI is processing your message"}
+          {rateLimitTimeRemaining > 0 && `Rate limit active, ${Math.ceil(rateLimitTimeRemaining / 1000)} seconds remaining`}
+          {error && `Error occurred: ${error}`}
+        </div>
+      </div>
+    );
+  }
+
+  // If NOT in AppShell, render the full standalone version (your original code)
   return (
     <div className="h-[100dvh] w-full flex flex-col overflow-hidden">
       <Header
@@ -242,7 +322,6 @@ const Index: React.FC = () => {
 
       {/* Spacer so content doesn't sit under the fixed header */}
       <div className="h-14" />
-
       
       {/* Backdrop blur for mobile screens */}
       {isSidebarOpen && (
@@ -259,58 +338,44 @@ const Index: React.FC = () => {
             isOpen={true}
             onClose={handleCloseSidebar}
             onNewChat={() => setIsNewChatModalOpen(true)}
-            width={256} // or match w-64
+            width={256}
           />
         </div>
       )}
       
       {/* Main content area */}
       <div className="flex-1 flex relative">
-        {/* Desktop sidebar shell with smooth width transition */}
+        {/* Desktop sidebar */}
         <div
           className="hidden md:block fixed top-0 left-0 z-40 h-screen overflow-hidden transition-[width] duration-300 ease-out"
           style={{ width: isSidebarOpen ? `${sidebarWidth}px` : `${RAIL_W}px` }}
         >
-          <div className="absolute inset-0">
-            {isSidebarOpen ? (
-              <Sidebar
-                isOpen={true}
-                onClose={handleCloseSidebar}
-                onNewChat={() => setIsNewChatModalOpen(true)}
-                width={sidebarWidth}
-              />
-            ) : (
-            <Sidebar
-              isOpen={true}
-              onClose={handleCloseSidebar}
-              onNewChat={() => setIsNewChatModalOpen(true)}
-              isCollapsed={true}
-              onToggleCollapsed={() => setIsSidebarOpen(true)}
-              width={sidebarWidth}
-              collapsedWidth={RAIL_W}
-            />
-          )}
-          </div>
+          <Sidebar
+            isOpen={true}
+            onClose={handleCloseSidebar}
+            onNewChat={() => setIsNewChatModalOpen(true)}
+            isCollapsed={!isSidebarOpen}
+            onToggleCollapsed={() => setIsSidebarOpen(prev => !prev)}
+            width={sidebarWidth}
+            collapsedWidth={RAIL_W}
+          />
         </div>
 
-        {/* Main content - full height with global scroll */}
+        {/* Chat content */}
         <div
           className="fixed bottom-0 right-0 flex flex-col transition-all duration-300 ease-out"
           style={{
-            top: '56px', // h-14
+            top: '56px',
             left: leftOffset,
             bottom: 0,
           }}
         >
-
           <ClipboardUpload onImagePaste={(file) => {
-            // Don't auto-send on paste, pass to PromptCard for preview
             if (document.querySelector('[data-prompt-card]')) {
               const event = new CustomEvent('pastedImage', { detail: file });
               document.dispatchEvent(event);
             }
           }}>
-            {/* Chat messages area - flex column so child absolute scroller can fit */}
             <div className="flex-1 min-h-0 relative">
               <div
                 ref={scrollRef}
@@ -329,21 +394,19 @@ const Index: React.FC = () => {
                     onSuggestionSelect={handleSuggestionSelect}
                     onEditMessage={handleEditMessage}
                     bottomPadPx={0}
-                    scrollParentRef={scrollRef}   // <-- pass parent scroller
+                    scrollParentRef={scrollRef}
                   />
                 </div>
               </div>
-
             </div>
 
-            {/* Input prompt card - properly positioned and shifts with sidebar */}
             <div
               ref={promptWrapRef}
               className="fixed z-30 mx-auto w-full max-w-3xl transition-all duration-300 ease-out"
               style={{
                 left: leftOffset,
                 right: 0,
-                bottom: '96px', // 96px to sit above the bottom tabs
+                bottom: '96px',
                 paddingBottom: 'calc(env(safe-area-inset-bottom) + 1px)',
               }}
             >
@@ -354,7 +417,6 @@ const Index: React.FC = () => {
                 hasMessages={messageCount > 0}
               />
             </div>
-
           </ClipboardUpload>
         </div>
       </div>
