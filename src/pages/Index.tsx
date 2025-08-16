@@ -47,7 +47,7 @@ const Index: React.FC = () => {
   });
 
   // Tracks the actual height of the PromptCard wrapper
-  const [promptHeight, setPromptHeight] = useState(0);
+  const [promptHeight, setPromptHeight] = useState(80);
   const promptWrapRef = React.useRef<HTMLDivElement | null>(null);
 
   const hasConversation = messageCount > 0;
@@ -142,14 +142,14 @@ const Index: React.FC = () => {
     // Older browsers: guard ResizeObserver
     if (typeof window.ResizeObserver === 'undefined') {
       // Fallback once on mount
-      setPromptHeight(el.getBoundingClientRect().height || 0);
+      setPromptHeight(el.getBoundingClientRect().height || 80);
       return;
     }
 
     const ro = new ResizeObserver((entries) => {
       for (const entry of entries) {
         const h = Math.round(entry.contentRect.height);
-        if (!Number.isNaN(h)) setPromptHeight(h);
+        if (!Number.isNaN(h) && h > 0) setPromptHeight(h);
       }
     });
 
@@ -158,7 +158,7 @@ const Index: React.FC = () => {
   }, []);
 
   return (
-    <div className="h-full relative">
+    <div className="h-full relative bg-background">
       <ClipboardUpload onImagePaste={(file) => {
         // Don't auto-send on paste, pass to PromptCard for preview
         if (document.querySelector('[data-prompt-card]')) {
@@ -169,10 +169,10 @@ const Index: React.FC = () => {
         
         {/* When no messages: Center everything vertically */}
         {!hasConversation ? (
-          <div className="h-full flex flex-col items-center justify-center px-4 pb-24">
-            <div className="w-full max-w-4xl mx-auto space-y-8">
-              {/* Welcome area */}
-              <div className="flex-1 flex items-center justify-center">
+          <div className="h-full flex flex-col">
+            {/* Welcome area takes most space */}
+            <div className="flex-1 flex items-center justify-center px-4">
+              <div className="w-full max-w-4xl">
                 <ResponseArea
                   messages={messages}
                   isTyping={isLoading}
@@ -181,9 +181,11 @@ const Index: React.FC = () => {
                   bottomPadPx={0}
                 />
               </div>
-              
-              {/* Centered prompt card */}
-              <div ref={promptWrapRef}>
+            </div>
+            
+            {/* Centered prompt card */}
+            <div className="pb-24 px-4"> {/* 96px for tabs */}
+              <div ref={promptWrapRef} className="w-full max-w-4xl mx-auto">
                 <PromptCard
                   onSendMessage={handleSendMessage}
                   isLoading={isLoading || !canSendMessage}
@@ -195,36 +197,32 @@ const Index: React.FC = () => {
           </div>
         ) : (
           /* When has messages: Normal layout with fixed prompt at bottom */
-          <>
+          <div className="h-full flex flex-col">
             {/* Chat messages area - takes remaining space */}
-            <div 
-              className="absolute inset-0"
-              style={{
-                bottom: Math.max(80, promptHeight + 10) + 96, // Add 96px for bottom tabs
-              }}
-            >
+            <div className="flex-1 min-h-0 relative">
               <div
                 ref={scrollRef}
-                className="h-full overflow-y-scroll touch-pan-y"
-                style={{ scrollbarGutter: 'stable' }}
+                className="absolute inset-0 overflow-y-scroll touch-pan-y"
+                style={{ 
+                  scrollbarGutter: 'stable',
+                  paddingBottom: `${promptHeight + 96 + 20}px` // prompt height + tabs + buffer
+                }}
               >
-                <div className="w-full max-w-4xl mx-auto px-4">
-                  <ResponseArea
-                    messages={messages}
-                    isTyping={isLoading}
-                    onSuggestionSelect={handleSuggestionSelect}
-                    onEditMessage={handleEditMessage}
-                    bottomPadPx={0}
-                    scrollParentRef={scrollRef}
-                  />
-                </div>
+                <ResponseArea
+                  messages={messages}
+                  isTyping={isLoading}
+                  onSuggestionSelect={handleSuggestionSelect}
+                  onEditMessage={handleEditMessage}
+                  bottomPadPx={0}
+                  scrollParentRef={scrollRef}
+                />
               </div>
             </div>
 
             {/* Fixed prompt card at bottom */}
             <div
               ref={promptWrapRef}
-              className="fixed bottom-0 left-0 right-0 z-30"
+              className="absolute bottom-0 left-0 right-0 z-30 bg-background/95 backdrop-blur"
               style={{
                 paddingBottom: 'calc(env(safe-area-inset-bottom) + 96px)', // 96px for bottom tabs
               }}
@@ -236,7 +234,7 @@ const Index: React.FC = () => {
                 hasMessages={messageCount > 0}
               />
             </div>
-          </>
+          </div>
         )}
       </ClipboardUpload>
 

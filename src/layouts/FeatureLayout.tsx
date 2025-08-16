@@ -13,7 +13,7 @@ export default function FeatureLayout() {
   const { pathname } = useLocation();
   const [isDesktop, setIsDesktop] = useState(window.innerWidth >= 768);
   const [sidebarOpen, setSidebarOpen] = useState(false);
-  const [sidebarWidth, setSidebarWidth] = useState(280);
+  const sidebarWidth = 280;
   const railWidth = 64;
 
   useEffect(() => {
@@ -21,27 +21,42 @@ export default function FeatureLayout() {
       setIsDesktop(window.innerWidth >= 768);
     };
 
-    const handleSidebarChange = () => {
-      const sidebar = document.querySelector('[data-sidebar="true"]');
-      if (sidebar) {
-        const isOpen = !sidebar.classList.contains('translate-x-0') ? false : 
-                      sidebar.getBoundingClientRect().width > railWidth;
+    const checkSidebarState = () => {
+      if (!isDesktop) {
+        setSidebarOpen(false);
+        return;
+      }
+
+      // Check AppShell's sidebar state by looking at main content margin
+      const main = document.querySelector('main');
+      if (main) {
+        const marginLeft = parseInt(window.getComputedStyle(main).marginLeft) || 0;
+        const isOpen = marginLeft >= sidebarWidth;
         setSidebarOpen(isOpen);
       }
     };
 
-    // Check initial sidebar state
-    handleSidebarChange();
+    // Initial check with a small delay to ensure DOM is ready
+    setTimeout(checkSidebarState, 100);
 
     window.addEventListener('resize', handleResize);
     
-    // Listen for sidebar state changes
-    const observer = new MutationObserver(handleSidebarChange);
+    // Listen for main content margin changes
+    const observer = new MutationObserver(checkSidebarState);
+    const main = document.querySelector('main');
+    if (main) {
+      observer.observe(main, { 
+        attributes: true, 
+        attributeFilter: ['style']
+      });
+    }
+
+    // Also listen for sidebar changes as fallback
     const sidebar = document.querySelector('[data-sidebar="true"]');
     if (sidebar) {
       observer.observe(sidebar, { 
         attributes: true, 
-        attributeFilter: ['class', 'style']
+        attributeFilter: ['style']
       });
     }
 
@@ -49,7 +64,7 @@ export default function FeatureLayout() {
       window.removeEventListener('resize', handleResize);
       observer.disconnect();
     };
-  }, []);
+  }, [isDesktop, sidebarWidth]);
 
   const leftOffset = isDesktop ? (sidebarOpen ? sidebarWidth : railWidth) : 0;
 
