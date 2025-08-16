@@ -66,17 +66,19 @@ const Header = forwardRef<HTMLElement, HeaderProps>(({ onToggleSidebar, isDeskto
     >
 
       <div className="w-full flex h-14 items-center justify-between pl-0 pr-5">
-        {/* Left section with sidebar toggle */}
+        {/* Left section with sidebar toggle - only show on mobile */}
         <div className="flex items-center gap-4">
-          <Button
-            variant="ghost"
-            size="sm"
-            onClick={onToggleSidebar}
-            className="text-foreground hover:bg-accent"
-            aria-label="Toggle sidebar"
-          >
-            <AlignJustify className="h-5 w-5" />
-          </Button>
+          {!isDesktop && (
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={onToggleSidebar}
+              className="text-foreground hover:bg-accent"
+              aria-label="Toggle sidebar"
+            >
+              <AlignJustify className="h-5 w-5" />
+            </Button>
+          )}
         </div>
 
         {/* Center section - App title (hidden on mobile to save space) */}
