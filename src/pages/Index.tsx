@@ -106,7 +106,8 @@ const Index: React.FC = () => {
         
         {!hasConversation && !isLoading ? (
           /* No conversation: Center everything vertically */
-          <div className="flex-1 flex flex-col items-center justify-center">
+          <div className="fixed">
+            <div className="flex-1 flex flex-col items-center justify-center">
             <div className="w-full max-w-4xl space-y-8">
               {/* Welcome area - ResponseArea with welcome screen */}
               <div>
@@ -128,6 +129,7 @@ const Index: React.FC = () => {
                   hasMessages={hasConversation}
                 />
               </div>
+            </div>
             </div>
           </div>
         ) : (
