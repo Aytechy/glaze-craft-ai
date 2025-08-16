@@ -91,7 +91,7 @@ export default function AppShell() {
 
       {/* Main Content Area */}
       <main 
-        className="transition-all duration-300 ease-in-out overflow-hidden"
+        className="transition-all duration-300 ease-in-out"
         style={{
           marginLeft: isDesktop ? (isSidebarOpen ? sidebarWidth : railWidth) : 0,
           paddingTop: '3.5rem', // 56px for fixed header

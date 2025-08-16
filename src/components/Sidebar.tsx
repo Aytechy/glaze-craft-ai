@@ -60,6 +60,7 @@ const Sidebar: React.FC<SidebarProps> = ({
   const navigationItems = [
     { name: 'Home', path: '/', icon: Home },
     { name: 'Notes', path: '/notes', icon: FileText },
+    { name: 'History', path: '/history', icon: History },
   ];
 
   // Event handlers remain mostly the same
