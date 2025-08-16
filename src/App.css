@@ -12,8 +12,8 @@ html, body, #root, #__next {
 /* Stop window/page scrolling + pull-to-refresh bounce */
 html, body {
   overflow: hidden;
-  overscroll-behavior-y: none; /* Chrome/Android */
-  touch-action: manipulation;  /* reduces weird gestures */
+  overscroll-behavior-y: none; 
+  touch-action: manipulation;  
 }
 
 /* Optional: iOS bounce hard-kill (keeps viewport stable) */
