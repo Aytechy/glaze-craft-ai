@@ -25,7 +25,7 @@ import { NewChatModal } from '@/components/modals/NewChatModal';
 import { ClipboardUpload } from '@/components/ClipboardUpload';
 import { useChat } from '@/hooks/useChat';
 import { useToast } from '@/hooks/use-toast';
-import { SidebarRail } from "@/components/SidebarRail";
+// import { SidebarRail } from "@/components/SidebarRail";
 
 
 

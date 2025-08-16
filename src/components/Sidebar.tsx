@@ -11,8 +11,8 @@ interface SidebarProps {
   isOpen: boolean;
   onClose: () => void;
   onNewChat?: () => void;
-  isCollapsed: boolean; // NEW: collapsed state
-  onToggleCollapsed: () => void; // NEW: toggle function
+  isCollapsed?: boolean; // NEW: collapsed state (optional for backwards compatibility)
+  onToggleCollapsed?: () => void; // NEW: toggle function (optional)
   width?: number;
   collapsedWidth?: number; // NEW: collapsed width
 }
@@ -34,7 +34,7 @@ const Sidebar: React.FC<SidebarProps> = ({
   isOpen, 
   onClose, 
   onNewChat, 
-  isCollapsed,
+  isCollapsed = false, // Default to false for backwards compatibility
   onToggleCollapsed,
   width = 250,
   collapsedWidth = 64
