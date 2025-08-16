@@ -4,6 +4,25 @@
   padding: 2rem;
   text-align: center;
 }
+/* app.css or globals.css */
+html, body, #root, #__next {
+  height: 100%;
+}
+
+/* Stop window/page scrolling + pull-to-refresh bounce */
+html, body {
+  overflow: hidden;
+  overscroll-behavior-y: none; /* Chrome/Android */
+  touch-action: manipulation;  /* reduces weird gestures */
+}
+
+/* Optional: iOS bounce hard-kill (keeps viewport stable) */
+@supports (-webkit-touch-callout: none) {
+  html, body {
+    position: fixed;
+    width: 100%;
+  }
+}
 
 .logo {
   height: 6em;
