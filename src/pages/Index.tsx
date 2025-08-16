@@ -159,9 +159,6 @@ const Index: React.FC = () => {
             {/* Fixed PromptCard at bottom */}
             <div 
               className="fixed bottom-0 z-30 bg-background/95 backdrop-blur border-t"
-              style={{
-                paddingBottom: 'calc(env(safe-area-inset-bottom) + 96px)', // Space for bottom tabs
-              }}
             >
               <PromptCard
                 onSendMessage={handleSendMessage}
