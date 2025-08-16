@@ -35,16 +35,16 @@ export default function AppShell() {
     }
   }, [location.pathname, isDesktop]);
 
-  // Handle new chat - navigate to assistant page and trigger chat reset
+  // Handle new chat - navigate to home page and trigger chat reset
   const handleNewChat = () => {
-    if (location.pathname !== '/assistant') {
-      navigate('/assistant');
+    if (location.pathname !== '/home') {
+      navigate('/home');
     }
     // Trigger a custom event to reset chat in the Index component
     window.dispatchEvent(new CustomEvent('newChatRequested'));
   };
 
-  const hasBottomTabs = ['/assistant', '/recipes-to-image', '/image-to-recipes', '/umf-calculator'].includes(location.pathname);
+  const hasBottomTabs = ['/home', '/recipes-to-image', '/image-to-recipes', '/umf-calculator'].includes(location.pathname);
 
   return (
     <div className="min-h-screen bg-background text-foreground">

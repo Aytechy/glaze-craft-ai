@@ -1,10 +1,9 @@
-
 import React, { useState, useEffect } from 'react';
 import { Outlet, useLocation, Link } from 'react-router-dom';
 import { MessageSquare, Image as ImgIcon, FlaskConical, Calculator } from 'lucide-react';
 
 const tabs = [
-  { to: '/assistant', label: 'GPT Assistant', icon: MessageSquare },
+  { to: '/home', label: 'Chat Assistant', icon: MessageSquare },
   { to: '/recipes-to-image', label: 'Recipes → Image', icon: FlaskConical },
   { to: '/image-to-recipes', label: 'Image → Recipes', icon: ImgIcon },
   { to: '/umf-calculator', label: 'UMF', icon: Calculator },

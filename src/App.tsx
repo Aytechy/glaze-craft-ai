@@ -25,7 +25,6 @@ import History from "./pages/History";
 import NotFound from "./pages/NotFound";
 import AppShell from './layouts/AppShell';
 import FeatureLayout from './layouts/FeatureLayout';
-import Assistant from './pages/Assistant';
 import RecipesToImage from './pages/RecipesToImage';
 import ImageToRecipes from './pages/ImageToRecipes';
 import UMFCalculator from './pages/UMFCalculator';
@@ -118,13 +117,13 @@ const App: React.FC = () => {
           {/* Router configuration */}
           <BrowserRouter>
             <Routes>
-              {/* Default redirect */}
-              <Route path="/" element={<Navigate to="/assistant" replace />} />
+              {/* Default redirect to home */}
+              <Route path="/" element={<Navigate to="/home" replace />} />
 
               {/* AppShell + Tabs */}
               <Route element={<AppShell />}>
                 <Route element={<FeatureLayout />}>
-                  <Route path="/assistant" element={<Assistant />} />
+                  <Route path="/home" element={<Index />} />
                   <Route path="/recipes-to-image" element={<RecipesToImage />} />
                   <Route path="/image-to-recipes" element={<ImageToRecipes />} />
                   <Route path="/umf-calculator" element={<UMFCalculator />} />
