@@ -37,14 +37,14 @@ export default function AppShell() {
 
   // Handle new chat - navigate to home page and trigger chat reset
   const handleNewChat = () => {
-    if (location.pathname !== '/home') {
-      navigate('/home');
+    if (location.pathname !== '/') {
+      navigate('/');
     }
     // Trigger a custom event to reset chat in the Index component
     window.dispatchEvent(new CustomEvent('newChatRequested'));
   };
 
-  const hasBottomTabs = ['/home', '/recipes-to-image', '/image-to-recipes', '/umf-calculator'].includes(location.pathname);
+  const hasBottomTabs = ['/', '/recipes-to-image', '/image-to-recipes', '/umf-calculator'].includes(location.pathname);
 
   return (
     <div className="min-h-screen bg-background text-foreground">

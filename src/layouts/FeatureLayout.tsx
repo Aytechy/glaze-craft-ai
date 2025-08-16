@@ -3,7 +3,7 @@ import { Outlet, useLocation, Link } from 'react-router-dom';
 import { MessageSquare, Image as ImgIcon, FlaskConical, Calculator } from 'lucide-react';
 
 const tabs = [
-  { to: '/home', label: 'Chat Assistant', icon: MessageSquare },
+  { to: '/', label: 'Chat Assistant', icon: MessageSquare },
   { to: '/recipes-to-image', label: 'Recipes → Image', icon: FlaskConical },
   { to: '/image-to-recipes', label: 'Image → Recipes', icon: ImgIcon },
   { to: '/umf-calculator', label: 'UMF', icon: Calculator },
@@ -12,7 +12,9 @@ const tabs = [
 export default function FeatureLayout() {
   const { pathname } = useLocation();
   const [isDesktop, setIsDesktop] = useState(window.innerWidth >= 768);
-  const [isSidebarOpen, setIsSidebarOpen] = useState(false);
+  const [sidebarOpen, setSidebarOpen] = useState(false);
+  const [sidebarWidth, setSidebarWidth] = useState(280);
+  const railWidth = 64;
 
   useEffect(() => {
     const handleResize = () => {
@@ -21,27 +23,35 @@ export default function FeatureLayout() {
 
     const handleSidebarChange = () => {
       const sidebar = document.querySelector('[data-sidebar="true"]');
-      setIsSidebarOpen(sidebar?.classList.contains('translate-x-0') || false);
+      if (sidebar) {
+        const isOpen = !sidebar.classList.contains('translate-x-0') ? false : 
+                      sidebar.getBoundingClientRect().width > railWidth;
+        setSidebarOpen(isOpen);
+      }
     };
 
+    // Check initial sidebar state
+    handleSidebarChange();
+
     window.addEventListener('resize', handleResize);
-    window.addEventListener('storage', handleSidebarChange);
     
     // Listen for sidebar state changes
     const observer = new MutationObserver(handleSidebarChange);
     const sidebar = document.querySelector('[data-sidebar="true"]');
     if (sidebar) {
-      observer.observe(sidebar, { attributes: true, attributeFilter: ['class'] });
+      observer.observe(sidebar, { 
+        attributes: true, 
+        attributeFilter: ['class', 'style']
+      });
     }
 
     return () => {
       window.removeEventListener('resize', handleResize);
-      window.removeEventListener('storage', handleSidebarChange);
       observer.disconnect();
     };
   }, []);
 
-  const railWidth = isDesktop && isSidebarOpen ? 280 : 0;
+  const leftOffset = isDesktop ? (sidebarOpen ? sidebarWidth : railWidth) : 0;
 
   return (
     <div className="relative">
@@ -49,7 +59,7 @@ export default function FeatureLayout() {
       <nav 
         className="fixed bottom-0 z-50 border-t bg-card/90 backdrop-blur supports-[backdrop-filter]:bg-card/60"
         style={{
-          left: railWidth,
+          left: leftOffset,
           right: 0
         }}
       >

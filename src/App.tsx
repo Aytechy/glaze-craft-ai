@@ -117,13 +117,10 @@ const App: React.FC = () => {
           {/* Router configuration */}
           <BrowserRouter>
             <Routes>
-              {/* Default redirect to home */}
-              <Route path="/" element={<Navigate to="/home" replace />} />
-
               {/* AppShell + Tabs */}
               <Route element={<AppShell />}>
                 <Route element={<FeatureLayout />}>
-                  <Route path="/home" element={<Index />} />
+                  <Route path="/" element={<Index />} />
                   <Route path="/recipes-to-image" element={<RecipesToImage />} />
                   <Route path="/image-to-recipes" element={<ImageToRecipes />} />
                   <Route path="/umf-calculator" element={<UMFCalculator />} />

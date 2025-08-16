@@ -6,6 +6,7 @@
  * - Uses AppShell's layout structure
  * - Focuses only on chat functionality
  * - Works with bottom tabs navigation
+ * - PromptCard is centered when no messages, fixed when chatting
  * 
  * Security features:
  * - Input validation and sanitization
@@ -157,7 +158,7 @@ const Index: React.FC = () => {
   }, []);
 
   return (
-    <div className="h-full flex flex-col relative">
+    <div className="h-full relative">
       <ClipboardUpload onImagePaste={(file) => {
         // Don't auto-send on paste, pass to PromptCard for preview
         if (document.querySelector('[data-prompt-card]')) {
@@ -165,45 +166,78 @@ const Index: React.FC = () => {
           document.dispatchEvent(event);
         }
       }}>
-        {/* Chat messages area - flex column so child absolute scroller can fit */}
-        <div className="flex-1 min-h-0 relative">
-          <div
-            ref={scrollRef}
-            className={`absolute inset-0 transition-all duration-300 ease-out touch-pan-y
-                        ${hasConversation ? 'overflow-y-scroll' : 'overflow-y-hidden'}`}
-            style={{
-              bottom: Math.max(80, promptHeight + 10),
-              ...(hasConversation ? { scrollbarGutter: 'stable' } : {}),
-            }}
-          >
-            <div className="w-full max-w-4xl mx-auto px-4">
-              <ResponseArea
-                messages={messages}
-                isTyping={isLoading}
-                onSuggestionSelect={handleSuggestionSelect}
-                onEditMessage={handleEditMessage}
-                bottomPadPx={0}
-                scrollParentRef={scrollRef}
-              />
+        
+        {/* When no messages: Center everything vertically */}
+        {!hasConversation ? (
+          <div className="h-full flex flex-col items-center justify-center px-4 pb-24">
+            <div className="w-full max-w-4xl mx-auto space-y-8">
+              {/* Welcome area */}
+              <div className="flex-1 flex items-center justify-center">
+                <ResponseArea
+                  messages={messages}
+                  isTyping={isLoading}
+                  onSuggestionSelect={handleSuggestionSelect}
+                  onEditMessage={handleEditMessage}
+                  bottomPadPx={0}
+                />
+              </div>
+              
+              {/* Centered prompt card */}
+              <div ref={promptWrapRef}>
+                <PromptCard
+                  onSendMessage={handleSendMessage}
+                  isLoading={isLoading || !canSendMessage}
+                  isTyping={isLoading}
+                  hasMessages={messageCount > 0}
+                />
+              </div>
             </div>
           </div>
-        </div>
+        ) : (
+          /* When has messages: Normal layout with fixed prompt at bottom */
+          <>
+            {/* Chat messages area - takes remaining space */}
+            <div 
+              className="absolute inset-0"
+              style={{
+                bottom: Math.max(80, promptHeight + 10) + 96, // Add 96px for bottom tabs
+              }}
+            >
+              <div
+                ref={scrollRef}
+                className="h-full overflow-y-scroll touch-pan-y"
+                style={{ scrollbarGutter: 'stable' }}
+              >
+                <div className="w-full max-w-4xl mx-auto px-4">
+                  <ResponseArea
+                    messages={messages}
+                    isTyping={isLoading}
+                    onSuggestionSelect={handleSuggestionSelect}
+                    onEditMessage={handleEditMessage}
+                    bottomPadPx={0}
+                    scrollParentRef={scrollRef}
+                  />
+                </div>
+              </div>
+            </div>
 
-        {/* Input prompt card - positioned at bottom */}
-        <div
-          ref={promptWrapRef}
-          className="sticky bottom-0 z-30 pb-24 "
-          style={{
-            paddingBottom: 'calc(env(safe-area-inset-bottom) + 96px)', // 96px for bottom tabs
-          }}
-        >
-          <PromptCard
-            onSendMessage={handleSendMessage}
-            isLoading={isLoading || !canSendMessage}
-            isTyping={isLoading}
-            hasMessages={messageCount > 0}
-          />
-        </div>
+            {/* Fixed prompt card at bottom */}
+            <div
+              ref={promptWrapRef}
+              className="fixed bottom-0 left-0 right-0 z-30"
+              style={{
+                paddingBottom: 'calc(env(safe-area-inset-bottom) + 96px)', // 96px for bottom tabs
+              }}
+            >
+              <PromptCard
+                onSendMessage={handleSendMessage}
+                isLoading={isLoading || !canSendMessage}
+                isTyping={isLoading}
+                hasMessages={messageCount > 0}
+              />
+            </div>
+          </>
+        )}
       </ClipboardUpload>
 
       {/* New Chat Modal */}
