@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Outlet, useLocation } from 'react-router-dom';
+import { Outlet, useLocation, useNavigate } from 'react-router-dom';
 import Header from '@/components/Header';
 import Sidebar from '@/components/Sidebar';
 
@@ -15,6 +15,7 @@ export default function AppShell() {
   const sidebarWidth = 280;
   const railWidth = 64;
   const location = useLocation();
+  const navigate = useNavigate();
 
   // Detect desktop screen size
   useEffect(() => {
@@ -33,6 +34,15 @@ export default function AppShell() {
       setIsSidebarOpen(false);
     }
   }, [location.pathname, isDesktop]);
+
+  // Handle new chat - navigate to assistant page and trigger chat reset
+  const handleNewChat = () => {
+    if (location.pathname !== '/assistant') {
+      navigate('/assistant');
+    }
+    // Trigger a custom event to reset chat in the Index component
+    window.dispatchEvent(new CustomEvent('newChatRequested'));
+  };
 
   const hasBottomTabs = ['/assistant', '/recipes-to-image', '/image-to-recipes', '/umf-calculator'].includes(location.pathname);
 
@@ -55,6 +65,7 @@ export default function AppShell() {
           onClose={() => setIsSidebarOpen(false)}
           isCollapsed={!isSidebarOpen}
           onToggleCollapsed={() => setIsSidebarOpen(prev => !prev)}
+          onNewChat={handleNewChat}
           width={sidebarWidth}
           collapsedWidth={railWidth}
         />
@@ -70,7 +81,8 @@ export default function AppShell() {
           <div className="fixed top-0 left-0 z-50 h-screen w-64">
             <Sidebar 
               isOpen={true} 
-              onClose={() => setIsSidebarOpen(false)} 
+              onClose={() => setIsSidebarOpen(false)}
+              onNewChat={handleNewChat}
               width={256}
             />
           </div>
