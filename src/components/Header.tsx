@@ -61,7 +61,7 @@ const Header = forwardRef<HTMLElement, HeaderProps>(({ onToggleSidebar, isDeskto
                 transition-all duration-300"
       style={{
         // Use CSS custom properties set by AppShell
-        left: 'calc(var(--is-desktop, 0) * var(--sidebar-offset, 0px))',
+        left: 'calc(var(--is-desktop, 0) * var(--sidebar-offset, 0px) + 50px)',
         right: 0
       }}
     >
