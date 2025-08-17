@@ -108,6 +108,7 @@ export default function AppShell() {
           marginLeft: 'var(--sidebar-offset, 0px)',
           paddingTop: '3.5rem',         // header is fixed, keep visual spacing
           paddingBottom: 0,             // remove extra padding
+          scrollbarGutter: 'stable',
           height: 'calc(100svh - 56px)' // 56px header height
         }}
       >
