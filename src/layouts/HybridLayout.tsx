@@ -26,7 +26,7 @@ export default function HybridLayout() {
       {/* Top Feature Tabs - Only show on feature pages */}
       {isFeaturePage && (
         <div 
-          className="fixed top-14 z-40 border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 transition-all duration-300"
+          className="fixed top-14 z-39 border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 transition-all duration-300"
           style={{
             // Use exact same positioning logic as Header component  
             left: isDesktop ? leftOffset : 0,
