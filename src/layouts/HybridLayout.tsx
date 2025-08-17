@@ -27,7 +27,7 @@ export default function HybridLayout() {
         return;
       }
 
-      // Get sidebar offset from main element (same logic as Header)
+      // Get the exact same leftOffset that Header uses
       const mainElement = document.querySelector('main');
       if (mainElement) {
         const styles = window.getComputedStyle(mainElement);
@@ -39,7 +39,7 @@ export default function HybridLayout() {
     updateState();
     window.addEventListener('resize', updateState);
 
-    // Watch for sidebar changes
+    // Watch for sidebar changes exactly like Header does
     const observer = new MutationObserver(updateState);
     const mainElement = document.querySelector('main');
     if (mainElement) {
@@ -62,6 +62,7 @@ export default function HybridLayout() {
         <div 
           className="fixed top-14 z-40 border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 transition-all duration-300"
           style={{
+            // Use exact same positioning logic as Header component  
             left: isDesktop ? leftOffset : 0,
             right: 0,
             height: '52px'
@@ -98,15 +99,9 @@ export default function HybridLayout() {
         </div>
       )}
 
-      {/* Content with proper spacing - FIXED: Now uses same structure as other pages */}
-      <div 
-        className="h-full overflow-hidden"
-        style={{ paddingTop: isFeaturePage ? '52px' : '0px' }}
-      >
-        {/* This div ensures content behaves the same as standalone pages */}
-        <div className="h-full">
-          <Outlet />
-        </div>
+      {/* Content - Uses same approach as RecipesToImage, etc. */}
+      <div style={{ paddingTop: isFeaturePage ? '52px' : '0px' }}>
+        <Outlet />
       </div>
     </div>
   );
