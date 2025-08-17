@@ -8,10 +8,17 @@
 @layer base {
   html, body, #root {
     height: 100%;
-    overflow: hidden;              /* kill root scroll */
+    /* Remove overflow: hidden to allow smooth transitions */
     overscroll-behavior-y: none;   /* prevent pull-to-refresh/chain */
     touch-action: manipulation;    /* smoother touch */
   }
+  
+  /* Apply overflow hidden only to the specific container that needs it */
+  .app-container {
+    height: 100vh;
+    overflow: hidden;
+  }
+  
   :root {
     /* Core Background System */
     --background: 0 0% 100%;

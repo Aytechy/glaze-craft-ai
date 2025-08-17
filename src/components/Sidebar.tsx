@@ -9,6 +9,7 @@ import { SettingsModal } from '@/components/modals/SettingsModal';
 interface EnhancedSidebarProps {
   isOpen: boolean;
   onClose: () => void;
+  onFastClose?: () => void; // New prop for faster closing
   onNewChat?: () => void;
   isCollapsed?: boolean;
   onToggleCollapsed?: () => void;
@@ -31,6 +32,7 @@ interface UserProfile {
 const EnhancedSidebar: React.FC<EnhancedSidebarProps> = ({ 
   isOpen, 
   onClose, 
+  onFastClose,
   onNewChat, 
   isCollapsed = false,
   onToggleCollapsed,
@@ -40,6 +42,65 @@ const EnhancedSidebar: React.FC<EnhancedSidebarProps> = ({
   const location = useLocation();
   const [isProfilePopupOpen, setIsProfilePopupOpen] = useState(false);
   const [isSettingsModalOpen, setIsSettingsModalOpen] = useState(false);
+  
+  // For mobile: handle mount/unmount with animation
+  const [shouldRender, setShouldRender] = useState(isOpen);
+  const [isAnimating, setIsAnimating] = useState(false);
+  const [transitionSpeed, setTransitionSpeed] = useState(400); // Default speed
+  
+  // Detect if this is mobile or desktop usage
+  const isMobileUsage = window.innerWidth < 768;
+
+  // Handle mobile mounting/unmounting with proper timing for animations
+  React.useEffect(() => {
+    if (!isMobileUsage) return; // Only for mobile
+    
+    if (isOpen) {
+      setShouldRender(true);
+      // Small delay to ensure DOM is ready for animation
+      setTimeout(() => setIsAnimating(true), 10);
+    } else {
+      // Keep isAnimating true during closing animation, then set to false
+      // This ensures the sidebar slides out smoothly before unmounting
+      setTimeout(() => {
+        setIsAnimating(false);
+        // Then unmount after the animation completes
+        setTimeout(() => setShouldRender(false), 400);
+      }, 10);
+    }
+  }, [isOpen, isMobileUsage]);
+
+  // For desktop, always render (no mount/unmount)
+  if (isMobileUsage && !shouldRender) return null;
+
+  const handleClose = (fast = false) => {
+    if (isMobileUsage) {
+      // Set transition speed based on close type
+      setTransitionSpeed(fast ? 200 : 400);
+      // For mobile, trigger the smooth closing animation
+      setIsAnimating(false);
+      setTimeout(() => {
+        setShouldRender(false);
+        onClose(); // Call parent's onClose after animation
+      }, fast ? 200 : 400);
+    } else {
+      // For desktop, use collapse functionality
+      onToggleCollapsed?.();
+    }
+  };
+
+  // Listen for fast close events from outside clicks
+  React.useEffect(() => {
+    const handleFastClose = () => {
+      handleClose(true);
+    };
+    
+    if (onFastClose) {
+      // You can trigger this from AppShell
+      window.addEventListener('closeSidebarFast', handleFastClose);
+      return () => window.removeEventListener('closeSidebarFast', handleFastClose);
+    }
+  }, [onFastClose]);
 
   const user: UserProfile = {
     name: "John Doe",
@@ -83,15 +144,15 @@ const EnhancedSidebar: React.FC<EnhancedSidebarProps> = ({
     <>
       <div 
         data-sidebar="true"
-        className={`
-          fixed top-0 left-0 flex flex-col h-full bg-sidebar border-r border-sidebar-border
-          z-[200] shadow-elevated
-          ${isOpen ? 'translate-x-0' : '-translate-x-full'}
-        `}
+        className="fixed top-0 left-0 flex flex-col h-full bg-sidebar border-r border-sidebar-border z-[200] shadow-elevated"
         style={{ 
           width: currentWidth,
-          transition: 'transform 300ms cubic-bezier(0.4, 0, 0.2, 1)',
-          willChange: 'transform'
+          transform: isMobileUsage 
+            ? (isAnimating ? 'translateX(0px)' : 'translateX(-100%)')
+            : 'translateX(0px)', // Desktop always visible, width changes instead
+          transition: `transform ${transitionSpeed}ms ease-in-out, width 300ms ease-in-out`,
+          willChange: 'transform, width',
+          backfaceVisibility: 'hidden'
         }}
       >
         {/* Header */}
@@ -105,14 +166,7 @@ const EnhancedSidebar: React.FC<EnhancedSidebarProps> = ({
                 <Button
                   variant="ghost"
                   size="sm"
-                  onClick={() => {
-                    // On mobile, close the sidebar entirely. On desktop, just collapse it.
-                    if (window.innerWidth < 768) {
-                      onClose();
-                    } else {
-                      onToggleCollapsed?.();
-                    }
-                  }}
+                  onClick={() => handleClose(false)} // Normal speed close
                   className="text-sidebar-foreground hover:bg-sidebar-accent"
                   aria-label="Collapse sidebar"
                 >
