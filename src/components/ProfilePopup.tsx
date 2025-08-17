@@ -35,7 +35,7 @@ export const ProfilePopup: React.FC<ProfilePopupProps> = ({ isOpen, onClose, use
     <>
       {/* Backdrop */}
       <div 
-        className="fixed inset-0 bg-black/20 backdrop-blur-sm z-40"
+        className="fixed inset-0 z-44"
         onClick={onClose}
       />
       
