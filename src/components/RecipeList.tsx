@@ -15,24 +15,12 @@ export default function RecipeList({ title, items, onChange }: Props) {
     const next = items.map((it, i) => (i === idx ? { ...it, ...patch } : it));
     onChange(next);
   }
-  
   function add() {
     onChange([...items, { material: '', amount: '', unit: '%' }]);
-  }
-  
+  } 
   function remove(idx: number) {
     const next = items.filter((_, i) => i != idx);
     onChange(next);
-  }
-
-  // Determine if remove button should be shown
-  function shouldShowRemove(index: number): boolean {
-    // For Base Recipe: don't show remove on first item if it's the only one
-    if (title === "Base Recipe" && index === 0 && items.length === 1) {
-      return false;
-    }
-    // For all other cases (additives, or base recipe with multiple items): show remove
-    return true;
   }
 
   return (
@@ -69,24 +57,13 @@ export default function RecipeList({ title, items, onChange }: Props) {
             >
               {UNITS.map(u => <option key={u} value={u}>{u}</option>)}
             </select>
-            
-            {/* Conditionally render Remove button */}
-            {shouldShowRemove(idx) ? (
-              <button 
-                type="button" 
-                onClick={() => remove(idx)} 
-                className="px-3 py-2 rounded-lg border hover:bg-muted"
-              >
-                Remove
-              </button>
-            ) : (
-              // Empty div to maintain grid layout when remove button is hidden
-              <div></div>
-            )}
+            <button type="button" onClick={() => remove(idx)} className="px-3 py-2 rounded-lg border hover:bg-muted">
+              Remove
+            </button>
           </div>
         ))}
         {items.length === 0 && (
-          <p className="text-xs text-muted-foreground">No items yet. Click "Add row".</p>
+          <p className="text-xs text-muted-foreground">No items yet. Click “Add row”.</p>
         )}
       </div>
     </section>
