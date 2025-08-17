@@ -8,7 +8,6 @@ import { ProfilePopup } from '@/components/ProfilePopup';
 // TypeScript interface for header component props
 interface HeaderProps {
   onToggleSidebar: () => void; // Callback to toggle sidebar visibility
-  leftOffset?: number;  
   isDesktop?: boolean;
 }
 
@@ -16,16 +15,17 @@ interface HeaderProps {
  * Header Component - Top navigation bar for GlazionStudio
  * 
  * Features:
- * - Responsive design
+ * - Responsive design using CSS custom properties
  * - Sidebar toggle functionality
  * - Premium upgrade call-to-action
  * - Clean, professional styling
+ * - No flash positioning with CSS variables
  * 
  * Security considerations:
  * - Upgrade button would lead to secure payment processing
  * - No sensitive data exposed in header
  */
-const Header = forwardRef<HTMLElement, HeaderProps>(({ onToggleSidebar, isDesktop = false, leftOffset = 0 }, ref) => {
+const Header = forwardRef<HTMLElement, HeaderProps>(({ onToggleSidebar, isDesktop = false }, ref) => {
   const [isUpgradeModalOpen, setIsUpgradeModalOpen] = useState(false);
   const [isSettingsModalOpen, setIsSettingsModalOpen] = useState(false);
   const [isProfilePopupOpen, setIsProfilePopupOpen] = useState(false);
@@ -60,7 +60,8 @@ const Header = forwardRef<HTMLElement, HeaderProps>(({ onToggleSidebar, isDeskto
                 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60
                 transition-all duration-300"
       style={{
-        left: isDesktop ? (leftOffset ?? 0) : 0,
+        // Use CSS custom properties set by AppShell
+        left: 'calc(var(--is-desktop, 0) * var(--sidebar-offset, 0px))',
         right: 0
       }}
     >

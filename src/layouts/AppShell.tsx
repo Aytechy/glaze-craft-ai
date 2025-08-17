@@ -1,11 +1,11 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useLayoutEffect } from 'react';
 import { Outlet, useLocation, useNavigate } from 'react-router-dom';
 import Header from '@/components/Header';
 import Sidebar from '@/components/Sidebar';
 
 /**
  * AppShell - Main layout component with sidebar functionality
- * - Uses existing Header and Sidebar components with collapse/expand functionality
+ * - Uses CSS custom properties for instant, flash-free positioning
  * - Responsive layout that adapts to screen size
  * - Proper spacing for fixed header and bottom tabs
  */
@@ -17,19 +17,32 @@ export default function AppShell() {
   const location = useLocation();
   const navigate = useNavigate();
 
-  // Detect desktop screen size
-  useEffect(() => {
-    const checkDesktop = () => {
-      setIsDesktop(window.innerWidth >= 768);
+  // Update CSS custom properties for instant positioning
+  useLayoutEffect(() => {
+    const updateLayoutVars = () => {
+      const desktop = window.innerWidth >= 768;
+      const offset = desktop ? (isSidebarOpen ? sidebarWidth : railWidth) : 0;
+      
+      // Set CSS custom properties on document root
+      document.documentElement.style.setProperty('--sidebar-offset', `${offset}px`);
+      document.documentElement.style.setProperty('--is-desktop', desktop ? '1' : '0');
+      document.documentElement.style.setProperty('--sidebar-width', `${sidebarWidth}px`);
+      document.documentElement.style.setProperty('--rail-width', `${railWidth}px`);
+      
+      // Update React state for conditional rendering
+      setIsDesktop(desktop);
     };
     
-    checkDesktop();
-    window.addEventListener('resize', checkDesktop);
-    return () => window.removeEventListener('resize', checkDesktop);
-  }, []);
+    // Initial update
+    updateLayoutVars();
+    
+    // Listen for resize
+    window.addEventListener('resize', updateLayoutVars);
+    return () => window.removeEventListener('resize', updateLayoutVars);
+  }, [isSidebarOpen, sidebarWidth, railWidth]);
 
   // Close sidebar on route change on mobile
-  useEffect(() => {
+  React.useEffect(() => {
     if (!isDesktop) {
       setIsSidebarOpen(false);
     }
@@ -45,23 +58,19 @@ export default function AppShell() {
   };
 
   const hasBottomTabs = ['/', '/recipes-to-image', '/image-to-recipes', '/umf-calculator'].includes(location.pathname);
-  
-  // Calculate leftOffset for Header and HybridLayout
-  const leftOffset = isDesktop ? (isSidebarOpen ? sidebarWidth : railWidth) : 0;
 
   return (
     <div className="h-[100svh] overflow-hidden bg-background text-foreground">
-      {/* Fixed Header */}
+      {/* Fixed Header - Now uses CSS variables */}
       <Header 
         onToggleSidebar={() => setIsSidebarOpen(prev => !prev)} 
-        leftOffset={leftOffset} 
         isDesktop={isDesktop} 
       />
 
       {/* Single Sidebar that handles both expanded and collapsed states */}
       <div
         className="hidden md:block fixed top-0 left-0 z-40 h-screen overflow-hidden transition-[width] duration-300 ease-out"
-        style={{ width: leftOffset }}
+        style={{ width: 'var(--sidebar-offset, 64px)' }}
       >
         <Sidebar 
           isOpen={true}
@@ -92,17 +101,17 @@ export default function AppShell() {
         </>
       )}
 
-      {/* Main Content Area */}
+      {/* Main Content Area - Now uses CSS variables */}
       <main
         className="transition-all duration-300 ease-in-out overflow-hidden"
         style={{
-          marginLeft: leftOffset,
-          paddingTop: '3.5rem',         // header is fixed, keep visual spacing if you want
-          paddingBottom: 0,             // remove extra 6rem padding that made root taller
+          marginLeft: 'var(--sidebar-offset, 0px)',
+          paddingTop: '3.5rem',         // header is fixed, keep visual spacing
+          paddingBottom: 0,             // remove extra padding
           height: 'calc(100svh - 56px)' // 56px header height
         }}
       >
-        <Outlet context={{ leftOffset, isDesktop }} />
+        <Outlet />
       </main>
     </div>
   );

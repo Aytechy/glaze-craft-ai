@@ -1,11 +1,6 @@
 import React from 'react';
-import { Outlet, useLocation, Link, useOutletContext } from 'react-router-dom';
+import { Outlet, useLocation, Link } from 'react-router-dom';
 import { MessageSquare, Image as ImgIcon, FlaskConical, Calculator } from 'lucide-react';
-
-interface OutletContextType {
-  leftOffset: number;
-  isDesktop: boolean;
-}
 
 const featureTabs = [
   { to: '/', label: 'Chat Assistant', icon: MessageSquare, short: 'Chat' },
@@ -14,9 +9,17 @@ const featureTabs = [
   { to: '/umf-calculator', label: 'UMF Calculator', icon: Calculator, short: 'UMF' },
 ];
 
+/**
+ * HybridLayout - Feature tabs layout using CSS custom properties
+ * 
+ * Benefits of CSS variables approach:
+ * - No flash/jump on initial load
+ * - Instant positioning updates
+ * - SSR-safe
+ * - Consistent with Header positioning
+ */
 export default function HybridLayout() {
   const { pathname } = useLocation();
-  const { leftOffset = 0, isDesktop = false } = useOutletContext<OutletContextType>();
 
   // Only show feature tabs on feature pages
   const isFeaturePage = ['/', '/recipes-to-image', '/image-to-recipes', '/umf-calculator'].includes(pathname);
@@ -26,10 +29,10 @@ export default function HybridLayout() {
       {/* Top Feature Tabs - Only show on feature pages */}
       {isFeaturePage && (
         <div 
-          className="fixed top-14 z-40 border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 transition-all duration-300"
+          className="fixed top-14 z-30 border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 transition-all duration-300"
           style={{
-            // Use exact same positioning logic as Header component  
-            left: isDesktop ? leftOffset : 0,
+            // Use CSS custom properties set by AppShell - same as Header
+            left: 'calc(var(--is-desktop, 0) * var(--sidebar-offset, 0px))',
             right: 0,
             height: '52px'
           }}
