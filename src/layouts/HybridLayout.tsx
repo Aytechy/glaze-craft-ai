@@ -11,94 +11,101 @@ const featureTabs = [
 
 export default function HybridLayout() {
   const { pathname } = useLocation();
-  const [isDesktop, setIsDesktop] = useState(window.innerWidth >= 768);
-  const [sidebarOpen, setSidebarOpen] = useState(false);
-  const sidebarWidth = 280;
-  const railWidth = 64;
+  const [leftOffset, setLeftOffset] = useState(0);
 
   // Only show feature tabs on feature pages
   const isFeaturePage = ['/', '/recipes-to-image', '/image-to-recipes', '/umf-calculator'].includes(pathname);
 
   useEffect(() => {
-    const handleResize = () => {
-      setIsDesktop(window.innerWidth >= 768);
-    };
-
-    const checkSidebarState = () => {
+    const updateLeftOffset = () => {
+      // Check if we're on desktop
+      const isDesktop = window.innerWidth >= 768;
+      
       if (!isDesktop) {
-        setSidebarOpen(false);
+        setLeftOffset(0);
         return;
       }
-      const sidebarContainer = document.querySelector('.hidden.md\\:block.fixed.top-0.left-0');
-      if (sidebarContainer) {
-        const width = sidebarContainer.getBoundingClientRect().width;
-        setSidebarOpen(width > railWidth + 10);
+
+      // Get the main content area to determine its left margin
+      const mainElement = document.querySelector('main');
+      if (mainElement) {
+        const styles = window.getComputedStyle(mainElement);
+        const marginLeft = parseInt(styles.marginLeft, 10) || 0;
+        setLeftOffset(marginLeft);
       }
     };
 
-    const timer = setTimeout(checkSidebarState, 100);
-    window.addEventListener('resize', handleResize);
-    
+    // Update on mount
+    updateLeftOffset();
+
+    // Listen for resize events
+    window.addEventListener('resize', updateLeftOffset);
+
+    // Use MutationObserver to watch for sidebar changes
     const observer = new MutationObserver(() => {
-      setTimeout(checkSidebarState, 50);
+      // Slight delay to allow transitions to complete
+      setTimeout(updateLeftOffset, 50);
     });
-    
-    const sidebarContainer = document.querySelector('.hidden.md\\:block.fixed.top-0.left-0');
-    if (sidebarContainer) {
-      observer.observe(sidebarContainer, { 
-        attributes: true, 
+
+    // Watch the main element for style changes (margin-left changes when sidebar toggles)
+    const mainElement = document.querySelector('main');
+    if (mainElement) {
+      observer.observe(mainElement, {
+        attributes: true,
         attributeFilter: ['style'],
-        subtree: true
       });
     }
 
     return () => {
-      clearTimeout(timer);
-      window.removeEventListener('resize', handleResize);
+      window.removeEventListener('resize', updateLeftOffset);
       observer.disconnect();
     };
-  }, [isDesktop, railWidth]);
-
-  const leftOffset = isDesktop ? (sidebarOpen ? sidebarWidth : railWidth) : 0;
+  }, []);
 
   return (
     <div className="relative">
       {/* Top Feature Tabs - Only show on feature pages */}
       {isFeaturePage && (
         <div 
-          className="fixed top-14 z-40 border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60"
+          className="fixed top-14 z-40 border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 transition-all duration-300"
           style={{
             left: leftOffset,
             right: 0,
             height: '52px'
           }}
         >
-          <nav className="h-full px-6">
-            <ul className="flex h-full items-center gap-2">
-              {featureTabs.map(({ to, label, icon: Icon }) => {
-                const active = pathname === to;
-                return (
-                  <li key={to}>
-                    <Link
-                      to={to}
-                      className={[
-                        'flex items-center gap-2 px-4 py-2.5 rounded-lg transition-all duration-200 text-sm font-medium',
-                        active 
-                          ? 'text-primary bg-primary/10 border border-primary/20 shadow-sm' 
-                          : 'text-muted-foreground hover:text-foreground hover:bg-accent/50'
-                      ].join(' ')}
-                      aria-current={active ? 'page' : undefined}
-                    >
-                      <Icon className="h-4 w-4 flex-shrink-0" />
-                      <span className="hidden sm:inline">{label}</span>
-                      {/* Show icon only on mobile for space */}
-                      <span className="sm:hidden text-xs">{label.split(' ')[0]}</span>
-                    </Link>
-                  </li>
-                );
-              })}
-            </ul>
-          </nav>
+          {/* Centered navigation container */}
+          <div className="h-full flex items-center justify-center px-4">
+            <nav className="w-full max-w-4xl mx-auto">
+              <ul className="flex h-full items-center justify-center gap-1 sm:gap-2 overflow-x-auto scrollbar-hide">
+                {featureTabs.map(({ to, label, icon: Icon }) => {
+                  const active = pathname === to;
+                  return (
+                    <li key={to} className="flex-shrink-0">
+                      <Link
+                        to={to}
+                        className={[
+                          'flex items-center gap-2 px-3 sm:px-4 py-2 sm:py-2.5 rounded-lg transition-all duration-200 text-sm font-medium whitespace-nowrap',
+                          active 
+                            ? 'text-primary bg-primary/10 border border-primary/20 shadow-sm' 
+                            : 'text-muted-foreground hover:text-foreground hover:bg-accent/50'
+                        ].join(' ')}
+                        aria-current={active ? 'page' : undefined}
+                      >
+                        <Icon className="h-4 w-4 flex-shrink-0" />
+                        {/* Responsive text display */}
+                        <span className="hidden sm:inline">{label}</span>
+                        {/* Show abbreviated text on very small screens */}
+                        <span className="sm:hidden text-xs">
+                          {label.includes('→') ? label.split(' ')[0] : label.split(' ')[0]}
+                        </span>
+                      </Link>
+                    </li>
+                  );
+                })}
+              </ul>
+            </nav>
+          </div>
         </div>
       )}
 
