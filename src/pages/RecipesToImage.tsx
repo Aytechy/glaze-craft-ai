@@ -31,9 +31,9 @@ export default function RecipesToImage() {
 
   return (
     <div className="container mx-auto max-w-7xl px-4 py-6 transition-all duration-300">
-      <div className="grid grid-cols-1 lg:grid-cols-[2fr_3fr] gap-6 items-start">
+      <div className="grid grid-cols-1 lg:grid-cols-[2fr_3fr] gap-8 items-start">
         {/* Left: Form */}
-        <form onSubmit={handleGenerate} className="grid gap-6">
+        <form onSubmit={handleGenerate} className="grid gap-6 w-full">
           <header>
             <h1 className="text-2xl font-semibold">Recipes → Image</h1>
             <p className="text-muted-foreground text-sm">Build your base and additives, set firing context, preview the glaze.</p>
@@ -42,47 +42,49 @@ export default function RecipesToImage() {
           <RecipeList title="Base Recipe" items={base} onChange={setBase} />
           <RecipeList title="Additives (optional)" items={additives} onChange={setAdditives} />
 
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-            <label className="grid gap-2">
-              <span className="text-sm font-medium">Oxidation Number</span>
-              <input
-                type="text"
-                className="rounded-lg border bg-background p-3"
-                placeholder="e.g., 0.5, 1.0, 1.5"
-                value={oxidation}
-                onChange={(e) => setOxidation(e.target.value)}
-                required
-              />
-            </label>
+          <div className="grid grid-cols-1 gap-4">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-1 xl:grid-cols-3 gap-4">
+              <label className="grid gap-2 min-w-0">
+                <span className="text-sm font-medium">Oxidation Number</span>
+                <input
+                  type="text"
+                  className="rounded-lg border bg-background p-3 w-full"
+                  placeholder="e.g., 0.5, 1.0, 1.5"
+                  value={oxidation}
+                  onChange={(e) => setOxidation(e.target.value)}
+                  required
+                />
+              </label>
 
-            <label className="grid gap-2">
-              <span className="text-sm font-medium">Atmosphere</span>
-              <select
-                className="rounded-lg border bg-background p-3"
-                value={atmosphere}
-                onChange={(e) => setAtmosphere(e.target.value)}
-                required
-              >
-                <option value="">Select...</option>
-                <option value="oxidation">Oxidation</option>
-                <option value="reduction">Reduction</option>
-                <option value="neutral">Neutral</option>
-                <option value="wood">Wood</option>
-                <option value="soda">Soda</option>
-                <option value="salt">Salt</option>
-              </select>
-            </label>
+              <label className="grid gap-2 min-w-0">
+                <span className="text-sm font-medium">Atmosphere</span>
+                <select
+                  className="rounded-lg border bg-background p-3 w-full"
+                  value={atmosphere}
+                  onChange={(e) => setAtmosphere(e.target.value)}
+                  required
+                >
+                  <option value="">Select...</option>
+                  <option value="oxidation">Oxidation</option>
+                  <option value="reduction">Reduction</option>
+                  <option value="neutral">Neutral</option>
+                  <option value="wood">Wood</option>
+                  <option value="soda">Soda</option>
+                  <option value="salt">Salt</option>
+                </select>
+              </label>
 
-            <label className="grid gap-2">
-              <span className="text-sm font-medium">Notes (optional)</span>
-              <input
-                type="text"
-                className="rounded-lg border bg-background p-3"
-                placeholder="cone, cooling, thickness..."
-                value={notes}
-                onChange={(e) => setNotes(e.target.value)}
-              />
-            </label>
+              <label className="grid gap-2 min-w-0 sm:col-span-2 lg:col-span-1 xl:col-span-1">
+                <span className="text-sm font-medium">Notes (optional)</span>
+                <input
+                  type="text"
+                  className="rounded-lg border bg-background p-3 w-full"
+                  placeholder="cone, cooling, thickness..."
+                  value={notes}
+                  onChange={(e) => setNotes(e.target.value)}
+                />
+              </label>
+            </div>
           </div>
 
           <div className="flex items-center gap-3">
