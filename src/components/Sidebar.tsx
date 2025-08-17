@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { X, Home, History, Settings, User, Plus, FileText, ChevronLeft, ChevronRight, MessageSquare, Image as ImgIcon, FlaskConical, Calculator } from 'lucide-react';
+import { Home, History, Settings, User, Plus, FileText, ChevronLeft, ChevronRight, MessageSquare, Image as ImgIcon, FlaskConical, Calculator } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Link, useLocation } from 'react-router-dom';
@@ -85,11 +85,14 @@ const EnhancedSidebar: React.FC<EnhancedSidebarProps> = ({
         data-sidebar="true"
         className={`
           fixed top-0 left-0 flex flex-col h-full bg-sidebar border-r border-sidebar-border
-          transform transition-all duration-300 ease-in-out z-[200]
-          shadow-elevated
+          z-[200] shadow-elevated
           ${isOpen ? 'translate-x-0' : '-translate-x-full'}
         `}
-        style={{ width: currentWidth }}
+        style={{ 
+          width: currentWidth,
+          transition: 'transform 300ms cubic-bezier(0.4, 0, 0.2, 1)',
+          willChange: 'transform'
+        }}
       >
         {/* Header */}
         <div className="flex items-center justify-between p-4 border-b border-sidebar-border">
@@ -102,20 +105,18 @@ const EnhancedSidebar: React.FC<EnhancedSidebarProps> = ({
                 <Button
                   variant="ghost"
                   size="sm"
-                  onClick={onToggleCollapsed}
+                  onClick={() => {
+                    // On mobile, close the sidebar entirely. On desktop, just collapse it.
+                    if (window.innerWidth < 768) {
+                      onClose();
+                    } else {
+                      onToggleCollapsed?.();
+                    }
+                  }}
                   className="text-sidebar-foreground hover:bg-sidebar-accent"
                   aria-label="Collapse sidebar"
                 >
                   <ChevronLeft className="h-4 w-4" />
-                </Button>
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  onClick={onClose}
-                  className="text-sidebar-foreground hover:bg-sidebar-accent md:hidden"
-                  aria-label="Close sidebar"
-                >
-                  <X className="h-4 w-4" />
                 </Button>
               </div>
             </>
