@@ -9,7 +9,7 @@ import { SettingsModal } from '@/components/modals/SettingsModal';
 interface EnhancedSidebarProps {
   isOpen: boolean;
   onClose: () => void;
-  onFastClose?: () => void; // New prop for faster closing
+  onFastClose?: () => void;
   onNewChat?: () => void;
   isCollapsed?: boolean;
   onToggleCollapsed?: () => void;
@@ -43,13 +43,40 @@ const EnhancedSidebar: React.FC<EnhancedSidebarProps> = ({
   const [isProfilePopupOpen, setIsProfilePopupOpen] = useState(false);
   const [isSettingsModalOpen, setIsSettingsModalOpen] = useState(false);
   
+  // Add internal animation state to control content visibility
+  const [isAnimating, setIsAnimating] = useState(false);
+  const [showContent, setShowContent] = useState(!isCollapsed);
+  
   // For mobile: handle mount/unmount with animation
   const [shouldRender, setShouldRender] = useState(isOpen);
-  const [isAnimating, setIsAnimating] = useState(false);
-  const [transitionSpeed, setTransitionSpeed] = useState(400); // Default speed
+  const [isMobileAnimating, setIsMobileAnimating] = useState(false);
+  const [transitionSpeed, setTransitionSpeed] = useState(400);
   
   // Detect if this is mobile or desktop usage
   const isMobileUsage = window.innerWidth < 768;
+
+  // Handle desktop collapse/expand animation timing
+  React.useEffect(() => {
+    if (isMobileUsage) return; // Only for desktop
+    
+    if (isCollapsed) {
+      // Closing: Start fade out immediately, content will fade during width collapse
+      setShowContent(false);
+      setIsAnimating(true);
+      setTimeout(() => {
+        setIsAnimating(false);
+      }, 150); // Match CSS transition duration
+    } else {
+      // Opening: Start width expansion, content will fade in during expansion
+      setIsAnimating(true);
+      setTimeout(() => {
+        setShowContent(true); // Start fade in after small delay
+        setTimeout(() => {
+          setIsAnimating(false);
+        }, 50);
+      }, 30); // Start content fade very early in the opening animation
+    }
+  }, [isCollapsed, isMobileUsage]);
 
   // Handle mobile mounting/unmounting with proper timing for animations
   React.useEffect(() => {
@@ -57,14 +84,10 @@ const EnhancedSidebar: React.FC<EnhancedSidebarProps> = ({
     
     if (isOpen) {
       setShouldRender(true);
-      // Small delay to ensure DOM is ready for animation
-      setTimeout(() => setIsAnimating(true), 10);
+      setTimeout(() => setIsMobileAnimating(true), 10);
     } else {
-      // Keep isAnimating true during closing animation, then set to false
-      // This ensures the sidebar slides out smoothly before unmounting
       setTimeout(() => {
-        setIsAnimating(false);
-        // Then unmount after the animation completes
+        setIsMobileAnimating(false);
         setTimeout(() => setShouldRender(false), 400);
       }, 10);
     }
@@ -75,13 +98,11 @@ const EnhancedSidebar: React.FC<EnhancedSidebarProps> = ({
 
   const handleClose = (fast = false) => {
     if (isMobileUsage) {
-      // Set transition speed based on close type
       setTransitionSpeed(fast ? 200 : 400);
-      // For mobile, trigger the smooth closing animation
-      setIsAnimating(false);
+      setIsMobileAnimating(false);
       setTimeout(() => {
         setShouldRender(false);
-        onClose(); // Call parent's onClose after animation
+        onClose();
       }, fast ? 200 : 400);
     } else {
       // For desktop, use collapse functionality
@@ -96,7 +117,6 @@ const EnhancedSidebar: React.FC<EnhancedSidebarProps> = ({
     };
     
     if (onFastClose) {
-      // You can trigger this from AppShell
       window.addEventListener('closeSidebarFast', handleFastClose);
       return () => window.removeEventListener('closeSidebarFast', handleFastClose);
     }
@@ -114,7 +134,6 @@ const EnhancedSidebar: React.FC<EnhancedSidebarProps> = ({
     { id: '3', title: 'Kiln Temperature Guide', timestamp: '3 days ago' },
   ];
 
-  // Enhanced navigation with feature sections
   const mainFeatures = [
     { name: 'Chat Assistant', path: '/', icon: MessageSquare },
     { name: 'Recipes → Image', path: '/recipes-to-image', icon: FlaskConical },
@@ -139,6 +158,9 @@ const EnhancedSidebar: React.FC<EnhancedSidebarProps> = ({
   };
 
   const currentWidth = isCollapsed ? collapsedWidth : width;
+  
+  // Use showContent for desktop content visibility instead of isCollapsed directly
+  const shouldShowContent = isMobileUsage ? true : showContent;
 
   return (
     <>
@@ -148,17 +170,23 @@ const EnhancedSidebar: React.FC<EnhancedSidebarProps> = ({
         style={{ 
           width: currentWidth,
           transform: isMobileUsage 
-            ? (isAnimating ? 'translateX(0px)' : 'translateX(-100%)')
-            : 'translateX(0px)', // Desktop always visible, width changes instead
-          transition: `transform ${transitionSpeed}ms ease-in-out, width 300ms ease-in-out`,
+            ? (isMobileAnimating ? 'translateX(0px)' : 'translateX(-100%)')
+            : 'translateX(0px)',
+          transition: `transform ${transitionSpeed}ms ease-in-out, width 150ms ease-in-out`,
           willChange: 'transform, width',
           backfaceVisibility: 'hidden'
         }}
       >
         {/* Header */}
         <div className="flex items-center justify-between p-4 border-b border-sidebar-border">
-          {!isCollapsed ? (
-            <>
+          {shouldShowContent ? (
+            <div 
+              className="flex items-center justify-between w-full"
+              style={{
+                opacity: shouldShowContent ? 1 : 0,
+                transition: 'opacity 150ms ease-in-out'
+              }}
+            >
               <h2 className="text-lg font-semibold text-sidebar-foreground font-heading">
                 GlazionStudio
               </h2>
@@ -166,14 +194,14 @@ const EnhancedSidebar: React.FC<EnhancedSidebarProps> = ({
                 <Button
                   variant="ghost"
                   size="sm"
-                  onClick={() => handleClose(false)} // Normal speed close
+                  onClick={() => handleClose(false)}
                   className="text-sidebar-foreground hover:bg-sidebar-accent"
                   aria-label="Collapse sidebar"
                 >
                   <ChevronLeft className="h-4 w-4" />
                 </Button>
               </div>
-            </>
+            </div>
           ) : (
             <Button
               variant="ghost"
@@ -193,24 +221,34 @@ const EnhancedSidebar: React.FC<EnhancedSidebarProps> = ({
           <div className="px-4 mb-6">
             <Button
               onClick={handleNewChat}
-              className={`w-full gradient-primary text-primary-foreground hover:opacity-90 transition-opacity ${
-                isCollapsed ? 'px-0' : ''
-              }`}
+              className="w-full gradient-primary text-primary-foreground hover:opacity-90 transition-opacity justify-start px-3"
               size="sm"
-              title={isCollapsed ? "New Chat" : undefined}
+              title={!shouldShowContent ? "New Chat" : undefined}
             >
-              <Plus className="h-4 w-4" />
-              {!isCollapsed && <span className="ml-2">New Chat</span>}
+              <Plus className="h-4 w-4 flex-shrink-0" />
+              <span 
+                className="ml-3 whitespace-nowrap"
+                style={{
+                  opacity: shouldShowContent ? 1 : 0,
+                  transition: 'opacity 150ms ease-in-out'
+                }}
+              >
+                New Chat
+              </span>
             </Button>
           </div>
 
           {/* Main Features Section */}
           <nav className="px-4 space-y-1 mb-6">
-            {!isCollapsed && (
-              <h3 className="text-xs font-semibold text-sidebar-foreground/60 uppercase tracking-wider mb-2">
-                Features
-              </h3>
-            )}
+            <h3 
+              className="text-xs font-semibold text-sidebar-foreground/60 uppercase tracking-wider mb-2 whitespace-nowrap"
+              style={{
+                opacity: shouldShowContent ? 1 : 0,
+                transition: 'opacity 150ms ease-in-out'
+              }}
+            >
+              Features
+            </h3>
             {mainFeatures.map((item) => {
               const isActive = location.pathname === item.path;
               const Icon = item.icon;
@@ -219,18 +257,24 @@ const EnhancedSidebar: React.FC<EnhancedSidebarProps> = ({
                 <Link
                   key={item.path}
                   to={item.path}
-                  onClick={() => !isCollapsed && onClose()}
-                  title={isCollapsed ? item.name : undefined}
-                  className={`flex items-center w-full ${
-                    isCollapsed ? 'justify-center px-2' : 'justify-start px-3'
-                  } py-2.5 rounded-lg text-sm font-medium transition-all duration-200 ${
+                  onClick={() => shouldShowContent && onClose()}
+                  title={!shouldShowContent ? item.name : undefined}
+                  className={`flex items-center w-full justify-start px-3 py-2.5 rounded-lg text-sm font-medium transition-all duration-200 ${
                     isActive 
                       ? 'bg-primary text-primary-foreground shadow-sm' 
                       : 'text-sidebar-foreground hover:bg-sidebar-accent hover:text-sidebar-accent-foreground'
                   }`}
                 >
-                  <Icon className="h-4 w-4" />
-                  {!isCollapsed && <span className="ml-3">{item.name}</span>}
+                  <Icon className="h-4 w-4 flex-shrink-0" />
+                  <span 
+                    className="ml-3 whitespace-nowrap"
+                    style={{
+                      opacity: shouldShowContent ? 1 : 0,
+                      transition: 'opacity 150ms ease-in-out'
+                    }}
+                  >
+                    {item.name}
+                  </span>
                 </Link>
               );
             })}
@@ -238,8 +282,14 @@ const EnhancedSidebar: React.FC<EnhancedSidebarProps> = ({
 
           {/* Utility Pages */}
           <nav className="px-4 space-y-1 mb-6">
-            {!isCollapsed && (
-              <h3 className="text-xs font-semibold text-sidebar-foreground/60 uppercase tracking-wider mb-2">
+            {shouldShowContent && (
+              <h3 
+                className="text-xs font-semibold text-sidebar-foreground/60 uppercase tracking-wider mb-2"
+                style={{
+                  opacity: shouldShowContent ? 1 : 0,
+                  transition: 'opacity 150ms ease-in-out'
+                }}
+              >
                 Tools
               </h3>
             )}
@@ -251,61 +301,69 @@ const EnhancedSidebar: React.FC<EnhancedSidebarProps> = ({
                 <Link
                   key={item.path}
                   to={item.path}
-                  onClick={() => !isCollapsed && onClose()}
-                  title={isCollapsed ? item.name : undefined}
-                  className={`flex items-center w-full ${
-                    isCollapsed ? 'justify-center px-2' : 'justify-start px-3'
-                  } py-2.5 rounded-lg text-sm font-medium transition-all duration-200 ${
+                  onClick={() => shouldShowContent && onClose()}
+                  title={!shouldShowContent ? item.name : undefined}
+                  className={`flex items-center w-full justify-start px-3 py-2.5 rounded-lg text-sm font-medium transition-all duration-200 ${
                     isActive 
                       ? 'bg-accent/50 text-primary border border-primary/20 shadow-sm' 
                       : 'text-sidebar-foreground hover:bg-sidebar-accent hover:text-sidebar-accent-foreground'
                   }`}
                 >
-                  <Icon className="h-4 w-4" />
-                  {!isCollapsed && <span className="ml-3">{item.name}</span>}
+                  <Icon className="h-4 w-4 flex-shrink-0" />
+                  <span 
+                    className="ml-3 whitespace-nowrap"
+                    style={{
+                      opacity: shouldShowContent ? 1 : 0,
+                      transition: 'opacity 150ms ease-in-out'
+                    }}
+                  >
+                    {item.name}
+                  </span>
                 </Link>
               );
             })}
           </nav>
 
           {/* Chat History Section */}
-          {!isCollapsed && (
-            <div className="flex-1 px-4 py-4 overflow-y-auto">
-              <h3 className="text-xs font-semibold text-sidebar-foreground/60 uppercase tracking-wider mb-3">
-                Recent Chats
-              </h3>
-              <div className="space-y-1">
-                {chatHistory.map((chat) => (
-                  <Link
-                    key={chat.id}
-                    to="/"
-                    onClick={onClose}
-                    className="block w-full text-left p-2.5 rounded-lg hover:bg-sidebar-accent 
-                             transition-colors group"
-                  >
-                    <div className="text-sm font-medium text-sidebar-foreground mb-1 
-                                  truncate group-hover:text-sidebar-accent-foreground">
-                      {chat.title}
-                    </div>
-                    <div className="text-xs text-sidebar-foreground/60">
-                      {chat.timestamp}
-                    </div>
-                  </Link>
-                ))}
-              </div>
+          <div 
+            className="flex-1 px-4 py-4 overflow-y-auto"
+            style={{
+              opacity: shouldShowContent ? 1 : 0,
+              transition: 'opacity 150ms ease-in-out'
+            }}
+          >
+            <h3 className="text-xs font-semibold text-sidebar-foreground/60 uppercase tracking-wider mb-3 whitespace-nowrap">
+              Recent Chats
+            </h3>
+            <div className="space-y-1">
+              {chatHistory.map((chat) => (
+                <Link
+                  key={chat.id}
+                  to="/"
+                  onClick={onClose}
+                  className="block w-full text-left p-2.5 rounded-lg hover:bg-sidebar-accent 
+                           transition-colors group"
+                >
+                  <div className="text-sm font-medium text-sidebar-foreground mb-1 
+                                truncate group-hover:text-sidebar-accent-foreground whitespace-nowrap">
+                    {chat.title}
+                  </div>
+                  <div className="text-xs text-sidebar-foreground/60 whitespace-nowrap">
+                    {chat.timestamp}
+                  </div>
+                </Link>
+              ))}
             </div>
-          )}
+          </div>
         </div>
         
         {/* Bottom section */}
         <div className="border-t border-sidebar-border p-3">
           <div 
             onClick={() => setIsProfilePopupOpen(true)}
-            title={isCollapsed ? user.name : undefined}
-            className={`flex items-center gap-2 p-2 rounded-lg hover:bg-sidebar-accent 
-                      transition-colors cursor-pointer mb-2 ${
-                        isCollapsed ? 'justify-center' : ''
-                      }`}
+            title={!shouldShowContent ? user.name : undefined}
+            className="flex items-center gap-2 p-2 rounded-lg hover:bg-sidebar-accent 
+                      transition-colors cursor-pointer mb-2"
           >
             <Avatar className="h-8 w-8 flex-shrink-0">
               <AvatarImage src={user.avatar} alt={user.name} />
@@ -313,29 +371,40 @@ const EnhancedSidebar: React.FC<EnhancedSidebarProps> = ({
                 {user.name.split(' ').map(n => n[0]).join('')}
               </AvatarFallback>
             </Avatar>
-            {!isCollapsed && (
-              <div className="flex-1 min-w-0">
-                <div className="text-sm font-medium text-sidebar-foreground truncate">
-                  {user.name}
-                </div>
-                <div className="text-xs text-sidebar-foreground/60 truncate">
-                  {user.email}
-                </div>
+            <div 
+              className="flex-1 min-w-0"
+              style={{
+                opacity: shouldShowContent ? 1 : 0,
+                transition: 'opacity 150ms ease-in-out'
+              }}
+            >
+              <div className="text-sm font-medium text-sidebar-foreground truncate whitespace-nowrap">
+                {user.name}
               </div>
-            )}
+              <div className="text-xs text-sidebar-foreground/60 truncate whitespace-nowrap">
+                {user.email}
+              </div>
+            </div>
           </div>
 
           <Button
             onClick={() => setIsSettingsModalOpen(true)}
             variant="ghost"
-            className={`w-full ${
-              isCollapsed ? 'justify-center px-0' : 'justify-start'
-            } text-sidebar-foreground hover:bg-sidebar-accent`}
+            className="w-full justify-start text-sidebar-foreground hover:bg-sidebar-accent px-3"
             size="sm"
-            title={isCollapsed ? "Settings" : undefined}
+            title={!shouldShowContent ? "Settings" : undefined}
           >
-            <Settings className="h-4 w-4" />
-            {!isCollapsed && <span className="ml-3">Settings</span>}
+            <Settings className="h-4 w-4 flex-shrink-0" />
+              <span 
+                className="ml-3"
+                style={{
+                  opacity: shouldShowContent ? 1 : 0,
+                  transition: 'opacity 150ms ease-in-out',
+                  visibility: shouldShowContent ? 'visible' : 'hidden'
+                }}
+              >
+                Settings
+              </span>
           </Button>
         </div>
       </div>
