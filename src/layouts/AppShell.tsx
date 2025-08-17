@@ -103,7 +103,7 @@ export default function AppShell() {
 
       {/* Main Content Area - Now uses CSS variables */}
       <main
-        className="transition-all duration-300 ease-in-out overflow-hidden"
+        className="transition-all duration-300 ease-in-out overflow-auto"
         style={{
           marginLeft: 'var(--sidebar-offset, 0px)',
           paddingTop: '3.5rem',         // header is fixed, keep visual spacing
