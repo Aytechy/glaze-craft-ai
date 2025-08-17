@@ -61,7 +61,7 @@ const Header = forwardRef<HTMLElement, HeaderProps>(({ onToggleSidebar, isDeskto
                 transition-all duration-300"
       style={{
         // Use CSS custom properties set by AppShell
-        left: 'calc(var(--is-desktop, 0) * var(--sidebar-offset, 0px) + 50px)',
+        left: 'calc(var(--is-desktop, 0) * var(--sidebar-offset, 0px))',
         right: 0
       }}
     >
@@ -83,7 +83,7 @@ const Header = forwardRef<HTMLElement, HeaderProps>(({ onToggleSidebar, isDeskto
         </div>
 
         {/* Center section - App title (hidden on mobile to save space) */}
-        <div className="hidden md:flex items-center">
+        <div className="hidden md:flex items-center pl-4">
           <h1 className="text-xl font-bold font-heading text-foreground">
             GlazionStudio
           </h1>
