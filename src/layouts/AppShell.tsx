@@ -87,7 +87,7 @@ export default function AppShell() {
       {isSidebarOpen && !isDesktop && (
         <>
           <div 
-            className="fixed inset-0 bg-black/20 backdrop-blur-sm z-50"
+            className="fixed inset-0 bg-black/20 backdrop-blur-sm z-40"
             onClick={() => setIsSidebarOpen(false)}
           />
           <div className="fixed top-0 left-0 z-50 h-screen w-64">
