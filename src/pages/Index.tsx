@@ -5,6 +5,7 @@
  * - PromptCard starts centered under ResponseArea welcome screen
  * - When conversation starts, PromptCard sticks to bottom, ResponseArea takes remaining space
  * - Clean, intuitive UX similar to ChatGPT/Claude
+ * - Now respects sidebar positioning using CSS custom properties
  */
 
 import React, { useState, useEffect } from 'react';
@@ -96,7 +97,16 @@ const Index: React.FC = () => {
   }, [error, toast]);
 
   return (
-    <div className="fixed inset-0 overflow-hidden flex flex-col">
+    <div 
+      className="fixed overflow-hidden flex flex-col"
+      style={{
+        // Respect sidebar positioning using CSS custom properties
+        left: 'calc(var(--is-desktop, 0) * var(--sidebar-offset, 0px))',
+        right: 0,
+        top: 0,
+        bottom: 0
+      }}
+    >
       <ClipboardUpload onImagePaste={(file) => {
         if (document.querySelector('[data-prompt-card]')) {
           const event = new CustomEvent('pastedImage', { detail: file });
@@ -160,8 +170,11 @@ const Index: React.FC = () => {
 
             {/* Fixed PromptCard at bottom */}
             <div 
-              className="fixed bottom-0 inset-x-0 mx-auto z-30 bg-background/95 backdrop-blur"
+              className="fixed bottom-0 z-30 bg-background/95 backdrop-blur"
               style={{
+                // Respect sidebar positioning for the prompt card too
+                left: 'calc(var(--is-desktop, 0) * var(--sidebar-offset, 0px))',
+                right: 0,
                 paddingBottom: 'calc(env(safe-area-inset-bottom) + 16px)',
               }}
             >
