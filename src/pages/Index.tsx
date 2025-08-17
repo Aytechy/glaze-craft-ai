@@ -12,7 +12,6 @@ import React, { useState, useEffect } from 'react';
 import ResponseArea from '@/components/ResponseArea';
 import PromptCard from '@/components/PromptCard';
 import { NewChatModal } from '@/components/modals/NewChatModal';
-import { ClipboardUpload } from '@/components/ClipboardUpload';
 import { useChat } from '@/hooks/useChat';
 import { useToast } from '@/hooks/use-toast';
 
@@ -98,17 +97,12 @@ const Index: React.FC = () => {
 
   return (
     <div className="h-full overflow-hidden flex flex-col">
-      <ClipboardUpload onImagePaste={(file) => {
-        if (document.querySelector('[data-prompt-card]')) {
-          const event = new CustomEvent('pastedImage', { detail: file });
-          document.dispatchEvent(event);
-        }
-      }}>
+      {/* content */}
         
         {!hasConversation && !isLoading ? (
           /* No conversation: Center everything vertically */
           <div className="flex flex-col items-center justify-center h-full">
-            <div className="w-full max-w-4xl">
+            <div className="w-full max-w-3xl">
               {/* Welcome area - ResponseArea with welcome screen */}
               <div>
                 <ResponseArea
@@ -143,7 +137,7 @@ const Index: React.FC = () => {
                   paddingBottom: '120px' // Space for fixed prompt
                 }}
               >
-                <div className="w-full max-w-4xl mx-auto">
+                <div className="w-full max-w-3xl mx-auto">
                   <ResponseArea
                     messages={messages}
                     isTyping={isLoading}
@@ -158,7 +152,7 @@ const Index: React.FC = () => {
 
             {/* Fixed PromptCard at bottom */}
             <div 
-              className="fixed bottom-0 z-30 bg-background/95 backdrop-blur"
+              className="fixed bottom-0 z-30 "
               style={{
                 // Use CSS custom properties to respect sidebar positioning
                 left: 'calc(var(--is-desktop, 0) * var(--sidebar-offset, 0px))',
@@ -175,7 +169,6 @@ const Index: React.FC = () => {
             </div>
           </>
         )}
-      </ClipboardUpload>
 
       <NewChatModal
         isOpen={isNewChatModalOpen}

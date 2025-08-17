@@ -95,13 +95,13 @@ const ResponseArea: React.FC<ResponseAreaProps> = (props) => {
   return (
     <div
       ref={scrollContainerRef}
-      className="h-full pl-0 md:px-4"
+      className="h-full pl-0 md:px-2"
       style={{
         paddingBottom: `calc(env(safe-area-inset-bottom) + ${bottomPadPx}px)`,
         scrollbarGutter: 'stable',
       }}
     >
-      <div className="max-w-4xl mx-auto space-y-2 pb-16 pt-5">
+      <div className="max-w-4xl mx-auto space-y-0 pb-10 pt-5">
 
         {/* Welcome screen shown only if no messages exist */}
         {messages.length === 0 && !isTyping && (
@@ -113,10 +113,7 @@ const ResponseArea: React.FC<ResponseAreaProps> = (props) => {
             </div>
             <h2 className="text-2xl font-bold text-foreground mb-2 font-heading">Good to See You!</h2>
             <h3 className="text-xl text-foreground mb-4 font-heading">How Can I be an Assistance?</h3>
-            <p className="text-muted-foreground max-w-md">
-              I'm available 24/7 for you, ask me anything about ceramics, glazes, and pottery techniques.
-            </p>
-            <div className="mt-8 flex flex-wrap gap-3 justify-center">
+            <div className="mt-2 flex flex-wrap gap-3 justify-center">
               <SuggestionButton text="Any advice for me?" onSelect={(text) => onSuggestionSelect && onSuggestionSelect(text)} />
               <SuggestionButton text="Some glaze recipe ideas" onSelect={(text) => onSuggestionSelect && onSuggestionSelect(text)} />
               <SuggestionButton text="Kiln firing techniques" onSelect={(text) => onSuggestionSelect && onSuggestionSelect(text)} />
@@ -144,7 +141,7 @@ const ResponseArea: React.FC<ResponseAreaProps> = (props) => {
               <div
                 className={`group flex gap-4 ${
                   message.type === 'user' ? 'flex-row-reverse' : 'flex-row'
-                } mb-3`}
+                } mb-0`}
               >
                 <div
                   className={`flex-1 max-w-3xl ${
@@ -167,7 +164,7 @@ const ResponseArea: React.FC<ResponseAreaProps> = (props) => {
                       className={`inline-block rounded-2xl ${
                         message.type === 'user'
                           // user bubbles keep padding, gradient, and shadow
-                          ? 'px-4 py-3 shadow-subtle gradient-primary text-primary-foreground'
+                          ? 'px-4 py-2 shadow-subtle gradient-primary text-primary-foreground'
                           // AI bubbles are transparent, no padding, no shadow, no border
                           : 'px-0 py-0 bg-transparent text-card-foreground'
                       }`}

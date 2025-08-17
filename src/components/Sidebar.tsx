@@ -178,7 +178,7 @@ const EnhancedSidebar: React.FC<EnhancedSidebarProps> = ({
         }}
       >
         {/* Header */}
-        <div className="flex items-center justify-between p-4 border-b border-sidebar-border">
+        <div className="flex items-center justify-between h-14 p-4 border-b border-sidebar-border">
           {shouldShowContent ? (
             <div 
               className="flex items-center justify-between w-full"
@@ -216,9 +216,9 @@ const EnhancedSidebar: React.FC<EnhancedSidebarProps> = ({
         </div>
 
         {/* Content */}
-        <div className="flex-1 py-4 flex flex-col overflow-hidden">
+        <div className="flex-1 py-2 flex flex-col overflow-hidden">
           {/* New Chat Button */}
-          <div className="px-4 mb-6">
+          <div className="px-3 mb-2">
             <Button
               onClick={handleNewChat}
               className="w-full gradient-primary text-primary-foreground hover:opacity-90 transition-opacity justify-start px-3"
@@ -239,7 +239,7 @@ const EnhancedSidebar: React.FC<EnhancedSidebarProps> = ({
           </div>
 
           {/* Main Features Section */}
-          <nav className="px-4 space-y-1 mb-6">
+          <nav className="px-3 space-y-0.5 mb-3">
             <h3 
               className="text-xs font-semibold text-sidebar-foreground/60 uppercase tracking-wider mb-2 whitespace-nowrap"
               style={{
@@ -259,7 +259,7 @@ const EnhancedSidebar: React.FC<EnhancedSidebarProps> = ({
                   to={item.path}
                   onClick={() => shouldShowContent && onClose()}
                   title={!shouldShowContent ? item.name : undefined}
-                  className={`flex items-center w-full justify-start px-3 py-2.5 rounded-lg text-sm font-medium transition-all duration-200 ${
+                  className={`flex items-center w-full justify-start px-3 py-2 rounded-lg text-sm font-medium transition-all duration-200 ${
                     isActive 
                       ? 'bg-primary text-primary-foreground shadow-sm' 
                       : 'text-sidebar-foreground hover:bg-sidebar-accent hover:text-sidebar-accent-foreground'
@@ -281,7 +281,7 @@ const EnhancedSidebar: React.FC<EnhancedSidebarProps> = ({
           </nav>
 
           {/* Utility Pages */}
-          <nav className="px-4 space-y-1 mb-6">
+          <nav className="px-3 space-y-0.5 mb-3">
             <h3 
               className="text-xs font-semibold text-sidebar-foreground/60 uppercase tracking-wider mb-2"
               style={{
@@ -301,7 +301,7 @@ const EnhancedSidebar: React.FC<EnhancedSidebarProps> = ({
                   to={item.path}
                   onClick={() => shouldShowContent && onClose()}
                   title={!shouldShowContent ? item.name : undefined}
-                  className={`flex items-center w-full justify-start px-3 py-2.5 rounded-lg text-sm font-medium transition-all duration-200 ${
+                  className={`flex items-center w-full justify-start px-3 py-2 rounded-lg text-sm font-medium transition-all duration-200 ${
                     isActive 
                       ? 'bg-accent/50 text-primary border border-primary/20 shadow-sm' 
                       : 'text-sidebar-foreground hover:bg-sidebar-accent hover:text-sidebar-accent-foreground'
@@ -324,7 +324,7 @@ const EnhancedSidebar: React.FC<EnhancedSidebarProps> = ({
 
           {/* Chat History Section */}
           <div 
-            className="flex-1 px-4 py-4 overflow-y-auto"
+            className="flex-1 px-3 py-4 overflow-y-auto"
             style={{
               opacity: shouldShowContent ? 1 : 0,
               transition: 'opacity 150ms ease-in-out'
@@ -356,7 +356,7 @@ const EnhancedSidebar: React.FC<EnhancedSidebarProps> = ({
         </div>
         
         {/* Bottom section */}
-        <div className="border-t border-sidebar-border p-3">
+        <div className="border-t border-sidebar-border px-1.5 py-3">
           <div 
             onClick={() => setIsProfilePopupOpen(true)}
             title={!shouldShowContent ? user.name : undefined}
@@ -388,7 +388,7 @@ const EnhancedSidebar: React.FC<EnhancedSidebarProps> = ({
           <Button
             onClick={() => setIsSettingsModalOpen(true)}
             variant="ghost"
-            className="w-full justify-start text-sidebar-foreground hover:bg-sidebar-accent px-3"
+            className="w-full justify-start text-sidebar-foreground hover:bg-sidebar-accent px-4"
             size="sm"
             title={!shouldShowContent ? "Settings" : undefined}
           >
