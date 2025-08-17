@@ -139,8 +139,7 @@ const Index: React.FC = () => {
               <div
                 ref={scrollRef}
                 className="h-full overflow-y-auto overscroll-contain px-4"
-                style={{ 
-                  scrollbarGutter: 'stable',
+                style={{
                   paddingBottom: '120px' // Space for fixed prompt
                 }}
               >
