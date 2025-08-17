@@ -45,20 +45,23 @@ export default function AppShell() {
   };
 
   const hasBottomTabs = ['/', '/recipes-to-image', '/image-to-recipes', '/umf-calculator'].includes(location.pathname);
+  
+  // Calculate leftOffset for Header and HybridLayout
+  const leftOffset = isDesktop ? (isSidebarOpen ? sidebarWidth : railWidth) : 0;
 
   return (
     <div className="h-[100svh] overflow-hidden bg-background text-foreground">
       {/* Fixed Header */}
       <Header 
         onToggleSidebar={() => setIsSidebarOpen(prev => !prev)} 
-        leftOffset={isDesktop ? (isSidebarOpen ? sidebarWidth : railWidth) : 0} 
+        leftOffset={leftOffset} 
         isDesktop={isDesktop} 
       />
 
       {/* Single Sidebar that handles both expanded and collapsed states */}
       <div
         className="hidden md:block fixed top-0 left-0 z-40 h-screen overflow-hidden transition-[width] duration-300 ease-out"
-        style={{ width: isSidebarOpen ? sidebarWidth : railWidth }}
+        style={{ width: leftOffset }}
       >
         <Sidebar 
           isOpen={true}
@@ -93,13 +96,13 @@ export default function AppShell() {
       <main
         className="transition-all duration-300 ease-in-out overflow-hidden"
         style={{
-          marginLeft: isDesktop ? (isSidebarOpen ? sidebarWidth : railWidth) : 0,
+          marginLeft: leftOffset,
           paddingTop: '3.5rem',         // header is fixed, keep visual spacing if you want
           paddingBottom: 0,             // remove extra 6rem padding that made root taller
           height: 'calc(100svh - 56px)' // 56px header height
         }}
       >
-        <Outlet />
+        <Outlet context={{ leftOffset, isDesktop }} />
       </main>
     </div>
   );

@@ -1,6 +1,11 @@
-import React, { useState, useEffect } from 'react';
-import { Outlet, useLocation, Link } from 'react-router-dom';
+import React from 'react';
+import { Outlet, useLocation, Link, useOutletContext } from 'react-router-dom';
 import { MessageSquare, Image as ImgIcon, FlaskConical, Calculator } from 'lucide-react';
+
+interface OutletContextType {
+  leftOffset: number;
+  isDesktop: boolean;
+}
 
 const featureTabs = [
   { to: '/', label: 'Chat Assistant', icon: MessageSquare, short: 'Chat' },
@@ -11,49 +16,10 @@ const featureTabs = [
 
 export default function HybridLayout() {
   const { pathname } = useLocation();
-  const [isDesktop, setIsDesktop] = useState(window.innerWidth >= 768);
-  const [leftOffset, setLeftOffset] = useState(0);
+  const { leftOffset = 0, isDesktop = false } = useOutletContext<OutletContextType>();
 
   // Only show feature tabs on feature pages
   const isFeaturePage = ['/', '/recipes-to-image', '/image-to-recipes', '/umf-calculator'].includes(pathname);
-
-  useEffect(() => {
-    const updateState = () => {
-      const desktop = window.innerWidth >= 768;
-      setIsDesktop(desktop);
-      
-      if (!desktop) {
-        setLeftOffset(0);
-        return;
-      }
-
-      // Get the exact same leftOffset that Header uses
-      const mainElement = document.querySelector('main');
-      if (mainElement) {
-        const styles = window.getComputedStyle(mainElement);
-        const marginLeft = parseInt(styles.marginLeft, 10) || 0;
-        setLeftOffset(marginLeft);
-      }
-    };
-
-    updateState();
-    window.addEventListener('resize', updateState);
-
-    // Watch for sidebar changes exactly like Header does
-    const observer = new MutationObserver(updateState);
-    const mainElement = document.querySelector('main');
-    if (mainElement) {
-      observer.observe(mainElement, {
-        attributes: true,
-        attributeFilter: ['style'],
-      });
-    }
-
-    return () => {
-      window.removeEventListener('resize', updateState);
-      observer.disconnect();
-    };
-  }, []);
 
   return (
     <div className="relative">
