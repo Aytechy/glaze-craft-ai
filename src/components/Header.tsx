@@ -83,7 +83,7 @@ const Header = forwardRef<HTMLElement, HeaderProps>(({ onToggleSidebar, isDeskto
         </div>
 
         {/* Center section - App title (hidden on mobile to save space) */}
-        <div className="hidden md:flex items-center pl-7">
+        <div className="hidden md:flex items-center pl-10">
           <h1 className="text-xl font-bold font-heading text-foreground">
             GlazionStudio
           </h1>
