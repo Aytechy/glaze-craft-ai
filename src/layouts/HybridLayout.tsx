@@ -11,43 +11,36 @@ const featureTabs = [
 
 export default function HybridLayout() {
   const { pathname } = useLocation();
-  const [isDesktop, setIsDesktop] = useState(false);
-  const [sidebarOpen, setSidebarOpen] = useState(false);
-  const sidebarWidth = 280;
-  const railWidth = 64;
+  const [isDesktop, setIsDesktop] = useState(window.innerWidth >= 768);
+  const [leftOffset, setLeftOffset] = useState(0);
 
   // Only show feature tabs on feature pages
   const isFeaturePage = ['/', '/recipes-to-image', '/image-to-recipes', '/umf-calculator'].includes(pathname);
 
   useEffect(() => {
-    const updateLayout = () => {
+    const updateState = () => {
       const desktop = window.innerWidth >= 768;
       setIsDesktop(desktop);
       
       if (!desktop) {
-        setSidebarOpen(false);
+        setLeftOffset(0);
         return;
       }
 
-      // Get the main content area to determine sidebar state
+      // Get sidebar offset from main element (same logic as Header)
       const mainElement = document.querySelector('main');
       if (mainElement) {
         const styles = window.getComputedStyle(mainElement);
         const marginLeft = parseInt(styles.marginLeft, 10) || 0;
-        // If margin is greater than rail width, sidebar is open
-        setSidebarOpen(marginLeft > railWidth + 10);
+        setLeftOffset(marginLeft);
       }
     };
 
-    // Update on mount and resize
-    updateLayout();
-    window.addEventListener('resize', updateLayout);
+    updateState();
+    window.addEventListener('resize', updateState);
 
-    // Watch for sidebar changes via MutationObserver
-    const observer = new MutationObserver(() => {
-      setTimeout(updateLayout, 50);
-    });
-
+    // Watch for sidebar changes
+    const observer = new MutationObserver(updateState);
     const mainElement = document.querySelector('main');
     if (mainElement) {
       observer.observe(mainElement, {
@@ -57,13 +50,10 @@ export default function HybridLayout() {
     }
 
     return () => {
-      window.removeEventListener('resize', updateLayout);
+      window.removeEventListener('resize', updateState);
       observer.disconnect();
     };
   }, []);
-
-  // Calculate left offset based on sidebar state
-  const leftOffset = isDesktop ? (sidebarOpen ? sidebarWidth : railWidth) : 0;
 
   return (
     <div className="relative">
@@ -72,32 +62,32 @@ export default function HybridLayout() {
         <div 
           className="fixed top-14 z-40 border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 transition-all duration-300"
           style={{
-            left: leftOffset,
+            left: isDesktop ? leftOffset : 0,
             right: 0,
             height: '52px'
           }}
         >
-          <div className="h-full flex items-center justify-center px-2 sm:px-4">
+          <div className="h-full flex items-center justify-center px-4">
             <nav className="w-full max-w-4xl mx-auto">
-              <ul className="flex h-full items-center justify-center gap-1">
+              <ul className="flex h-full items-center justify-center gap-2">
                 {featureTabs.map(({ to, label, icon: Icon, short }) => {
                   const active = pathname === to;
                   return (
-                    <li key={to} className="flex-shrink-0">
+                    <li key={to}>
                       <Link
                         to={to}
                         className={[
-                          'flex items-center gap-1.5 sm:gap-2 px-2 sm:px-4 py-2 sm:py-2.5 rounded-lg transition-all duration-200 text-sm font-medium',
+                          'flex items-center gap-2 px-3 py-2 rounded-lg transition-all duration-200 text-sm font-medium',
                           active 
                             ? 'text-primary bg-primary/10 border border-primary/20 shadow-sm' 
                             : 'text-muted-foreground hover:text-foreground hover:bg-accent/50'
                         ].join(' ')}
                         aria-current={active ? 'page' : undefined}
                       >
-                        <Icon className="h-4 w-4 flex-shrink-0" />
-                        {/* Responsive text - full label on sm+, short on mobile */}
+                        <Icon className="h-4 w-4" />
+                        {/* Full label on desktop, short on mobile */}
                         <span className="hidden sm:inline">{label}</span>
-                        <span className="sm:hidden text-xs font-medium">{short}</span>
+                        <span className="sm:hidden">{short}</span>
                       </Link>
                     </li>
                   );
