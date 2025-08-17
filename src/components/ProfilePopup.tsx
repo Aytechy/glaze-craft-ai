@@ -35,12 +35,12 @@ export const ProfilePopup: React.FC<ProfilePopupProps> = ({ isOpen, onClose, use
     <>
       {/* Backdrop */}
       <div 
-        className="fixed inset-0 z-40 top-19"
+        className="fixed inset-0 z-40"
         onClick={onClose}
       />
       
       {/* Popup */}
-      <div className="fixed right-4 top-16 w-64 bg-card border border-border shadow-elevated rounded-lg z-50 
+      <div className="fixed right-4 top-16 w-64 bg-card border border-border shadow-elevated rounded-lg z-60 
                       transform transition-all duration-300 ease-in-out animate-fade-in"
                       style={{ animation: 'fade-in 0.2s ease-out' }}>
         {/* Header */}
