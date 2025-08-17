@@ -98,9 +98,15 @@ export default function HybridLayout() {
         </div>
       )}
 
-      {/* Content with proper spacing */}
-      <div style={{ paddingTop: isFeaturePage ? '52px' : '0px' }}>
-        <Outlet />
+      {/* Content with proper spacing - FIXED: Now uses same structure as other pages */}
+      <div 
+        className="h-full overflow-hidden"
+        style={{ paddingTop: isFeaturePage ? '52px' : '0px' }}
+      >
+        {/* This div ensures content behaves the same as standalone pages */}
+        <div className="h-full">
+          <Outlet />
+        </div>
       </div>
     </div>
   );
