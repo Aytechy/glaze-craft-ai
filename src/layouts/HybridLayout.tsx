@@ -3,51 +3,51 @@ import { Outlet, useLocation, Link } from 'react-router-dom';
 import { MessageSquare, Image as ImgIcon, FlaskConical, Calculator } from 'lucide-react';
 
 const featureTabs = [
-  { to: '/', label: 'Chat Assistant', icon: MessageSquare },
-  { to: '/recipes-to-image', label: 'Recipes → Image', icon: FlaskConical },
-  { to: '/image-to-recipes', label: 'Image → Recipes', icon: ImgIcon },
-  { to: '/umf-calculator', label: 'UMF Calculator', icon: Calculator },
+  { to: '/', label: 'Chat Assistant', icon: MessageSquare, short: 'Chat' },
+  { to: '/recipes-to-image', label: 'Recipes → Image', icon: FlaskConical, short: 'R→I' },
+  { to: '/image-to-recipes', label: 'Image → Recipes', icon: ImgIcon, short: 'I→R' },
+  { to: '/umf-calculator', label: 'UMF Calculator', icon: Calculator, short: 'UMF' },
 ];
 
 export default function HybridLayout() {
   const { pathname } = useLocation();
-  const [leftOffset, setLeftOffset] = useState(0);
+  const [isDesktop, setIsDesktop] = useState(false);
+  const [sidebarOpen, setSidebarOpen] = useState(false);
+  const sidebarWidth = 280;
+  const railWidth = 64;
 
   // Only show feature tabs on feature pages
   const isFeaturePage = ['/', '/recipes-to-image', '/image-to-recipes', '/umf-calculator'].includes(pathname);
 
   useEffect(() => {
-    const updateLeftOffset = () => {
-      // Check if we're on desktop
-      const isDesktop = window.innerWidth >= 768;
+    const updateLayout = () => {
+      const desktop = window.innerWidth >= 768;
+      setIsDesktop(desktop);
       
-      if (!isDesktop) {
-        setLeftOffset(0);
+      if (!desktop) {
+        setSidebarOpen(false);
         return;
       }
 
-      // Get the main content area to determine its left margin
+      // Get the main content area to determine sidebar state
       const mainElement = document.querySelector('main');
       if (mainElement) {
         const styles = window.getComputedStyle(mainElement);
         const marginLeft = parseInt(styles.marginLeft, 10) || 0;
-        setLeftOffset(marginLeft);
+        // If margin is greater than rail width, sidebar is open
+        setSidebarOpen(marginLeft > railWidth + 10);
       }
     };
 
-    // Update on mount
-    updateLeftOffset();
+    // Update on mount and resize
+    updateLayout();
+    window.addEventListener('resize', updateLayout);
 
-    // Listen for resize events
-    window.addEventListener('resize', updateLeftOffset);
-
-    // Use MutationObserver to watch for sidebar changes
+    // Watch for sidebar changes via MutationObserver
     const observer = new MutationObserver(() => {
-      // Slight delay to allow transitions to complete
-      setTimeout(updateLeftOffset, 50);
+      setTimeout(updateLayout, 50);
     });
 
-    // Watch the main element for style changes (margin-left changes when sidebar toggles)
     const mainElement = document.querySelector('main');
     if (mainElement) {
       observer.observe(mainElement, {
@@ -57,10 +57,13 @@ export default function HybridLayout() {
     }
 
     return () => {
-      window.removeEventListener('resize', updateLeftOffset);
+      window.removeEventListener('resize', updateLayout);
       observer.disconnect();
     };
   }, []);
+
+  // Calculate left offset based on sidebar state
+  const leftOffset = isDesktop ? (sidebarOpen ? sidebarWidth : railWidth) : 0;
 
   return (
     <div className="relative">
@@ -74,18 +77,17 @@ export default function HybridLayout() {
             height: '52px'
           }}
         >
-          {/* Centered navigation container */}
-          <div className="h-full flex items-center justify-center px-4">
+          <div className="h-full flex items-center justify-center px-2 sm:px-4">
             <nav className="w-full max-w-4xl mx-auto">
-              <ul className="flex h-full items-center justify-center gap-1 sm:gap-2 overflow-x-auto scrollbar-hide">
-                {featureTabs.map(({ to, label, icon: Icon }) => {
+              <ul className="flex h-full items-center justify-center gap-1">
+                {featureTabs.map(({ to, label, icon: Icon, short }) => {
                   const active = pathname === to;
                   return (
                     <li key={to} className="flex-shrink-0">
                       <Link
                         to={to}
                         className={[
-                          'flex items-center gap-2 px-3 sm:px-4 py-2 sm:py-2.5 rounded-lg transition-all duration-200 text-sm font-medium whitespace-nowrap',
+                          'flex items-center gap-1.5 sm:gap-2 px-2 sm:px-4 py-2 sm:py-2.5 rounded-lg transition-all duration-200 text-sm font-medium',
                           active 
                             ? 'text-primary bg-primary/10 border border-primary/20 shadow-sm' 
                             : 'text-muted-foreground hover:text-foreground hover:bg-accent/50'
@@ -93,12 +95,9 @@ export default function HybridLayout() {
                         aria-current={active ? 'page' : undefined}
                       >
                         <Icon className="h-4 w-4 flex-shrink-0" />
-                        {/* Responsive text display */}
+                        {/* Responsive text - full label on sm+, short on mobile */}
                         <span className="hidden sm:inline">{label}</span>
-                        {/* Show abbreviated text on very small screens */}
-                        <span className="sm:hidden text-xs">
-                          {label.includes('→') ? label.split(' ')[0] : label.split(' ')[0]}
-                        </span>
+                        <span className="sm:hidden text-xs font-medium">{short}</span>
                       </Link>
                     </li>
                   );
