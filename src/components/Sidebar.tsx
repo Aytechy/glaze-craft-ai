@@ -282,17 +282,15 @@ const EnhancedSidebar: React.FC<EnhancedSidebarProps> = ({
 
           {/* Utility Pages */}
           <nav className="px-4 space-y-1 mb-6">
-            {shouldShowContent && (
-              <h3 
-                className="text-xs font-semibold text-sidebar-foreground/60 uppercase tracking-wider mb-2"
-                style={{
-                  opacity: shouldShowContent ? 1 : 0,
-                  transition: 'opacity 150ms ease-in-out'
-                }}
-              >
-                Tools
-              </h3>
-            )}
+            <h3 
+              className="text-xs font-semibold text-sidebar-foreground/60 uppercase tracking-wider mb-2"
+              style={{
+                opacity: shouldShowContent ? 1 : 0,
+                transition: 'opacity 150ms ease-in-out'
+              }}
+            >
+              Tools
+            </h3>
             {utilityPages.map((item) => {
               const isActive = location.pathname === item.path;
               const Icon = item.icon;
