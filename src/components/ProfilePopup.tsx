@@ -40,9 +40,10 @@ export const ProfilePopup: React.FC<ProfilePopupProps> = ({ isOpen, onClose, use
       />
       
       {/* Popup */}
-      <div className="fixed right-4 top-30 w-64 bg-card border border-border shadow-elevated rounded-lg z-50 
+      <div className="fixed right-4 top-30 w-64 bg-card border border-border shadow-elevated rounded-lg
                       transform transition-all duration-300 ease-in-out animate-fade-in"
-                      style={{ animation: 'fade-in 0.2s ease-out' }}>
+                      style={{ animation: 'fade-in 0.2s ease-out', zIndex: 9999 }}
+      >
         {/* Header */}
         <div className="flex items-center justify-between p-3 border-b border-border">
           <h3 className="text-sm font-semibold text-card-foreground">Quick Actions</h3>
