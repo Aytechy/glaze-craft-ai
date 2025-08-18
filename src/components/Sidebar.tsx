@@ -4,7 +4,7 @@ import { Button } from '@/components/ui/button';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Link, useLocation } from 'react-router-dom';
 import { ProfilePopup } from '@/components/ProfilePopup';
-import { SettingsModal } from '@/components/modals/SettingsModal';
+// import { SettingsModal } from '@/components/modals/SettingsModal';
 
 interface EnhancedSidebarProps {
   isOpen: boolean;
@@ -41,7 +41,9 @@ const EnhancedSidebar: React.FC<EnhancedSidebarProps> = ({
 }) => {
   const location = useLocation();
   const [isProfilePopupOpen, setIsProfilePopupOpen] = useState(false);
-  const [isSettingsModalOpen, setIsSettingsModalOpen] = useState(false);
+  const handleSettings = () => {
+    navigate('/settings');  // Add this import: import { useNavigate } from 'react-router-dom';
+  };
   
   // Add internal animation state to control content visibility
   const [isAnimating, setIsAnimating] = useState(false);

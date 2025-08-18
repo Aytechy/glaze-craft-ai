@@ -29,6 +29,7 @@ import RecipesToImage from './pages/RecipesToImage';
 import ImageToRecipes from './pages/ImageToRecipes';
 import UMFCalculator from './pages/UMFCalculator';
 import { Navigate } from 'react-router-dom';
+import SettingsPage from "./pages/Settings";
 
 // Configure React Query client with security-focused settings
 const queryClient = new QueryClient({
@@ -132,7 +133,7 @@ const App: React.FC = () => {
               </Route>
               
               {/* Future routes can be added here */}
-              {/* <Route path="/settings" element={<Settings />} /> */}
+              <Route path="/settings" element={<SettingsPage />} />
               
               {/* Catch-all route for 404 handling */}
               <Route path="*" element={<NotFound />} />

@@ -2,7 +2,7 @@ import React, { useState, forwardRef } from 'react';
 import { PanelRight, Crown, Settings, User } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { UpgradeModal } from '@/components/modals/UpgradeModal';
-import { SettingsModal } from '@/components/modals/SettingsModal';
+// import { SettingsModal } from '@/components/modals/SettingsModal';
 import { ProfilePopup } from '@/components/ProfilePopup';
 
 // TypeScript interface for header component props
@@ -77,7 +77,7 @@ const Header = forwardRef<HTMLElement, HeaderProps>(({ onToggleSidebar, isDeskto
               className="text-foreground hover:bg-accent"
               aria-label="Toggle sidebar"
             >
-              <PanelRight strokeWidth={1.5} style={{ width: '24px', height: '24px', minWidth: '24px', minHeight: '24px' }} />
+              <PanelRight strokeWidth={1} style={{ width: '24px', height: '24px', minWidth: '24px', minHeight: '24px' }} />
             </Button>
           )}
         </div>
