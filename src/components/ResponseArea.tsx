@@ -82,10 +82,33 @@ const ResponseArea: React.FC<ResponseAreaProps> = (props) => {
     if (container && lastMessageRef.current) {
       const target = lastMessageRef.current;
       const header = document.querySelector('header.fixed.top-0') as HTMLElement;
-      const headerHeight = header?.getBoundingClientRect().height || 64;
-      const bottomBuffer = 60;
-      const scrollOffset = target.offsetTop - container.offsetTop - headerHeight - bottomBuffer;
-      container.scrollTo({ top: scrollOffset, behavior: 'smooth' });
+      const tabBar = document.querySelector('[data-tab-bar]') as HTMLElement; // Add this if you have a tab bar
+      
+      const headerHeight = header?.getBoundingClientRect().height || 56;
+      const tabBarHeight = tabBar?.getBoundingClientRect().height || 60; // Adjust this value
+      const totalTopOffset = headerHeight + tabBarHeight;
+      
+      // Check if the message is long (more than ~4 lines)
+      const messageElement = target.querySelector('.message-content') || target;
+      const messageHeight = messageElement.getBoundingClientRect().height;
+      const approximateLineHeight = 24; // Adjust based on your text size
+      const maxLinesVisible = 4;
+      const maxVisibleHeight = maxLinesVisible * approximateLineHeight;
+      
+      let scrollPosition;
+      
+      if (messageHeight > maxVisibleHeight) {
+        // Long message: scroll to show bottom 3-4 lines
+        scrollPosition = target.offsetTop + messageHeight - maxVisibleHeight - totalTopOffset;
+      } else {
+        // Short message: scroll to show entire message under top bar
+        scrollPosition = target.offsetTop - totalTopOffset - 20; // 20px buffer
+      }
+      
+      container.scrollTo({ 
+        top: Math.max(0, scrollPosition), 
+        behavior: 'smooth' 
+      });
     }
   }, [messages.length]);
 
