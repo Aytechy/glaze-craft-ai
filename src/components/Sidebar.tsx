@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Home, History, Settings, User, Plus, FileText, ChevronLeft, ChevronRight, MessageSquare, Image as ImgIcon, FlaskConical, Calculator } from 'lucide-react';
+import { Home, History, Settings, User, Plus, FileText, PanelLeft, PanelRight, MessageSquare, Image as ImgIcon, FlaskConical, Calculator } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Link, useLocation } from 'react-router-dom';
@@ -198,7 +198,7 @@ const EnhancedSidebar: React.FC<EnhancedSidebarProps> = ({
                   className="text-sidebar-foreground hover:bg-sidebar-accent"
                   aria-label="Collapse sidebar"
                 >
-                  <ChevronLeft className="h-4 w-4" />
+                  <PanelLeft className="h-8 w-8" />
                 </Button>
               </div>
             </div>
@@ -210,7 +210,7 @@ const EnhancedSidebar: React.FC<EnhancedSidebarProps> = ({
               className="text-sidebar-foreground hover:bg-sidebar-accent mx-auto"
               aria-label="Expand sidebar"
             >
-              <ChevronRight className="h-4 w-4" />
+              <PanelRight className="h-8 w-8" />
             </Button>
           )}
         </div>

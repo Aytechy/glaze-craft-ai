@@ -101,7 +101,7 @@ const Index: React.FC = () => {
         
         {!hasConversation && !isLoading ? (
           /* No conversation: Center everything vertically */
-          <div className="flex flex-col items-center justify-center h-full">
+          <div className="flex flex-col items-center justify-center h-full pt-16 md:pt-20">
             <div className="w-full max-w-4xl">
               {/* Welcome area - ResponseArea with welcome screen */}
               <div>
