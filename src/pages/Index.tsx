@@ -102,7 +102,7 @@ const Index: React.FC = () => {
         {!hasConversation && !isLoading ? (
           /* No conversation: Center everything vertically */
           <div className="flex flex-col items-center justify-center h-full">
-            <div className="w-full max-w-3xl">
+            <div className="w-full max-w-4xl">
               {/* Welcome area - ResponseArea with welcome screen */}
               <div>
                 <ResponseArea
@@ -132,12 +132,13 @@ const Index: React.FC = () => {
             <div className="flex-1 min-h-0">
               <div
                 ref={scrollRef}
-                className="h-full overflow-y-auto overscroll-contain pr-2"
+                className="overflow-y-auto overscroll-contain pr-2"
                 style={{
+                  height: 'calc(100vh - 200px)',
                   paddingBottom: '120px' // Space for fixed prompt
                 }}
               >
-                <div className="w-full max-w-3xl mx-auto">
+                <div className="w-full max-w-4xl mx-auto">
                   <ResponseArea
                     messages={messages}
                     isTyping={isLoading}

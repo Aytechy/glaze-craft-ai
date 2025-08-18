@@ -85,7 +85,7 @@ const PromptCard: React.FC<PromptCardProps> = ({
 
   return (
     <div className="w-full px-4">
-      <div className="w-full max-w-3xl mx-auto">
+      <div className="w-full max-w-4xl mx-auto">
         <div className="relative bg-card border rounded-2xl px-4 py-3 shadow-sm transition-all duration-200 ease-out">
           {/* Main input area with send button positioned at bottom right */}
           <div className="relative">

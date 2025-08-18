@@ -80,39 +80,30 @@ const ResponseArea: React.FC<ResponseAreaProps> = (props) => {
   React.useLayoutEffect(() => {
     const container = getScrollEl();
     if (container && lastMessageRef.current) {
-      // Small delay to ensure message is fully rendered
       setTimeout(() => {
-        const target = lastMessageRef.current!;
-        const header = document.querySelector('header.fixed.top-0') as HTMLElement;
-        const tabBar = document.querySelector('div[style*="top-14"]') as HTMLElement; // The actual tab bar
+        if (!lastMessageRef.current) return;
         
-        const headerHeight = header?.getBoundingClientRect().height || 56;
-        const tabBarHeight = tabBar?.getBoundingClientRect().height || 52; // From HybridLayout
-        const totalTopOffset = headerHeight + tabBarHeight;
+        const target = lastMessageRef.current;
+        const headerOffset = 108; // Header + tab bar height
         
-        // Find the actual message bubble content
+        // Find the message bubble
         const messageBubble = target.querySelector('div[class*="inline-block"]') || target;
         const messageHeight = messageBubble.getBoundingClientRect().height;
         
-        const approximateLineHeight = 20; // Adjust based on your text-sm size
-        const maxLinesVisible = 4;
-        const maxVisibleHeight = maxLinesVisible * approximateLineHeight;
+        // Check if message is long (more than ~4 lines ≈ 100px)
+        const isLongMessage = messageHeight > 100;
         
-        let scrollPosition;
-        
-        if (messageHeight > maxVisibleHeight) {
-          // Long message: scroll to show bottom 3-4 lines
-          scrollPosition = target.offsetTop + messageHeight - maxVisibleHeight - totalTopOffset;
+        if (isLongMessage) {
+          // Long message: scroll to show only bottom 3-4 lines
+          const visibleHeight = 100; // Show ~4 lines
+          const scrollPosition = target.offsetTop + messageHeight - visibleHeight - headerOffset;
+          container.scrollTo({ top: Math.max(0, scrollPosition), behavior: 'smooth' });
         } else {
-          // Short message: scroll to show entire message under top bars
-          scrollPosition = target.offsetTop - totalTopOffset - 20; // 20px buffer
+          // Short message: scroll to show entire message under top bar  
+          const scrollPosition = target.offsetTop - headerOffset - 20;
+          container.scrollTo({ top: Math.max(0, scrollPosition), behavior: 'smooth' });
         }
-        
-        container.scrollTo({ 
-          top: Math.max(0, scrollPosition), 
-          behavior: 'smooth' 
-        });
-      }, 100); // Small delay to ensure rendering is complete
+      }, 200);
     }
   }, [messages.length]);
 
