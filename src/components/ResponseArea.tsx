@@ -80,35 +80,39 @@ const ResponseArea: React.FC<ResponseAreaProps> = (props) => {
   React.useLayoutEffect(() => {
     const container = getScrollEl();
     if (container && lastMessageRef.current) {
-      const target = lastMessageRef.current;
-      const header = document.querySelector('header.fixed.top-0') as HTMLElement;
-      const tabBar = document.querySelector('[data-tab-bar]') as HTMLElement; // Add this if you have a tab bar
-      
-      const headerHeight = header?.getBoundingClientRect().height || 56;
-      const tabBarHeight = tabBar?.getBoundingClientRect().height || 60; // Adjust this value
-      const totalTopOffset = headerHeight + tabBarHeight;
-      
-      // Check if the message is long (more than ~4 lines)
-      const messageElement = target.querySelector('.message-content') || target;
-      const messageHeight = messageElement.getBoundingClientRect().height;
-      const approximateLineHeight = 24; // Adjust based on your text size
-      const maxLinesVisible = 4;
-      const maxVisibleHeight = maxLinesVisible * approximateLineHeight;
-      
-      let scrollPosition;
-      
-      if (messageHeight > maxVisibleHeight) {
-        // Long message: scroll to show bottom 3-4 lines
-        scrollPosition = target.offsetTop + messageHeight - maxVisibleHeight - totalTopOffset;
-      } else {
-        // Short message: scroll to show entire message under top bar
-        scrollPosition = target.offsetTop - totalTopOffset - 20; // 20px buffer
-      }
-      
-      container.scrollTo({ 
-        top: Math.max(0, scrollPosition), 
-        behavior: 'smooth' 
-      });
+      // Small delay to ensure message is fully rendered
+      setTimeout(() => {
+        const target = lastMessageRef.current!;
+        const header = document.querySelector('header.fixed.top-0') as HTMLElement;
+        const tabBar = document.querySelector('div[style*="top-14"]') as HTMLElement; // The actual tab bar
+        
+        const headerHeight = header?.getBoundingClientRect().height || 56;
+        const tabBarHeight = tabBar?.getBoundingClientRect().height || 52; // From HybridLayout
+        const totalTopOffset = headerHeight + tabBarHeight;
+        
+        // Find the actual message bubble content
+        const messageBubble = target.querySelector('div[class*="inline-block"]') || target;
+        const messageHeight = messageBubble.getBoundingClientRect().height;
+        
+        const approximateLineHeight = 20; // Adjust based on your text-sm size
+        const maxLinesVisible = 4;
+        const maxVisibleHeight = maxLinesVisible * approximateLineHeight;
+        
+        let scrollPosition;
+        
+        if (messageHeight > maxVisibleHeight) {
+          // Long message: scroll to show bottom 3-4 lines
+          scrollPosition = target.offsetTop + messageHeight - maxVisibleHeight - totalTopOffset;
+        } else {
+          // Short message: scroll to show entire message under top bars
+          scrollPosition = target.offsetTop - totalTopOffset - 20; // 20px buffer
+        }
+        
+        container.scrollTo({ 
+          top: Math.max(0, scrollPosition), 
+          behavior: 'smooth' 
+        });
+      }, 100); // Small delay to ensure rendering is complete
     }
   }, [messages.length]);
 
