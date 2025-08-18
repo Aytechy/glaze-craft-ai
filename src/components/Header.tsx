@@ -1,5 +1,5 @@
 import React, { useState, forwardRef } from 'react';
-import { AlignJustify, Crown, Settings, User } from 'lucide-react';
+import { PanelRight, Crown, Settings, User } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { UpgradeModal } from '@/components/modals/UpgradeModal';
 import { SettingsModal } from '@/components/modals/SettingsModal';
@@ -77,7 +77,7 @@ const Header = forwardRef<HTMLElement, HeaderProps>(({ onToggleSidebar, isDeskto
               className="text-foreground hover:bg-accent"
               aria-label="Toggle sidebar"
             >
-              <AlignJustify className="h-5 w-5" />
+              <PanelRight strokeWidth={1.5} style={{ width: '24px', height: '24px', minWidth: '24px', minHeight: '24px' }} />
             </Button>
           )}
         </div>

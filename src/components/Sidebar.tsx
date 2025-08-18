@@ -195,10 +195,10 @@ const EnhancedSidebar: React.FC<EnhancedSidebarProps> = ({
                   variant="ghost"
                   size="sm"
                   onClick={() => handleClose(false)}
-                  className="text-sidebar-foreground hover:bg-sidebar-accent"
+                  className="text-sidebar-foreground hover:bg-sidebar-accent p-2"
                   aria-label="Collapse sidebar"
                 >
-                  <PanelLeft className="h-8 w-8" />
+                  <PanelLeft strokeWidth={1.5} style={{ width: '27px', height: '27px', minWidth: '27px', minHeight: '27px' }} />
                 </Button>
               </div>
             </div>
@@ -207,10 +207,11 @@ const EnhancedSidebar: React.FC<EnhancedSidebarProps> = ({
               variant="ghost"
               size="sm"
               onClick={onToggleCollapsed}
-              className="text-sidebar-foreground hover:bg-sidebar-accent mx-auto"
+              className="text-sidebar-foreground hover:bg-sidebar-accent mx-auto p-2"
+              style={{ marginLeft: '-5px' }}
               aria-label="Expand sidebar"
             >
-              <PanelRight className="h-8 w-8" />
+              <PanelRight strokeWidth={1.5} style={{ width: '27px', height: '27px', minWidth: '27px', minHeight: '27px' }} />
             </Button>
           )}
         </div>
