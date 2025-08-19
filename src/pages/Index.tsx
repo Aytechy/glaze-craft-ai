@@ -77,15 +77,23 @@ const Index: React.FC = () => {
       }
     };
     
-    const handleNewChatFromSidebar = () => {
+    // Handle the event from AppShell (when user navigates to chat and needs reset)
+    const handleNewChatFromAppShell = () => {
       handleNewChatEvent();
     };
     
-    window.addEventListener('newChatRequested', handleNewChatEvent);
+    // Handle the event from Sidebar (when user clicks New Chat button)
+    const handleNewChatFromSidebar = () => {
+      // Always show modal from sidebar, regardless of conversation state
+      // This gives user control over whether they want to start fresh
+      setIsNewChatModalOpen(true);
+    };
+    
+    window.addEventListener('newChatRequested', handleNewChatFromAppShell);
     window.addEventListener('openNewChatModal', handleNewChatFromSidebar);
     
     return () => {
-      window.removeEventListener('newChatRequested', handleNewChatEvent);
+      window.removeEventListener('newChatRequested', handleNewChatFromAppShell);
       window.removeEventListener('openNewChatModal', handleNewChatFromSidebar);
     };
   }, [clearMessages, hasConversation]);

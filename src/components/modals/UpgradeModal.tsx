@@ -1,4 +1,5 @@
 import React, { useEffect } from 'react';
+import { createPortal } from 'react-dom';
 import { Crown, Check, X } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
@@ -21,6 +22,19 @@ export const UpgradeModal: React.FC<UpgradeModalProps> = ({ isOpen, onClose }) =
       document.body.style.overflow = 'unset';
     };
   }, [isOpen]);
+
+  useEffect(() => {
+      const handleKeyDown = (event: KeyboardEvent) => {
+        if (event.key === 'Escape') {
+          onClose();
+        }
+      };
+  
+      if (isOpen) {
+        document.addEventListener('keydown', handleKeyDown);
+        return () => document.removeEventListener('keydown', handleKeyDown);
+      }
+    }, [isOpen, onClose]);
 
   if (!isOpen) return null;
 
@@ -82,7 +96,7 @@ export const UpgradeModal: React.FC<UpgradeModalProps> = ({ isOpen, onClose }) =
   };
 
   // Render to document body to ensure it's on top
-  return (
+  const modalContent = (
     <>
       <style>{`
         .upgrade-modal-overlay {
@@ -111,7 +125,7 @@ export const UpgradeModal: React.FC<UpgradeModalProps> = ({ isOpen, onClose }) =
         </div>
 
         {/* Content */}
-        <div className="h-full w-full overflow-y-auto">
+        <div className="h-full w-full overflow-y-auto sm:overflow-y-hidden">
           <div className="container mx-auto px-4 py-8 max-w-6xl min-h-full flex flex-col justify-center">
             {/* Header */}
             <div className="text-center mb-8">
@@ -204,7 +218,7 @@ export const UpgradeModal: React.FC<UpgradeModalProps> = ({ isOpen, onClose }) =
               <p className="text-sm text-muted-foreground">
                 All plans include a 14-day free trial. Cancel anytime.
                 <br />
-                Questions? Contact us at support@glazeai.com
+                Questions? Contact us at support@glazion.com
               </p>
             </div>
           </div>
@@ -212,4 +226,6 @@ export const UpgradeModal: React.FC<UpgradeModalProps> = ({ isOpen, onClose }) =
       </div>
     </>
   );
+
+  return createPortal(modalContent, document.body);
 };

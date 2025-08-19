@@ -149,15 +149,20 @@ const EnhancedSidebar: React.FC<EnhancedSidebarProps> = ({
     { name: 'History', path: '/history', icon: History },
   ];
 
+  // Updated handleNewChat to trigger the modal properly
   const handleNewChat = () => {
-    if (onNewChat) {
-      onNewChat();
-    } else {
-      if (location.pathname !== '/') {
-        window.location.href = '/';
-      }
+    // Navigate to chat page if not already there
+    if (location.pathname !== '/') {
+      navigate('/');
     }
-    if (!isCollapsed) onClose();
+    
+    // Dispatch event to open the new chat modal
+    window.dispatchEvent(new CustomEvent('openNewChatModal'));
+    
+    // Close sidebar on mobile
+    if (!isCollapsed && isMobileUsage) {
+      onClose();
+    }
   };
 
   const currentWidth = isCollapsed ? collapsedWidth : width;
