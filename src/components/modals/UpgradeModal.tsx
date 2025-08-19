@@ -1,12 +1,5 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { Crown, Check, X } from 'lucide-react';
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogHeader,
-  DialogTitle,
-} from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 
@@ -16,6 +9,21 @@ interface UpgradeModalProps {
 }
 
 export const UpgradeModal: React.FC<UpgradeModalProps> = ({ isOpen, onClose }) => {
+  // Prevent body scroll when modal is open
+  useEffect(() => {
+    if (isOpen) {
+      document.body.style.overflow = 'hidden';
+    } else {
+      document.body.style.overflow = 'unset';
+    }
+    
+    return () => {
+      document.body.style.overflow = 'unset';
+    };
+  }, [isOpen]);
+
+  if (!isOpen) return null;
+
   const plans = [
     {
       name: 'Free',
@@ -73,101 +81,135 @@ export const UpgradeModal: React.FC<UpgradeModalProps> = ({ isOpen, onClose }) =
     // TODO: Integrate with payment processing
   };
 
+  // Render to document body to ensure it's on top
   return (
-    <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="max-w-5xl max-h-[90vh] overflow-y-auto">
-        <DialogHeader>
-          <DialogTitle className="flex items-center gap-2 text-2xl">
-            <Crown className="h-6 w-6 text-primary" />
-            Choose Your Plan
-          </DialogTitle>
-          <DialogDescription>
-            Unlock the full potential of GlazeAI with our premium features
-          </DialogDescription>
-        </DialogHeader>
+    <>
+      <style>{`
+        .upgrade-modal-overlay {
+          position: fixed !important;
+          top: 0 !important;
+          left: 0 !important;
+          right: 0 !important;
+          bottom: 0 !important;
+          z-index: 999999 !important;
+          background: hsl(var(--background) / 0.95) !important;
+          backdrop-filter: blur(8px) !important;
+          pointer-events: auto !important;
+        }
+      `}</style>
+      <div className="upgrade-modal-overlay">
+        {/* Close button - top right */}
+        <div className="absolute top-4 right-4 z-10">
+          <Button
+            variant="ghost"
+            size="sm"
+            onClick={onClose}
+            className="h-8 w-8 p-0 hover:bg-accent"
+          >
+            <X className="h-4 w-4" />
+          </Button>
+        </div>
 
-        <div className="grid md:grid-cols-3 gap-6 mt-6">
-          {plans.map((plan) => (
-            <Card
-              key={plan.name}
-              className={`relative ${
-                plan.popular
-                  ? 'border-primary shadow-moderate'
-                  : plan.current
-                  ? 'border-accent'
-                  : 'border-border'
-              }`}
-            >
-              {plan.popular && (
-                <div className="absolute -top-3 left-1/2 transform -translate-x-1/2">
-                  <span className="bg-primary text-primary-foreground px-3 py-1 rounded-full text-sm font-medium">
-                    Most Popular
-                  </span>
-                </div>
-              )}
-              
-              {plan.current && (
-                <div className="absolute -top-3 left-1/2 transform -translate-x-1/2">
-                  <span className="bg-accent text-accent-foreground px-3 py-1 rounded-full text-sm font-medium">
-                    Current Plan
-                  </span>
-                </div>
-              )}
+        {/* Content */}
+        <div className="h-full w-full overflow-y-auto">
+          <div className="container mx-auto px-4 py-8 max-w-6xl min-h-full flex flex-col justify-center">
+            {/* Header */}
+            <div className="text-center mb-8">
+              <div className="flex items-center justify-center gap-2 mb-4">
+                <Crown className="h-8 w-8 text-primary" />
+                <h1 className="text-3xl font-bold">Choose Your Plan</h1>
+              </div>
+              <p className="text-lg text-muted-foreground">
+                Unlock the full potential of GlazeAI with our premium features
+              </p>
+            </div>
 
-              <CardHeader className="text-center">
-                <CardTitle className="text-xl">{plan.name}</CardTitle>
-                <CardDescription>{plan.description}</CardDescription>
-                <div className="mt-4">
-                  <span className="text-3xl font-bold">{plan.price}</span>
-                  {plan.period && (
-                    <span className="text-muted-foreground">{plan.period}</span>
-                  )}
-                </div>
-              </CardHeader>
-
-              <CardContent className="space-y-4">
-                <div className="space-y-3">
-                  {plan.features.map((feature) => (
-                    <div key={feature} className="flex items-center gap-2">
-                      <Check className="h-4 w-4 text-green-500 flex-shrink-0" />
-                      <span className="text-sm">{feature}</span>
-                    </div>
-                  ))}
-                  
-                  {plan.limitations?.map((limitation) => (
-                    <div key={limitation} className="flex items-center gap-2">
-                      <X className="h-4 w-4 text-muted-foreground flex-shrink-0" />
-                      <span className="text-sm text-muted-foreground">{limitation}</span>
-                    </div>
-                  ))}
-                </div>
-
-                <Button
-                  className={`w-full ${
+            {/* Plans Grid */}
+            <div className="grid md:grid-cols-3 gap-6 mb-8">
+              {plans.map((plan) => (
+                <Card
+                  key={plan.name}
+                  className={`relative ${
                     plan.popular
-                      ? 'gradient-primary text-primary-foreground'
+                      ? 'border-primary shadow-moderate scale-105'
                       : plan.current
-                      ? 'bg-accent text-accent-foreground'
-                      : 'bg-secondary text-secondary-foreground'
+                      ? 'border-accent'
+                      : 'border-border'
                   }`}
-                  onClick={() => handleUpgrade(plan.name)}
-                  disabled={plan.current}
                 >
-                  {plan.current ? 'Current Plan' : `Upgrade to ${plan.name}`}
-                </Button>
-              </CardContent>
-            </Card>
-          ))}
-        </div>
+                  {plan.popular && (
+                    <div className="absolute -top-3 left-1/2 transform -translate-x-1/2">
+                      <span className="bg-primary text-primary-foreground px-3 py-1 rounded-full text-sm font-medium">
+                        Most Popular
+                      </span>
+                    </div>
+                  )}
+                  
+                  {plan.current && (
+                    <div className="absolute -top-3 left-1/2 transform -translate-x-1/2">
+                      <span className="bg-accent text-accent-foreground px-3 py-1 rounded-full text-sm font-medium">
+                        Current Plan
+                      </span>
+                    </div>
+                  )}
 
-        <div className="mt-8 p-4 bg-accent/20 rounded-lg">
-          <p className="text-sm text-center text-muted-foreground">
-            All plans include a 14-day free trial. Cancel anytime.
-            <br />
-            Questions? Contact us at support@glazeai.com
-          </p>
+                  <CardHeader className="text-center">
+                    <CardTitle className="text-xl">{plan.name}</CardTitle>
+                    <CardDescription>{plan.description}</CardDescription>
+                    <div className="mt-4">
+                      <span className="text-3xl font-bold">{plan.price}</span>
+                      {plan.period && (
+                        <span className="text-muted-foreground">{plan.period}</span>
+                      )}
+                    </div>
+                  </CardHeader>
+
+                  <CardContent className="space-y-4">
+                    <div className="space-y-3">
+                      {plan.features.map((feature) => (
+                        <div key={feature} className="flex items-center gap-2">
+                          <Check className="h-4 w-4 text-green-500 flex-shrink-0" />
+                          <span className="text-sm">{feature}</span>
+                        </div>
+                      ))}
+                      
+                      {plan.limitations?.map((limitation) => (
+                        <div key={limitation} className="flex items-center gap-2">
+                          <X className="h-4 w-4 text-muted-foreground flex-shrink-0" />
+                          <span className="text-sm text-muted-foreground">{limitation}</span>
+                        </div>
+                      ))}
+                    </div>
+
+                    <Button
+                      className={`w-full ${
+                        plan.popular
+                          ? 'gradient-primary text-primary-foreground'
+                          : plan.current
+                          ? 'bg-accent text-accent-foreground'
+                          : 'bg-secondary text-secondary-foreground'
+                      }`}
+                      onClick={() => handleUpgrade(plan.name)}
+                      disabled={plan.current}
+                    >
+                      {plan.current ? 'Current Plan' : `Upgrade to ${plan.name}`}
+                    </Button>
+                  </CardContent>
+                </Card>
+              ))}
+            </div>
+
+            {/* Footer info */}
+            <div className="text-center p-6 bg-accent/20 rounded-lg">
+              <p className="text-sm text-muted-foreground">
+                All plans include a 14-day free trial. Cancel anytime.
+                <br />
+                Questions? Contact us at support@glazeai.com
+              </p>
+            </div>
+          </div>
         </div>
-      </DialogContent>
-    </Dialog>
+      </div>
+    </>
   );
 };

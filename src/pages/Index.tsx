@@ -66,14 +66,29 @@ const Index: React.FC = () => {
     setIsNewChatModalOpen(false);
   };
 
-  // Listen for new chat events from AppShell
+  // Listen for new chat events from AppShell and Sidebar
   useEffect(() => {
     const handleNewChatEvent = () => {
-      clearMessages();
+      // If there are existing messages, show modal, otherwise just clear
+      if (hasConversation) {
+        setIsNewChatModalOpen(true);
+      } else {
+        clearMessages();
+      }
     };
+    
+    const handleNewChatFromSidebar = () => {
+      handleNewChatEvent();
+    };
+    
     window.addEventListener('newChatRequested', handleNewChatEvent);
-    return () => window.removeEventListener('newChatRequested', handleNewChatEvent);
-  }, [clearMessages]);
+    window.addEventListener('openNewChatModal', handleNewChatFromSidebar);
+    
+    return () => {
+      window.removeEventListener('newChatRequested', handleNewChatEvent);
+      window.removeEventListener('openNewChatModal', handleNewChatFromSidebar);
+    };
+  }, [clearMessages, hasConversation]);
 
   useEffect(() => {
     if (rateLimitTimeRemaining > 0) {

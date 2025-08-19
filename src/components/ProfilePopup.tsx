@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { X, User, LogOut, Crown } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
@@ -12,10 +12,42 @@ interface ProfilePopupProps {
     email: string;
     avatar?: string;
   };
+  triggerRef?: React.RefObject<HTMLElement>;
 }
 
-export const ProfilePopup: React.FC<ProfilePopupProps> = ({ isOpen, onClose, user }) => {
+export const ProfilePopup: React.FC<ProfilePopupProps> = ({ isOpen, onClose, user, triggerRef }) => {
   const navigate = useNavigate();
+  const popupRef = useRef<HTMLDivElement>(null);
+  const [position, setPosition] = useState({ top: 0, left: 0, bottom: 'auto' });
+  
+  useEffect(() => {
+    if (isOpen && triggerRef?.current && popupRef.current) {
+      const triggerRect = triggerRef.current.getBoundingClientRect();
+      const popupRect = popupRef.current.getBoundingClientRect();
+      const viewportHeight = window.innerHeight;
+      const viewportWidth = window.innerWidth;
+      
+      // Position above the trigger element with some margin
+      const preferredTop = triggerRect.top - popupRect.height - 8;
+      const preferredLeft = triggerRect.left;
+      
+      // Check if popup fits above trigger
+      if (preferredTop >= 0) {
+        setPosition({
+          top: preferredTop,
+          left: Math.min(preferredLeft, viewportWidth - popupRect.width - 16),
+          bottom: 'auto'
+        });
+      } else {
+        // If not enough space above, position below
+        setPosition({
+          top: triggerRect.bottom + 8,
+          left: Math.min(preferredLeft, viewportWidth - popupRect.width - 16),
+          bottom: 'auto'
+        });
+      }
+    }
+  }, [isOpen, triggerRef]);
   
   if (!isOpen) return null;
 
@@ -33,10 +65,19 @@ export const ProfilePopup: React.FC<ProfilePopupProps> = ({ isOpen, onClose, use
 
   return (
     <>
+      {/* Backdrop */}
+      <div className="fixed inset-0 z-[300]" onClick={onClose} />
+      
       {/* Popup */}
-      <div className="fixed right-0 w-64 bg-card border border-border shadow-elevated rounded-lg
-                      transform transition-all duration-300 ease-in-out animate-fade-in"
-                      style={{ animation: 'fade-in 0.2s ease-out', zIndex: 99999, top: '100px' }}
+      <div 
+        ref={popupRef}
+        className="fixed z-[301] w-64 bg-card border border-border shadow-elevated rounded-lg
+                  transform transition-all duration-200 ease-out"
+        style={{
+          top: position.top,
+          left: position.left,
+          bottom: position.bottom
+        }}
       >
         {/* Header */}
         <div className="flex items-center justify-between p-3 border-b border-border">

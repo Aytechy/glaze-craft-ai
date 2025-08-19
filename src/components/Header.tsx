@@ -1,9 +1,7 @@
 import React, { useState, forwardRef } from 'react';
-import { PanelRight, Crown, Settings, User } from 'lucide-react';
+import { PanelRight, Crown } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { UpgradeModal } from '@/components/modals/UpgradeModal';
-import { ProfilePopup } from '@/components/ProfilePopup';
-import { useNavigate } from 'react-router-dom';
 
 // TypeScript interface for header component props
 interface HeaderProps {
@@ -27,8 +25,6 @@ interface HeaderProps {
  */
 const Header = forwardRef<HTMLElement, HeaderProps>(({ onToggleSidebar, isDesktop = false }, ref) => {
   const [isUpgradeModalOpen, setIsUpgradeModalOpen] = useState(false);
-  const [isProfilePopupOpen, setIsProfilePopupOpen] = useState(false);
-  const navigate = useNavigate();
 
   // Listen for upgrade modal events from profile popup
   React.useEffect(() => {
@@ -43,14 +39,6 @@ const Header = forwardRef<HTMLElement, HeaderProps>(({ onToggleSidebar, isDeskto
   // Handle upgrade button click
   const handleUpgrade = () => {
     setIsUpgradeModalOpen(true);
-  };
-
-  const handleSettings = () => {
-    navigate('/settings');
-  };
-
-  const handleProfile = () => {
-    setIsProfilePopupOpen(true);
   };
 
   return (
@@ -89,26 +77,8 @@ const Header = forwardRef<HTMLElement, HeaderProps>(({ onToggleSidebar, isDeskto
           </h1>
         </div>
 
-        {/* Right section with profile, settings and upgrade buttons */}
+        {/* Right section with upgrade button only */}
         <div className="flex items-center gap-2">
-          <Button
-            variant="ghost"
-            size="sm"
-            onClick={handleProfile}
-            className="text-foreground hover:bg-accent"
-            aria-label="Profile"
-          >
-            <User className="h-4 w-4" />
-          </Button>
-          <Button
-            variant="ghost"
-            size="sm"
-            onClick={handleSettings}
-            className="text-foreground hover:bg-accent"
-            aria-label="Settings"
-          >
-            <Settings className="h-4 w-4" />
-          </Button>
           <Button
             onClick={handleUpgrade}
             className="gradient-primary text-primary-foreground hover:opacity-90 
@@ -125,15 +95,6 @@ const Header = forwardRef<HTMLElement, HeaderProps>(({ onToggleSidebar, isDeskto
       <UpgradeModal 
         isOpen={isUpgradeModalOpen} 
         onClose={() => setIsUpgradeModalOpen(false)} 
-      />
-      <ProfilePopup 
-        isOpen={isProfilePopupOpen} 
-        onClose={() => setIsProfilePopupOpen(false)} 
-        user={{
-          name: "John Doe",
-          email: "john@example.com",
-          avatar: undefined
-        }}
       />
     </header>
   );
