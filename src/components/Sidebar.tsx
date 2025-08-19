@@ -2,9 +2,8 @@ import React, { useState } from 'react';
 import { Home, History, Settings, User, Plus, FileText, PanelLeft, PanelRight, MessageSquare, Image as ImgIcon, FlaskConical, Calculator } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
-import { Link, useLocation } from 'react-router-dom';
+import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { ProfilePopup } from '@/components/ProfilePopup';
-// import { SettingsModal } from '@/components/modals/SettingsModal';
 
 interface EnhancedSidebarProps {
   isOpen: boolean;
@@ -40,10 +39,8 @@ const EnhancedSidebar: React.FC<EnhancedSidebarProps> = ({
   collapsedWidth = 64
 }) => {
   const location = useLocation();
+  const navigate = useNavigate();
   const [isProfilePopupOpen, setIsProfilePopupOpen] = useState(false);
-  const handleSettings = () => {
-    navigate('/settings');  // Add this import: import { useNavigate } from 'react-router-dom';
-  };
   
   // Add internal animation state to control content visibility
   const [isAnimating, setIsAnimating] = useState(false);
@@ -56,6 +53,10 @@ const EnhancedSidebar: React.FC<EnhancedSidebarProps> = ({
   
   // Detect if this is mobile or desktop usage
   const isMobileUsage = window.innerWidth < 768;
+
+  const handleSettings = () => {
+    navigate('/settings');
+  };
 
   // Handle desktop collapse/expand animation timing
   React.useEffect(() => {
@@ -200,7 +201,7 @@ const EnhancedSidebar: React.FC<EnhancedSidebarProps> = ({
                   className="text-sidebar-foreground hover:bg-sidebar-accent p-2"
                   aria-label="Collapse sidebar"
                 >
-                  <PanelLeft strokeWidth={1.5} style={{ width: '27px', height: '27px', minWidth: '27px', minHeight: '27px' }} />
+                  <PanelLeft strokeWidth={1} style={{ width: '27px', height: '27px', minWidth: '27px', minHeight: '27px' }} />
                 </Button>
               </div>
             </div>
@@ -213,7 +214,7 @@ const EnhancedSidebar: React.FC<EnhancedSidebarProps> = ({
               style={{ marginLeft: '-5px' }}
               aria-label="Expand sidebar"
             >
-              <PanelRight strokeWidth={1.5} style={{ width: '27px', height: '27px', minWidth: '27px', minHeight: '27px' }} />
+              <PanelRight strokeWidth={1} style={{ width: '27px', height: '27px', minWidth: '27px', minHeight: '27px' }} />
             </Button>
           )}
         </div>
@@ -389,23 +390,23 @@ const EnhancedSidebar: React.FC<EnhancedSidebarProps> = ({
           </div>
 
           <Button
-            onClick={() => setIsSettingsModalOpen(true)}
+            onClick={handleSettings}
             variant="ghost"
             className="w-full justify-start text-sidebar-foreground hover:bg-sidebar-accent px-4"
             size="sm"
             title={!shouldShowContent ? "Settings" : undefined}
           >
             <Settings className="h-4 w-4 flex-shrink-0" />
-              <span 
-                className="ml-3"
-                style={{
-                  opacity: shouldShowContent ? 1 : 0,
-                  transition: 'opacity 150ms ease-in-out',
-                  visibility: shouldShowContent ? 'visible' : 'hidden'
-                }}
-              >
-                Settings
-              </span>
+            <span 
+              className="ml-3"
+              style={{
+                opacity: shouldShowContent ? 1 : 0,
+                transition: 'opacity 150ms ease-in-out',
+                visibility: shouldShowContent ? 'visible' : 'hidden'
+              }}
+            >
+              Settings
+            </span>
           </Button>
         </div>
       </div>
@@ -415,11 +416,6 @@ const EnhancedSidebar: React.FC<EnhancedSidebarProps> = ({
         isOpen={isProfilePopupOpen}
         onClose={() => setIsProfilePopupOpen(false)}
         user={user}
-      />
-
-      <SettingsModal
-        isOpen={isSettingsModalOpen}
-        onClose={() => setIsSettingsModalOpen(false)}
       />
     </>
   );

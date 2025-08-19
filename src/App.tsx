@@ -28,8 +28,8 @@ import HybridLayout from './layouts/HybridLayout';
 import RecipesToImage from './pages/RecipesToImage';
 import ImageToRecipes from './pages/ImageToRecipes';
 import UMFCalculator from './pages/UMFCalculator';
-import { Navigate } from 'react-router-dom';
 import SettingsPage from "./pages/Settings";
+import { Navigate } from 'react-router-dom';
 
 // Configure React Query client with security-focused settings
 const queryClient = new QueryClient({
@@ -118,8 +118,9 @@ const App: React.FC = () => {
           {/* Router configuration */}
           <BrowserRouter>
             <Routes>
-              {/* AppShell + Tabs */}
+              {/* All pages with AppShell (sidebar + header) */}
               <Route element={<AppShell />}>
+                {/* Main pages with tabs */}
                 <Route element={<HybridLayout />}>
                   <Route path="/" element={<Index />} />
                   <Route path="/recipes-to-image" element={<RecipesToImage />} />
@@ -130,10 +131,8 @@ const App: React.FC = () => {
                 {/* Pages with AppShell but no tabs */}
                 <Route path="/notes" element={<Notes />} />
                 <Route path="/history" element={<History />} />
+                <Route path="/settings" element={<SettingsPage />} />
               </Route>
-              
-              {/* Future routes can be added here */}
-              <Route path="/settings" element={<SettingsPage />} />
               
               {/* Catch-all route for 404 handling */}
               <Route path="*" element={<NotFound />} />
@@ -145,4 +144,4 @@ const App: React.FC = () => {
   );
 };
 
-export default App; 
+export default App;

@@ -2,8 +2,8 @@ import React, { useState, forwardRef } from 'react';
 import { PanelRight, Crown, Settings, User } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { UpgradeModal } from '@/components/modals/UpgradeModal';
-// import { SettingsModal } from '@/components/modals/SettingsModal';
 import { ProfilePopup } from '@/components/ProfilePopup';
+import { useNavigate } from 'react-router-dom';
 
 // TypeScript interface for header component props
 interface HeaderProps {
@@ -27,8 +27,8 @@ interface HeaderProps {
  */
 const Header = forwardRef<HTMLElement, HeaderProps>(({ onToggleSidebar, isDesktop = false }, ref) => {
   const [isUpgradeModalOpen, setIsUpgradeModalOpen] = useState(false);
-  const [isSettingsModalOpen, setIsSettingsModalOpen] = useState(false);
   const [isProfilePopupOpen, setIsProfilePopupOpen] = useState(false);
+  const navigate = useNavigate();
 
   // Listen for upgrade modal events from profile popup
   React.useEffect(() => {
@@ -46,7 +46,7 @@ const Header = forwardRef<HTMLElement, HeaderProps>(({ onToggleSidebar, isDeskto
   };
 
   const handleSettings = () => {
-    setIsSettingsModalOpen(true);
+    navigate('/settings');
   };
 
   const handleProfile = () => {
@@ -125,10 +125,6 @@ const Header = forwardRef<HTMLElement, HeaderProps>(({ onToggleSidebar, isDeskto
       <UpgradeModal 
         isOpen={isUpgradeModalOpen} 
         onClose={() => setIsUpgradeModalOpen(false)} 
-      />
-      <SettingsModal 
-        isOpen={isSettingsModalOpen} 
-        onClose={() => setIsSettingsModalOpen(false)} 
       />
       <ProfilePopup 
         isOpen={isProfilePopupOpen} 

@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Settings, User, Bell, Shield, Palette, Download, Trash2, ArrowLeft } from 'lucide-react';
+import { Settings, User, Bell, Shield, Palette, Download, Trash2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Switch } from '@/components/ui/switch';
@@ -10,11 +10,9 @@ import { Separator } from '@/components/ui/separator';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { useToast } from '@/hooks/use-toast';
-import { useNavigate } from 'react-router-dom';
 
 const SettingsPage: React.FC = () => {
   const { toast } = useToast();
-  const navigate = useNavigate();
   
   // Settings state
   const [notifications, setNotifications] = useState({
@@ -67,37 +65,32 @@ const SettingsPage: React.FC = () => {
   };
 
   return (
-    <div className="min-h-screen bg-background p-4 sm:p-6 lg:p-8">
+    <div className="h-full overflow-y-auto p-4 sm:p-6 lg:p-8">
       <div className="max-w-4xl mx-auto">
         {/* Header */}
-        <div className="flex items-center gap-4 mb-8">
-          <Button
-            variant="ghost"
-            size="sm"
-            onClick={() => navigate(-1)}
-            className="flex items-center gap-2"
-          >
-            <ArrowLeft className="h-4 w-4" />
-            Back
-          </Button>
-          <div>
-            <h1 className="text-3xl font-bold flex items-center gap-2">
-              <Settings className="h-7 w-7" />
-              Settings
-            </h1>
-            <p className="text-muted-foreground mt-1">
-              Manage your account settings and preferences
-            </p>
-          </div>
+        <div className="mb-8">
+          <h1 className="text-3xl font-bold flex items-center gap-2 mb-2">
+            <Settings className="h-7 w-7" />
+            Settings
+          </h1>
+          <p className="text-muted-foreground">
+            Manage your account settings and preferences
+          </p>
         </div>
 
         <Tabs defaultValue="profile" className="space-y-6">
-          <TabsList className="grid w-full grid-cols-2 sm:grid-cols-4">
-            <TabsTrigger value="profile">Profile</TabsTrigger>
-            <TabsTrigger value="notifications">Notifications</TabsTrigger>
-            <TabsTrigger value="appearance">Appearance</TabsTrigger>
-            <TabsTrigger value="privacy">Privacy</TabsTrigger>
-          </TabsList>
+          {/* Mobile-optimized tabs with horizontal scroll */}
+          <div className="relative">
+            <TabsList className="flex w-full items-center rounded-md bg-muted p-1 text-muted-foreground overflow-x-auto sm:overflow-visible">
+                <TabsTrigger value="profile" className="flex-1 basis-0 text-center whitespace-nowrap">Profile</TabsTrigger>
+                <TabsTrigger value="notifications" className="flex-1 basis-0 text-center whitespace-nowrap">Notifications</TabsTrigger>
+                <TabsTrigger value="appearance" className="flex-1 basis-0 text-center whitespace-nowrap">Appearance</TabsTrigger>
+                <TabsTrigger value="privacy" className="flex-1 basis-0 text-center whitespace-nowrap">Privacy</TabsTrigger>
+            </TabsList>
+            
+            {/* Scroll hint shadows */}
+            <div className="absolute right-0 top-0 h-full w-8 bg-gradient-to-l from-background to-transparent pointer-events-none sm:hidden" />
+          </div>
 
           <TabsContent value="profile" className="space-y-6">
             <Card>
@@ -456,11 +449,8 @@ const SettingsPage: React.FC = () => {
           </TabsContent>
         </Tabs>
 
-        <div className="flex flex-col sm:flex-row justify-end gap-2 mt-8 sticky bottom-4">
-          <Button variant="outline" onClick={() => navigate(-1)}>
-            Cancel
-          </Button>
-          <Button onClick={handleSave}>
+        <div className="flex flex-col sm:flex-row justify-end gap-2 mt-8 pb-4">
+          <Button onClick={handleSave} className="gradient-primary">
             Save Changes
           </Button>
         </div>
