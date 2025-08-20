@@ -4,7 +4,7 @@
  * Enhancements:
  * - GlazionStudio favicon with spinning effect during typing
  * - Shows "GlazionStudio" label beside favicon
- * - Typing animation for AI responses
+ * - Typing animation for AI responses with markdown support
  * - Timestamp hidden for AI messages; only copy button shown
  * - User messages retain timestamp and hover-based actions
  * - Maintains scroll behavior and layout structure
@@ -12,6 +12,7 @@
 
 import React from 'react';
 import { useState } from 'react';
+import ReactMarkdown from 'react-markdown';
 // import { User } from 'lucide-react';
 // import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import { MessageActions } from '@/components/MessageActions';
@@ -199,27 +200,30 @@ const ResponseArea: React.FC<ResponseAreaProps> = (props) => {
                         </div>
                       )}
 
-                      {/* Text or typing animation */}
-                      <div className="leading-relaxed whitespace-pre-wrap text-sm">
+                      {/* Text or typing animation - UPDATED FOR MARKDOWN */}
+                      <div className="leading-relaxed text-sm">
                         {message.type === 'ai' ? (
                           message.content ? (
-                            <TypingMessage
-                              content={message.content.trim()}
-                              speed={1000}
-                              delay={0}
-                              onComplete={() =>
-                                setFinishedMessages((prev) => {
-                                  const next = new Set(prev);
-                                  next.add(message.id);
-                                  return next;
-                                })
-                              }
-                            />
+                            <div className="prose prose-sm max-w-none prose-headings:text-foreground prose-p:text-foreground prose-li:text-foreground prose-strong:text-foreground prose-ul:text-foreground">
+                              <TypingMessage
+                                content={message.content.trim()}
+                                speed={1000}
+                                delay={0}
+                                onComplete={() =>
+                                  setFinishedMessages((prev) => {
+                                    const next = new Set(prev);
+                                    next.add(message.id);
+                                    return next;
+                                  })
+                                }
+                                useMarkdown={true}
+                              />
+                            </div>
                           ) : (
                             <div />
                           )
                         ) : (
-                          <div>{message.content}</div>
+                          <div className="whitespace-pre-wrap">{message.content}</div>
                         )}
                       </div>
                     </div>
