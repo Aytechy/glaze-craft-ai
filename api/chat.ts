@@ -1,4 +1,14 @@
+// /api/chat.ts  (Vercel Serverless Function – TypeScript)
 import type { VercelRequest, VercelResponse } from '@vercel/node';
+
+/**
+ * Minimal proxy from your frontend to your pottery search API.
+ * - Calls GET http://glazeon.somee.com/api/Pottery/query?question=...&topK=...
+ * - Returns { content, raw } so your UI can stay the same.
+ * - No API keys. No CORS issues (server-to-server).
+ */
+
+const BASE_URL = process.env.PRIVATE_API_BASE_URL || 'http://glazeon.somee.com';
 
 export default async function handler(req: VercelRequest, res: VercelResponse) {
   try {
@@ -6,62 +16,41 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       return res.status(405).json({ error: 'Method not allowed' });
     }
 
-    const { message, imageBase64, model } = (req.body || {}) as {
-      message?: string; imageBase64?: string; model?: string;
+    const { message, topK } = (req.body || {}) as {
+      message?: string;
+      topK?: number | string;
     };
 
-    if (!message && !imageBase64) {
-      return res.status(400).json({ error: 'message or imageBase64 is required' });
+    if (!message) {
+      return res.status(400).json({ error: 'message is required' });
     }
 
-    // Handle image uploads (your API doesn't seem to support images yet)
-    if (imageBase64) {
-      return res.status(400).json({ 
-        error: 'Image uploads are not supported by the pottery API yet' 
-      });
+    // Build GET URL with query params
+    const qs = new URLSearchParams({
+      question: String(message),
+      ...(topK ? { topK: String(topK) } : {}),
+    }).toString();
+
+    const url = `${BASE_URL}/api/Pottery/query?${qs}`;
+
+    const upstream = await fetch(url, { method: 'GET' });
+
+    const text = await upstream.text();
+    let json: any;
+    try { json = JSON.parse(text); } catch { json = text; }
+
+    if (!upstream.ok) {
+      return res
+        .status(upstream.status)
+        .json({ error: (json && json.error) || text || 'Upstream error', raw: json });
     }
 
-    // Your API endpoint
-    const apiUrl = 'http://glazeon.somee.com/api/Pottery/query';
-    
-    // Build query parameters for GET request
-    const queryParams = new URLSearchParams({
-      question: message || '',
-      topK: '5' // Default to 5, you can make this configurable
-    });
+    // Your API returns { answer, question, success, matches, ... }
+    const content = typeof json === 'object' && json?.answer
+      ? json.answer
+      : (typeof json === 'string' ? json : '');
 
-    const fullUrl = `${apiUrl}?${queryParams}`;
-
-    // Make GET request to your API (not POST like OpenRouter)
-    const r = await fetch(fullUrl, {
-      method: 'GET',
-      headers: {
-        'Accept': 'application/json',
-        'Content-Type': 'application/json',
-      },
-    });
-
-    if (!r.ok) {
-      const text = await r.text().catch(() => '');
-      return res.status(r.status).json({ error: text || 'Pottery API error' });
-    }
-
-    const json = await r.json();
-    
-    // Check if your API returned success
-    if (!json.success) {
-      return res.status(400).json({ error: 'Pottery API returned error' });
-    }
-
-    // Extract the answer from your API response
-    const content = json.answer || 'No answer received';
-
-    // Return in the format your frontend expects
-    return res.status(200).json({ 
-      content, 
-      raw: json 
-    });
-
+    return res.status(200).json({ content, raw: json });
   } catch (err) {
     console.error(err);
     return res.status(500).json({ error: 'Server error' });
