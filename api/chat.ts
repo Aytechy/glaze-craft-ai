@@ -33,7 +33,11 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
 
     const url = `${BASE_URL}/api/Pottery/query?${qs}`;
 
-    const upstream = await fetch(url, { method: 'GET' });
+    // ADD THE HEADERS HERE ⬇️
+    const upstream = await fetch(url, { 
+      method: 'GET',
+      headers: { 'Accept': 'application/json' }
+    });
 
     const text = await upstream.text();
     let json: any;
