@@ -1,11 +1,12 @@
-// /api/chat.ts — Smart Router: Knowledge Base + Conversational AI
+// /api/chat.ts — KB-first with Conversation fallback. Returns ONLY { content }.
 import type { VercelRequest, VercelResponse } from '@vercel/node';
 
 const BASE_URL = (process.env.PRIVATE_API_BASE_URL || 'http://glazeon.somee.com').replace(/\/+$/, '');
+const KB_TIMEOUT_MS = 10_000;
+const CONV_TIMEOUT_MS = 10_000;
 
 /* -------------------- Intent: short / medium / long -------------------- */
 type Mode = 'short' | 'medium' | 'long';
-type RouteDecision = 'knowledge' | 'conversation' | 'hybrid';
 
 function inferMode(q: string): Mode {
   const s = (q || '').toLowerCase();
@@ -27,67 +28,33 @@ function inferMode(q: string): Mode {
   return 'medium';
 }
 
-// NEW: Smart routing decision
-function decideRoute(question: string): RouteDecision {
-  const q = question.toLowerCase();
-
-  // Use CONVERSATION AI for:
-  
-  // 1. Personal/beginner questions
-  if (/\b(i|my|me|help|advice|recommend|suggest|beginner|start|confused|frustrated|excited|new to|first time)\b/.test(q)) {
-    return 'conversation';
-  }
-  
-  // 2. Troubleshooting (problems)
-  if (/\b(why|what went wrong|problem|issue|failed|cracked|broke|help|fix|broken|not working)\b/.test(q)) {
-    return 'conversation';
-  }
-  
-  // 3. Comparison and choice questions
-  if (/\b(vs|versus|better|best|compare|difference|which|what should|choose|pick|decide)\b/.test(q)) {
-    return 'conversation';
-  }
-  
-  // 4. Planning/setup questions
-  if (/\b(plan|planning|setup|studio|budget|buy|purchase|getting started|how do i start)\b/.test(q)) {
-    return 'conversation';
-  }
-
-  // 5. Greeting/casual
-  if (/\b(hi|hello|hey|thanks|thank you|please|can you|could you)\b/.test(q)) {
-    return 'conversation';
-  }
-  
-  // Use KNOWLEDGE BASE for:
-  // - Factual definitions: "What is cone 6", "bisque firing temperature"
-  // - Technical terms: "oxidation", "reduction", "earthenware"
-  // - Specific pottery vocabulary
-  
-  return 'knowledge';
-}
-
-/* --------------------------- Text utilities (UNCHANGED) --------------------------- */
+/* --------------------------- Text utilities --------------------------- */
 function normalizeWhitespace(t: string): string {
   return (t || '').replace(/\s+/g, ' ').trim();
 }
 
+// Clean copy/paste artifacts (quotes, extra asterisks, wrapping **…**)
 function stripArtifacts(t: string): string {
   if (!t) return '';
   let s = t
-    .replace(/[""]/g, '"')
-    .replace(/['']/g, "'")
+    .replace(/[“”]/g, '"')
+    .replace(/[‘’]/g, "'")
     .replace(/\u00A0/g, ' ')
     .replace(/\*{3,}/g, '**')
     .trim();
 
+  // remove full-string wrapping quotes
   if ((s.startsWith('"') && s.endsWith('"')) || (s.startsWith("'") && s.endsWith("'"))) {
     s = s.slice(1, -1).trim();
   }
+  // remove full-string wrapping **…**
   if (s.startsWith('**') && s.endsWith('**')) {
     s = s.slice(2, -2).trim();
   }
+  // remove stray leading/trailing asterisks
   s = s.replace(/^\*+/, '').replace(/\*+$/, '').trim();
 
+  // collapse duplicated "No relevant … found" lines
   s = s.replace(
     /(No relevant [^.]*? found\. Please try rephrasing your question\.)\s*\1+/gi,
     '$1'
@@ -96,6 +63,7 @@ function stripArtifacts(t: string): string {
   return s;
 }
 
+// Sentence splitter (keeps sentences whole; avoids mid-cut)
 function splitSentences(t: string): string[] {
   if (!t) return [];
   return t
@@ -121,23 +89,30 @@ function looksLikeNoInfo(s: string): boolean {
   return /^no relevant .* found/i.test(s || '');
 }
 
+/* ------------------------ Markdown-aware helpers ---------------------- */
+// Respect backend "Thh Title" as a heading marker
 function applyThhHeadings(text: string): string {
   return (text || '').replace(/\bThh\b\s*([^\n.]+)\.?/g, (_, h) => `\n\n### **${String(h).trim()}**\n\n`);
 }
 
+// If answer already contains ordered items "1. **Title**: …", keep them.
+// Otherwise, we can create neat bullets from matches when needed.
 function bulletify(list: string[]): string {
   return list.map(s => `- ${s}`).join('\n');
 }
 
-/* ----------------------- Composition (by mode) - UNCHANGED ------------------------ */
+/* ----------------------- Composition (by mode) ------------------------ */
+// SHORT → answer only (cleaned), nothing else.
 function composeShort(answer: string): string {
   return stripArtifacts(answer);
 }
 
+// MEDIUM → answer + a few relevant, non-duplicate bits from matches.
 function composeMedium(answer: string, matches: any[]): string {
   const base = stripArtifacts(answer);
   const picked: string[] = [];
 
+  // Take 3–6 supporting sentences from matches (lede/description), no duplicates
   for (const m of matches || []) {
     for (const field of [m?.lede, m?.description]) {
       const ss = dedupeSentences(splitSentences(stripArtifacts(String(field || ''))));
@@ -152,15 +127,21 @@ function composeMedium(answer: string, matches: any[]): string {
   }
 
   if (!picked.length) return base;
+
+  // Keep paragraphs readable
   return `${base}\n\n${bulletify(picked)}`;
 }
 
+// LONG → structured markdown: Overview, Key Steps/Points, Tips & Issues, plus elaboration.
+// Uses answer + ALL relevant matches (titles/lede/description), deduped, no mid-sentence cuts.
 function composeLong(question: string, answer: string, matches: any[]): string {
   const procedural = /\b(how|how to|guide|tutorial|technique|techniques|steps|process|build|make|recipe|schedule|troubleshoot|fix|prevent|best practices)\b/i.test(question);
   const base = stripArtifacts(answer);
 
+  // Start with Overview (answer or first good sentence)
   const overview = base || (splitSentences(stripArtifacts(matches?.[0]?.description || '')).shift() || '');
 
+  // Gather step-like and key-point sentences
   const stepLike: string[] = [];
   const keyPoints: string[] = [];
 
@@ -176,8 +157,10 @@ function composeLong(question: string, answer: string, matches: any[]): string {
     }
   };
 
+  // Seed with answer
   pushSentences(base);
 
+  // Add from matches: title as bold point + lede/description sentences
   const elaborations: string[] = [];
   for (const m of matches || []) {
     const title = stripArtifacts(m?.title || '');
@@ -189,10 +172,12 @@ function composeLong(question: string, answer: string, matches: any[]): string {
     if (desc) pushSentences(desc);
   }
 
+  // Dedupe lists
   const deStep = dedupeSentences(stepLike);
   const dePoints = dedupeSentences(keyPoints);
   const deElabs = dedupeSentences(elaborations);
 
+  // Build markdown
   let out: string[] = [];
 
   if (overview) {
@@ -203,9 +188,11 @@ function composeLong(question: string, answer: string, matches: any[]): string {
     out.push(`### **Key Steps**\n\n${bulletify(deStep)}`);
   }
 
+  // If not strongly procedural, show key points first
   if (!procedural && dePoints.length) {
     out.push(`### **Key Points**\n\n${bulletify(dePoints)}`);
   } else if (procedural && dePoints.length) {
+    // For procedural, keep points too if present
     out.push(`### **Notes & Parameters**\n\n${bulletify(dePoints)}`);
   }
 
@@ -216,6 +203,7 @@ function composeLong(question: string, answer: string, matches: any[]): string {
   let result = out.join('\n\n');
   result = applyThhHeadings(result);
 
+  // Final cleanup & spacing
   result = result
     .replace(/\n{3,}/g, '\n\n')
     .trim();
@@ -223,175 +211,137 @@ function composeLong(question: string, answer: string, matches: any[]): string {
   return result || stripArtifacts(answer);
 }
 
-/* -------------------- NEW: API Callers -------------------- */
-
-// Call knowledge base (your existing pottery database)
-async function getKnowledgeResponse(question: string, topK?: number | string) {
+/* ------------------------------ Fetch utils --------------------------- */
+async function fetchWithTimeout(url: string, init: RequestInit, timeoutMs: number): Promise<Response> {
+  const controller = new AbortController();
+  const t = setTimeout(() => controller.abort(), timeoutMs);
   try {
-    const qs = new URLSearchParams({
-      question: String(question),
-      ...(topK ? { topK: String(topK) } : {})
-    }).toString();
-    const url = `${BASE_URL}/api/Pottery/query?${qs}`;
-
-    const upstream = await fetch(url, { method: 'GET' });
-    const text = await upstream.text();
-
-    let json: any; 
-    try { json = JSON.parse(text); } catch { json = text; }
-    
-    if (!upstream.ok) {
-      return { success: false, error: (json && (json.error || json.message)) || text || 'Knowledge base error' };
-    }
-
-    const baseAnswerRaw = typeof json === 'object' ? (json?.answer ?? '') : (typeof json === 'string' ? json : '');
-    const baseAnswer = stripArtifacts(baseAnswerRaw);
-    const matches = (typeof json === 'object' && Array.isArray(json?.matches)) ? json.matches : [];
-
-    return {
-      success: true,
-      answer: baseAnswer,
-      matches,
-      hasGoodMatch: baseAnswer && baseAnswer.length > 50 && !looksLikeNoInfo(baseAnswer) && matches.length > 0
-    };
-  } catch (error) {
-    return { success: false, error: 'Knowledge base connection error' };
+    return await fetch(url, { ...init, signal: controller.signal });
+  } finally {
+    clearTimeout(t);
   }
 }
 
-// Call conversation AI
-async function getConversationResponse(question: string) {
-  try {
-    const qs = new URLSearchParams({ question: String(question) }).toString();
-    const url = `${BASE_URL}/api/Conversation/ask?${qs}`;
+/* ---------------------------- Upstream calls -------------------------- */
+async function askKB(baseUrl: string, question: string, topK?: string | number) {
+  const qs = new URLSearchParams({
+    question: String(question),
+    ...(topK ? { topK: String(topK) } : {})
+  }).toString();
+  const url = `${baseUrl}/api/Pottery/query?${qs}`;
+  const r = await fetchWithTimeout(url, { method: 'GET', headers: { accept: 'application/json' } }, KB_TIMEOUT_MS);
+  const text = await r.text();
 
-    const upstream = await fetch(url, { method: 'GET' });
-    
-    if (!upstream.ok) {
-      return { success: false, error: `Conversation API error: ${upstream.status}` };
-    }
-
-    const json = await upstream.json();
-    
-    return {
-      success: json.success || false,
-      answer: json.answer || '',
-      confidence: json.confidence || 0,
-      suggestedQuestions: json.suggestedQuestions || []
-    };
-  } catch (error) {
-    return { success: false, error: 'Conversation API connection error' };
+  let json: any; try { json = JSON.parse(text); } catch { json = text; }
+  if (!r.ok) {
+    throw new Error((json && (json.error || json.message)) || text || 'KB upstream error');
   }
+
+  return {
+    answer: typeof json === 'object' ? (json?.answer ?? '') : (typeof json === 'string' ? json : ''),
+    matches: (typeof json === 'object' && Array.isArray(json?.matches)) ? json.matches : []
+  };
 }
 
-/* ------------------------------ SMART ROUTER HANDLER ------------------------------- */
+async function askConversation(baseUrl: string, question: string, userId?: string) {
+  const params = new URLSearchParams({ question: String(question) });
+  if (userId) params.set('userId', String(userId));
+  const url = `${baseUrl}/api/Conversation/ask?${params.toString()}`;
+  const r = await fetchWithTimeout(url, { method: 'GET', headers: { accept: 'application/json' } }, CONV_TIMEOUT_MS);
+  const text = await r.text();
+
+  let json: any; try { json = JSON.parse(text); } catch { json = { answer: text }; }
+  if (!r.ok) throw new Error(json?.error || text || 'Conversation upstream error');
+
+  return {
+    answer: stripArtifacts(json?.answer || ''),
+    confidence: typeof json?.confidence === 'number' ? json.confidence : undefined,
+    suggestedQuestions: Array.isArray(json?.suggestedQuestions) ? json.suggestedQuestions : []
+  };
+}
+
+/* ---------------------------- Intent helpers -------------------------- */
+function isConversationalSmallTalk(msg: string): boolean {
+  const s = (msg || '').toLowerCase().trim();
+  if (s.length > 40) return false;
+  return /\b(hi|hello|hey|yo|sup|how are you|what's up|continue|explain more|talk|chat)\b/.test(s);
+}
+
+function kbLooksWeak(answer: string, matches: any[]): boolean {
+  if (!answer) return true;
+  const a = stripArtifacts(answer).trim();
+  if (!a) return true;
+  if (looksLikeNoInfo(a)) return true;
+  if (a.length < 20 && (!matches || matches.length === 0)) return true;
+  return false;
+}
+
+/* ------------------------------ Handler ------------------------------- */
 export default async function handler(req: VercelRequest, res: VercelResponse) {
   try {
     if (req.method !== 'POST') return res.status(405).json({ error: 'Method not allowed' });
 
-    const { message, topK } = (req.body || {}) as {
+    const { message, topK, userId } = (req.body || {}) as {
       message?: string;
       topK?: number | string;
+      userId?: string;
     };
 
     if (!message) return res.status(400).json({ error: 'message is required' });
 
-    // Step 1: Decide routing strategy
-    const route = decideRoute(message);
     const mode = inferMode(message);
 
+    // 1) Small-talk or meta-chat → Conversation first
+    if (isConversationalSmallTalk(message)) {
+      const conv = await askConversation(BASE_URL, message, userId);
+      return res.status(200).json({ content: conv.answer || 'Hello! Ask me anything about pottery or ceramics.' });
+    }
+
+    // 2) KB-first
+    let kb: { answer: string; matches: any[] } | null = null;
+    try {
+      kb = await askKB(BASE_URL, message, topK);
+    } catch (e) {
+      // KB failed hard → try Conversation once
+      const conv = await askConversation(BASE_URL, message, userId).catch(() => null);
+      if (conv?.answer) return res.status(200).json({ content: conv.answer });
+      // If conversation also failed, surface the KB error
+      return res.status(502).json({ error: (e as Error)?.message || 'Upstream error' });
+    }
+
+    const baseAnswer = stripArtifacts(kb.answer || '');
+    const matches = Array.isArray(kb.matches) ? kb.matches : [];
+
+    // 3) Confidence gate → fallback to Conversation if weak
+    if (kbLooksWeak(baseAnswer, matches)) {
+      const conv = await askConversation(BASE_URL, message, userId).catch(() => null);
+      const convAnswer = stripArtifacts(conv?.answer || '');
+      if (convAnswer) {
+        return res.status(200).json({ content: convAnswer });
+      }
+      // salvage from matches or nudge
+      if (mode === 'medium' || mode === 'long') {
+        const salvage = composeMedium('', matches);
+        return res.status(200).json({
+          content: salvage || 'We couldn’t find enough on that. Try a related term like “cone 6 firing schedule”, “oxidation vs reduction”, or “bisque firing steps”.'
+        });
+      }
+      return res.status(200).json({ content: 'We couldn’t find enough on that topic. Try rephrasing your question.' });
+    }
+
+    // 4) Compose from KB (respect mode)
     let content = '';
-    let suggestedQuestions: string[] = [];
-    let source = '';
-
-    if (route === 'conversation') {
-      // Use conversation AI
-      const convResponse = await getConversationResponse(message);
-      
-      if (convResponse.success && convResponse.answer) {
-        content = stripArtifacts(convResponse.answer);
-        suggestedQuestions = convResponse.suggestedQuestions || [];
-        source = 'conversation';
-      } else {
-        // Fallback to knowledge base
-        const knowledgeResponse = await getKnowledgeResponse(message, topK);
-        
-        if (knowledgeResponse.success) {
-          const isNoInfo = looksLikeNoInfo(knowledgeResponse.answer);
-          
-          if (mode === 'short') {
-            content = knowledgeResponse.answer || 'We couldn\'t find enough on that topic. Try a related term.';
-          } else if (mode === 'medium') {
-            content = !isNoInfo ? composeMedium(knowledgeResponse.answer, knowledgeResponse.matches) : 
-                     (knowledgeResponse.matches?.length ? composeMedium('', knowledgeResponse.matches) : 
-                     'We couldn\'t find enough on that topic. Try a related term.');
-          } else { // long
-            content = !isNoInfo ? composeLong(message, knowledgeResponse.answer, knowledgeResponse.matches) : 
-                     (knowledgeResponse.matches?.length ? composeLong(message, '', knowledgeResponse.matches) : 
-                     'We couldn\'t find enough on that topic. Try asking about specific techniques or materials.');
-          }
-          source = 'knowledge_fallback';
-        } else {
-          content = 'I\'m having trouble accessing my systems right now. Please try again in a moment.';
-          source = 'error';
-        }
-      }
+    if (mode === 'short') {
+      content = composeShort(baseAnswer);
+    } else if (mode === 'medium') {
+      content = composeMedium(baseAnswer, matches);
     } else {
-      // Use knowledge base (your original excellent system)
-      const knowledgeResponse = await getKnowledgeResponse(message, topK);
-      
-      if (knowledgeResponse.success) {
-        const isNoInfo = looksLikeNoInfo(knowledgeResponse.answer);
-        
-        if (mode === 'short') {
-          content = composeShort(knowledgeResponse.answer);
-          if (!content && knowledgeResponse.matches?.length) {
-            const first = splitSentences(stripArtifacts(knowledgeResponse.matches[0]?.description || knowledgeResponse.matches[0]?.lede || '')).shift() || '';
-            content = first || 'We couldn\'t find enough on that topic. Try a related term.';
-          }
-        } else if (mode === 'medium') {
-          if (!isNoInfo) {
-            content = composeMedium(knowledgeResponse.answer, knowledgeResponse.matches);
-          } else if (knowledgeResponse.matches?.length) {
-            content = composeMedium('', knowledgeResponse.matches);
-          } else {
-            content = 'We couldn\'t find enough on that topic. Try a related term like "cone 6 firing schedule", "oxidation vs reduction", or "bisque firing steps".';
-          }
-        } else { // long
-          if (!isNoInfo) {
-            content = composeLong(message, knowledgeResponse.answer, knowledgeResponse.matches);
-          } else if (knowledgeResponse.matches?.length) {
-            content = composeLong(message, '', knowledgeResponse.matches);
-          } else {
-            content = 'We couldn\'t find enough on that topic. Try: techniques, schedules, materials, or defects related to your query.';
-          }
-        }
-        source = 'knowledge';
-      } else {
-        // Fallback to conversation AI
-        const convResponse = await getConversationResponse(message);
-        
-        if (convResponse.success && convResponse.answer) {
-          content = stripArtifacts(convResponse.answer);
-          suggestedQuestions = convResponse.suggestedQuestions || [];
-          source = 'conversation_fallback';
-        } else {
-          content = 'I\'m having trouble accessing my systems right now. Please try again in a moment.';
-          source = 'error';
-        }
-      }
+      content = composeLong(message, baseAnswer, matches);
     }
 
-    // Final polish
+    // 5) Final polish
     content = applyThhHeadings(content).replace(/\n{3,}/g, '\n\n').trim();
-
-    // Return response (include suggested questions if available)
-    const response: any = { content, source };
-    if (suggestedQuestions.length > 0) {
-      response.suggestedQuestions = suggestedQuestions;
-    }
-
-    return res.status(200).json(response);
+    return res.status(200).json({ content });
   } catch (e) {
     console.error(e);
     return res.status(500).json({ error: 'Server error' });
