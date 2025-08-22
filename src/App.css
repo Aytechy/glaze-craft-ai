@@ -17,6 +17,10 @@
 .logo.react:hover {
   filter: drop-shadow(0 0 2em #61dafbaa);
 }
+/* wherever you keep globals (e.g., globals.css) */
+.chat-markdown li > p { margin: 0; }          /* prevent a new line after the marker */
+.chat-markdown ol, .chat-markdown ul { margin: 0; padding-left: 1.5rem; }
+.chat-markdown li { list-style-position: outside; }
 
 @keyframes logo-spin {
   from {
