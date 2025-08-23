@@ -17,6 +17,7 @@ import { useToast } from '@/hooks/use-toast';
 
 const Index: React.FC = () => {
   const [isNewChatModalOpen, setIsNewChatModalOpen] = useState<boolean>(false);
+  const [isMessageTyping, setIsMessageTyping] = useState<boolean>(false);
   
   const {
     messages,
@@ -64,6 +65,11 @@ const Index: React.FC = () => {
   const handleNewChat = () => {
     clearMessages();
     setIsNewChatModalOpen(false);
+  };
+
+  // Function to handle message typing state changes from ResponseArea
+  const handleMessageTypingChange = (isTyping: boolean) => {
+    setIsMessageTyping(isTyping);
   };
 
   // Listen for new chat events from AppShell and Sidebar
@@ -133,6 +139,7 @@ const Index: React.FC = () => {
                   isTyping={isLoading}
                   onSuggestionSelect={handleSuggestionSelect}
                   onEditMessage={handleEditMessage}
+                  onMessageTypingChange={handleMessageTypingChange}
                   bottomPadPx={0}
                 />
               </div>
@@ -143,6 +150,7 @@ const Index: React.FC = () => {
                   onSendMessage={handleSendMessage}
                   isLoading={isLoading || !canSendMessage}
                   isTyping={isLoading}
+                  isMessageTyping={isMessageTyping}
                   hasMessages={hasConversation}
                 />
               </div>
@@ -167,6 +175,7 @@ const Index: React.FC = () => {
                     isTyping={isLoading}
                     onSuggestionSelect={handleSuggestionSelect}
                     onEditMessage={handleEditMessage}
+                    onMessageTypingChange={handleMessageTypingChange}
                     bottomPadPx={0}
                     scrollParentRef={scrollRef}
                   />
@@ -188,6 +197,7 @@ const Index: React.FC = () => {
                 onSendMessage={handleSendMessage}
                 isLoading={isLoading || !canSendMessage}
                 isTyping={isLoading}
+                isMessageTyping={isMessageTyping}
                 hasMessages={hasConversation}
               />
             </div>

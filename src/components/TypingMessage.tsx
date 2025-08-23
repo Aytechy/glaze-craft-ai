@@ -3,16 +3,28 @@ import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
 import { useTypingEffect } from '@/hooks/useTypingEffect';
 
+// Define the interface for TypingMessage props
+interface TypingMessageProps {
+  content: string;
+  speed?: number;
+  delay?: number;
+  onComplete?: () => void;
+  onStart?: () => void; // NEW: Callback when typing starts
+  className?: string;
+  useMarkdown?: boolean;
+}
+
 export const TypingMessage: React.FC<TypingMessageProps> = ({
   content,
   speed,
   delay,
   onComplete,
+  onStart,
   className = '',
   useMarkdown = false,
 }) => {
   const { displayedText, isTyping, startTyping } =
-    useTypingEffect({ speed, delay, onComplete });
+    useTypingEffect({ speed, delay, onComplete, onStart });
   const prevContent = useRef<string>('');
 
   useEffect(() => {

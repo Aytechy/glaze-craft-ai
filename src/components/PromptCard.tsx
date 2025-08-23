@@ -4,7 +4,7 @@
  * Features:
  * - Auto-resizing textarea
  * - Send on Enter (Shift+Enter for new line)
- * - Disabled during AI typing
+ * - Disabled during AI typing AND message typing animation
  * - Clean, responsive design
  */
 
@@ -17,7 +17,8 @@ import { useToast } from '@/hooks/use-toast';
 interface PromptCardProps {
   onSendMessage: (content: string) => void;
   isLoading: boolean;
-  isTyping: boolean; // NEW: AI typing state
+  isTyping: boolean; // AI thinking state
+  isMessageTyping: boolean; // NEW: Message typing animation state
   hasMessages: boolean;
 }
 
@@ -25,6 +26,7 @@ const PromptCard: React.FC<PromptCardProps> = ({
   onSendMessage,
   isLoading,
   isTyping,
+  isMessageTyping,
   hasMessages
 }) => {
   const [prompt, setPrompt] = useState('');
@@ -59,7 +61,8 @@ const PromptCard: React.FC<PromptCardProps> = ({
   const handleKeyDown = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
     if (e.key === 'Enter' && !e.shiftKey) {
       e.preventDefault();
-      if (!isLoading && !isTyping) {
+      // Disable submit during any typing state
+      if (!isLoading && !isTyping && !isMessageTyping) {
         handleSubmit();
       }
     }
@@ -82,6 +85,9 @@ const PromptCard: React.FC<PromptCardProps> = ({
     el.addEventListener('focus', onFocus);
     return () => el.removeEventListener('focus', onFocus);
   }, []);
+
+  // Check if any typing state is active
+  const isAnyTypingActive = isTyping || isLoading || isMessageTyping;
 
   return (
     <div className="w-full px-4">
@@ -106,7 +112,7 @@ const PromptCard: React.FC<PromptCardProps> = ({
             {/* Send button positioned at bottom right */}
             <Button
               onClick={handleSubmit}
-              disabled={isTyping || isLoading || !prompt.trim()}
+              disabled={isAnyTypingActive || !prompt.trim()}
               className="absolute bottom-1 right-1 h-8 w-8 rounded-full p-0 bg-primary hover:bg-primary/90 disabled:opacity-50 transition-all duration-200"
               size="sm"
             >

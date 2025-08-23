@@ -8,6 +8,7 @@
  * - Timestamp hidden for AI messages; only copy button shown
  * - User messages retain timestamp and hover-based actions
  * - Maintains scroll behavior and layout structure
+ * - Communicates typing state to parent component
  */
 
 import React from 'react';
@@ -34,6 +35,7 @@ interface ResponseAreaProps {
   isTyping: boolean;
   onSuggestionSelect?: (text: string) => void;
   onEditMessage?: (messageId: string, content: string) => void;
+  onMessageTypingChange?: (isTyping: boolean) => void; // NEW: Callback for typing state
   bottomPadPx?: number;
   scrollParentRef?: React.RefObject<HTMLDivElement>;
 }
@@ -49,7 +51,7 @@ const SuggestionButton: React.FC<{ text: string; onSelect: (text: string) => voi
 );
 
 const ResponseArea: React.FC<ResponseAreaProps> = (props) => {
-  const { messages, isTyping, onSuggestionSelect, onEditMessage, bottomPadPx = 96 } = props;
+  const { messages, isTyping, onSuggestionSelect, onEditMessage, onMessageTypingChange, bottomPadPx = 96 } = props;
   const scrollContainerRef = React.useRef<HTMLDivElement>(null);
   const lastMessageRef = React.useRef<HTMLDivElement>(null);
 
@@ -57,6 +59,9 @@ const ResponseArea: React.FC<ResponseAreaProps> = (props) => {
   const [finishedMessages, setFinishedMessages] = useState<Set<string>>(
     () => new Set(messages.map((m) => m.id))
   );
+
+  // Track typing state for each message
+  const [typingMessages, setTypingMessages] = useState<Set<string>>(new Set());
 
   // 2) Detect truly new messages and allow them to animate
   const prevCount = React.useRef(messages.length);
@@ -74,6 +79,26 @@ const ResponseArea: React.FC<ResponseAreaProps> = (props) => {
     }
     prevCount.current = messages.length;
   }, [messages]);
+
+  // Notify parent about overall typing state
+  React.useEffect(() => {
+    const isAnyMessageTyping = typingMessages.size > 0;
+    onMessageTypingChange?.(isAnyMessageTyping);
+  }, [typingMessages, onMessageTypingChange]);
+
+  // Functions to manage typing state
+  const handleTypingStart = (messageId: string) => {
+    setTypingMessages(prev => new Set(prev).add(messageId));
+  };
+
+  const handleTypingComplete = (messageId: string) => {
+    setTypingMessages(prev => {
+      const next = new Set(prev);
+      next.delete(messageId);
+      return next;
+    });
+    setFinishedMessages(prev => new Set(prev).add(messageId));
+  };
 
   // pick the real scroll element
   const getScrollEl = () => props.scrollParentRef?.current ?? scrollContainerRef.current;
@@ -209,13 +234,8 @@ const ResponseArea: React.FC<ResponseAreaProps> = (props) => {
                                 content={message.content.trim()}
                                 speed={1000}
                                 delay={0}
-                                onComplete={() =>
-                                  setFinishedMessages((prev) => {
-                                    const next = new Set(prev);
-                                    next.add(message.id);
-                                    return next;
-                                  })
-                                }
+                                onStart={() => handleTypingStart(message.id)}
+                                onComplete={() => handleTypingComplete(message.id)}
                                 useMarkdown={true}
                               />
                             </div>

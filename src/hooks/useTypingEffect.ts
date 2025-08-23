@@ -4,6 +4,7 @@ interface UseTypingEffectOptions {
   speed?: number; // Characters per second (default: 50)
   delay?: number; // Initial delay before typing starts (default: 100ms)
   onComplete?: () => void; // Callback when typing is complete
+  onStart?: () => void; // NEW: Callback when typing starts
 }
 
 interface UseTypingEffectReturn {
@@ -15,7 +16,7 @@ interface UseTypingEffectReturn {
 }
 
 export const useTypingEffect = (options: UseTypingEffectOptions = {}): UseTypingEffectReturn => {
-  const { speed = 800, delay = 0, onComplete } = options;
+  const { speed = 800, delay = 0, onComplete, onStart } = options;
   
   const [displayedText, setDisplayedText] = useState('');
   const [isTyping, setIsTyping] = useState(false);
@@ -24,6 +25,7 @@ export const useTypingEffect = (options: UseTypingEffectOptions = {}): UseTyping
   const intervalRef = useRef<NodeJS.Timeout | null>(null);
   const timeoutRef = useRef<NodeJS.Timeout | null>(null);
   const currentIndexRef = useRef(0);
+  const hasStartedRef = useRef(false);
 
   const clearTimers = () => {
     if (intervalRef.current) {
@@ -42,6 +44,7 @@ export const useTypingEffect = (options: UseTypingEffectOptions = {}): UseTyping
     setDisplayedText('');
     setIsTyping(true);
     currentIndexRef.current = 0;
+    hasStartedRef.current = false;
 
     // Ensure the component is mounted and text is available
     if (!text) {
@@ -51,6 +54,12 @@ export const useTypingEffect = (options: UseTypingEffectOptions = {}): UseTyping
 
     // Start typing after initial delay
     timeoutRef.current = setTimeout(() => {
+      // Call onStart callback when typing actually begins
+      if (!hasStartedRef.current) {
+        onStart?.();
+        hasStartedRef.current = true;
+      }
+
       const interval = 1000 / speed; // Convert speed to interval in ms
       
       intervalRef.current = setInterval(() => {
@@ -84,6 +93,7 @@ export const useTypingEffect = (options: UseTypingEffectOptions = {}): UseTyping
     setTargetText('');
     setIsTyping(false);
     currentIndexRef.current = 0;
+    hasStartedRef.current = false;
   };
 
   // Cleanup on unmount
