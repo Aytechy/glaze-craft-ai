@@ -4,7 +4,7 @@
  * Features:
  * - Auto-resizing textarea
  * - Send on Enter (Shift+Enter for new line)
- * - Disabled during AI typing AND message typing animation
+ * - Disabled during any busy state (simplified from 3 states to 1)
  * - Clean, responsive design
  */
 
@@ -16,17 +16,13 @@ import { useToast } from '@/hooks/use-toast';
 
 interface PromptCardProps {
   onSendMessage: (content: string) => void;
-  isLoading: boolean;
-  isTyping: boolean; // AI thinking state
-  isMessageTyping: boolean; // NEW: Message typing animation state
+  isBusy: boolean; // ✅ ONE simple state instead of isLoading + isTyping + isMessageTyping
   hasMessages: boolean;
 }
 
 const PromptCard: React.FC<PromptCardProps> = ({
   onSendMessage,
-  isLoading,
-  isTyping,
-  isMessageTyping,
+  isBusy,
   hasMessages
 }) => {
   const [prompt, setPrompt] = useState('');
@@ -61,8 +57,8 @@ const PromptCard: React.FC<PromptCardProps> = ({
   const handleKeyDown = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
     if (e.key === 'Enter' && !e.shiftKey) {
       e.preventDefault();
-      // Disable submit during any typing state
-      if (!isLoading && !isTyping && !isMessageTyping) {
+      // ✅ Simple check - just one state instead of 3
+      if (!isBusy) {
         handleSubmit();
       }
     }
@@ -86,9 +82,6 @@ const PromptCard: React.FC<PromptCardProps> = ({
     return () => el.removeEventListener('focus', onFocus);
   }, []);
 
-  // Check if any typing state is active
-  const isAnyTypingActive = isTyping || isLoading || isMessageTyping;
-
   return (
     <div className="w-full px-4">
       <div className="w-full max-w-3xl mx-auto">
@@ -109,16 +102,18 @@ const PromptCard: React.FC<PromptCardProps> = ({
               style={{ height: '40px' }}
             />
             
-            {/* Send button positioned at bottom right */}
+            {/* Send button - shows spinner when busy, send icon when ready */}
             <Button
               onClick={handleSubmit}
-              disabled={isAnyTypingActive || !prompt.trim()}
+              disabled={isBusy || !prompt.trim()} // ✅ One simple check
               className="absolute bottom-1 right-1 h-8 w-8 rounded-full p-0 bg-primary hover:bg-primary/90 disabled:opacity-50 transition-all duration-200"
               size="sm"
             >
-              {isLoading ? (
+              {isBusy ? (
+                // Shows spinning circle when AI is working (any busy state)
                 <div className="w-4 h-4 border-2 border-current border-t-transparent rounded-full animate-spin" />
               ) : (
+                // Shows send icon when ready
                 <Send className="w-4 h-4" />
               )}
               <span className="sr-only">Send message</span>
