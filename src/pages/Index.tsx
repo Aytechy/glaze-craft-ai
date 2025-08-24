@@ -152,7 +152,6 @@ const Index: React.FC = () => {
                 <PromptCard
                   onSendMessage={handleSendMessage}
                   isBusy={isBusy}
-                  hasMessages={hasConversation}
                 />
               </div>
             </div>
@@ -198,7 +197,6 @@ const Index: React.FC = () => {
               <PromptCard
                 onSendMessage={handleSendMessage}
                 isBusy={isBusy}
-                hasMessages={hasConversation}
               />
             </div>
           </>

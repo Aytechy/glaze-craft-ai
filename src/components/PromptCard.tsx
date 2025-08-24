@@ -4,11 +4,11 @@
  * Features:
  * - Auto-resizing textarea
  * - Send on Enter (Shift+Enter for new line)
- * - Disabled during any busy state (simplified from 3 states to 1)
+ * - Disabled during any busy state
  * - Clean, responsive design
  */
 
-import React, { useState, useRef, useEffect } from 'react';
+import React, { useState, useRef } from 'react';
 import { Send } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
@@ -16,17 +16,15 @@ import { useToast } from '@/hooks/use-toast';
 
 interface PromptCardProps {
   onSendMessage: (content: string) => void;
-  isBusy: boolean; // ✅ ONE simple state instead of isLoading + isTyping + isMessageTyping
-  hasMessages: boolean;
+  isBusy: boolean;
+  // ✅ Removed hasMessages - wasn't being used
 }
 
 const PromptCard: React.FC<PromptCardProps> = ({
   onSendMessage,
-  isBusy,
-  hasMessages
+  isBusy
 }) => {
   const [prompt, setPrompt] = useState('');
-
   const textareaRef = useRef<HTMLTextAreaElement>(null);
   const { toast } = useToast();
 
@@ -57,36 +55,18 @@ const PromptCard: React.FC<PromptCardProps> = ({
   const handleKeyDown = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
     if (e.key === 'Enter' && !e.shiftKey) {
       e.preventDefault();
-      // ✅ Simple check - just one state instead of 3
       if (!isBusy) {
         handleSubmit();
       }
     }
   };
   
-  useEffect(() => {
-    const el = textareaRef.current;
-    if (!el) return;
-
-    const onFocus = () => {
-      // Small delay so browser finishes keyboard animation before scrolling
-      setTimeout(() => {
-        el.scrollIntoView({
-          block: 'nearest',
-          behavior: 'smooth',
-        });
-      }, 50);
-    };
-
-    el.addEventListener('focus', onFocus);
-    return () => el.removeEventListener('focus', onFocus);
-  }, []);
+  // ✅ Removed scroll-into-view useEffect - will re-implement later if needed
 
   return (
     <div className="w-full px-4">
       <div className="w-full max-w-3xl mx-auto">
         <div className="relative bg-card border rounded-2xl px-4 py-3 shadow-sm transition-all duration-200 ease-out">
-          {/* Main input area with send button positioned at bottom right */}
           <div className="relative">
             <Textarea
               ref={textareaRef}
@@ -102,18 +82,15 @@ const PromptCard: React.FC<PromptCardProps> = ({
               style={{ height: '40px' }}
             />
             
-            {/* Send button - shows spinner when busy, send icon when ready */}
             <Button
               onClick={handleSubmit}
-              disabled={isBusy || !prompt.trim()} // ✅ One simple check
+              disabled={isBusy || !prompt.trim()}
               className="absolute bottom-1 right-1 h-8 w-8 rounded-full p-0 bg-primary hover:bg-primary/90 disabled:opacity-50 transition-all duration-200"
               size="sm"
             >
               {isBusy ? (
-                // ✅ This same spinner shows for ALL busy states: isLoading + isTyping + isMessageTyping
                 <div className="w-4 h-4 border-2 border-current border-t-transparent rounded-full animate-spin" />
               ) : (
-                // Shows send icon when ready
                 <Send className="w-4 h-4" />
               )}
               <span className="sr-only">Send message</span>
