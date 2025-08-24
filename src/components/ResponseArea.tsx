@@ -145,7 +145,7 @@ const ResponseArea: React.FC<ResponseAreaProps> = (props) => {
         scrollbarGutter: 'stable',
       }}
     >
-      <div className="max-w-4xl mx-auto space-y-0 pb-10 pt-5">
+      <div className="max-w-3xl mx-auto space-y-0 pb-10 pt-5">
 
         {/* Welcome screen shown only if no messages exist */}
         {messages.length === 0 && !isTyping && (
