@@ -18,6 +18,7 @@ import { useToast } from '@/hooks/use-toast';
 const Index: React.FC = () => {
   const [isNewChatModalOpen, setIsNewChatModalOpen] = useState<boolean>(false);
   const [isMessageTyping, setIsMessageTyping] = useState<boolean>(false);
+  const [keyboardHeight, setKeyboardHeight] = useState<number>(0);
   
   const {
     messages,
@@ -74,6 +75,40 @@ const Index: React.FC = () => {
 
   // ✅ SIMPLIFIED: Combine all busy states into one
   const isBusy = isLoading || !canSendMessage || isMessageTyping;
+
+  // ✅ Handle mobile keyboard with Visual Viewport API
+  useEffect(() => {
+    const handleViewportChange = () => {
+      if (window.visualViewport) {
+        // Calculate keyboard height
+        const keyboardHeight = window.innerHeight - window.visualViewport.height;
+        setKeyboardHeight(Math.max(0, keyboardHeight));
+      }
+    };
+
+    // Check if Visual Viewport API is supported
+    if (window.visualViewport) {
+      window.visualViewport.addEventListener('resize', handleViewportChange);
+      window.visualViewport.addEventListener('scroll', handleViewportChange);
+      
+      return () => {
+        window.visualViewport?.removeEventListener('resize', handleViewportChange);
+        window.visualViewport?.removeEventListener('scroll', handleViewportChange);
+      };
+    } else {
+      // Fallback for browsers without Visual Viewport API
+      const initialHeight = window.innerHeight;
+      
+      const handleResize = () => {
+        const currentHeight = window.innerHeight;
+        const keyboardHeight = initialHeight - currentHeight;
+        setKeyboardHeight(Math.max(0, keyboardHeight));
+      };
+
+      window.addEventListener('resize', handleResize);
+      return () => window.removeEventListener('resize', handleResize);
+    }
+  }, []);
 
   // Listen for new chat events from AppShell and Sidebar
   useEffect(() => {
@@ -152,6 +187,7 @@ const Index: React.FC = () => {
                 <PromptCard
                   onSendMessage={handleSendMessage}
                   isBusy={isBusy}
+                  keyboardHeight={keyboardHeight}
                 />
               </div>
             </div>

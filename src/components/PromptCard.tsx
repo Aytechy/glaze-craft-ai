@@ -17,15 +17,15 @@ import { useToast } from '@/hooks/use-toast';
 interface PromptCardProps {
   onSendMessage: (content: string) => void;
   isBusy: boolean;
-  // ✅ Removed hasMessages - wasn't being used
+  keyboardHeight?: number; // ✅ Accept keyboard height from parent
 }
 
 const PromptCard: React.FC<PromptCardProps> = ({
   onSendMessage,
-  isBusy
+  isBusy,
+  keyboardHeight = 0
 }) => {
   const [prompt, setPrompt] = useState('');
-  const [keyboardHeight, setKeyboardHeight] = useState(0);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
   const { toast } = useToast();
 
@@ -62,51 +62,10 @@ const PromptCard: React.FC<PromptCardProps> = ({
     }
   };
   
-  // ✅ Handle mobile keyboard with Visual Viewport API
-  useEffect(() => {
-    const handleViewportChange = () => {
-      if (window.visualViewport) {
-        // Calculate keyboard height
-        const keyboardHeight = window.innerHeight - window.visualViewport.height;
-        setKeyboardHeight(Math.max(0, keyboardHeight));
-      }
-    };
-
-    // Check if Visual Viewport API is supported
-    if (window.visualViewport) {
-      window.visualViewport.addEventListener('resize', handleViewportChange);
-      
-      // Also listen to scroll events (iOS Safari needs this)
-      window.visualViewport.addEventListener('scroll', handleViewportChange);
-      
-      return () => {
-        window.visualViewport?.removeEventListener('resize', handleViewportChange);
-        window.visualViewport?.removeEventListener('scroll', handleViewportChange);
-      };
-    } else {
-      // Fallback for browsers without Visual Viewport API
-      const initialHeight = window.innerHeight;
-      
-      const handleResize = () => {
-        const currentHeight = window.innerHeight;
-        const keyboardHeight = initialHeight - currentHeight;
-        setKeyboardHeight(Math.max(0, keyboardHeight));
-      };
-
-      window.addEventListener('resize', handleResize);
-      return () => window.removeEventListener('resize', handleResize);
-    }
-  }, []);
+  // ✅ Keyboard handling moved to parent component (Index.tsx)
 
   return (
-    <div 
-      className="w-full px-4"
-      style={{
-        // Move up by keyboard height when keyboard is open
-        transform: keyboardHeight > 0 ? `translateY(-${keyboardHeight}px)` : 'none',
-        transition: 'transform 0.3s ease-in-out'
-      }}
-    >
+    <div className="w-full px-4">
       <div className="w-full max-w-3xl mx-auto">
         <div className="relative bg-card border rounded-2xl px-4 py-3 shadow-sm transition-all duration-200 ease-out">
           <div className="relative">
