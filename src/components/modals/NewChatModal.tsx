@@ -80,17 +80,16 @@ export const NewChatModal: React.FC<NewChatModalProps> = ({
 
   const modalContent = (
     <div 
-      className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center p-4"
-      style={{ zIndex: 99998 }}
+      className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-[99998]"
       onClick={(e) => {
         if (e.target === e.currentTarget) {
           onClose();
         }
       }}
     >
-      {/* Modal container */}
+      {/* Modal container - Increased height with proper text wrapping */}
       <div 
-        className="bg-background border border-border rounded-lg shadow-2xl max-w-2xl w-full max-h-[90vh] overflow-y-auto"
+        className="bg-background border border-border rounded-lg shadow-2xl w-full max-w-2xl mx-4 min-h-[600px]"
         onClick={(e) => e.stopPropagation()}
       >
         {/* Header */}
@@ -109,46 +108,47 @@ export const NewChatModal: React.FC<NewChatModalProps> = ({
           </Button>
         </div>
 
-        {/* Content */}
-        <div className="p-6">
-          <p className="text-muted-foreground mb-6">
+        {/* Content - Increased spacing and text wrapping */}
+        <div className="p-6 space-y-6">
+          <p className="text-muted-foreground text-base leading-relaxed">
             Begin a fresh conversation with GlazeAI. Your current chat will be saved automatically.
           </p>
 
-          <div className="space-y-4">
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              {chatTemplates.map((template) => (
-                <Button
-                  key={template.title}
-                  variant="outline"
-                  className="h-auto p-4 flex flex-col items-start gap-2 hover:bg-accent/50 transition-colors"
-                  onClick={handleCreateNewChat}
-                >
-                  <div className="flex items-center gap-2 w-full">
-                    <template.icon className="h-5 w-5 text-primary" />
-                    <span className="font-medium text-left">{template.title}</span>
-                  </div>
-                  <span className="text-sm text-muted-foreground text-left">
-                    {template.description}
-                  </span>
-                </Button>
-              ))}
-            </div>
-
-            <div className="border-t pt-4">
+          {/* Templates Grid - Larger with proper text wrapping */}
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            {chatTemplates.map((template) => (
               <Button
+                key={template.title}
+                variant="outline"
+                className="h-auto p-4 flex flex-col items-start gap-2 hover:bg-accent/50 transition-colors min-h-[80px]"
                 onClick={handleCreateNewChat}
-                className="w-full gradient-primary text-primary-foreground hover:opacity-90"
-                size="lg"
               >
-                <Plus className="h-4 w-4 mr-2" />
-                Start Fresh Conversation
+                <div className="flex items-center gap-2 w-full">
+                  <template.icon className="h-5 w-5 text-primary flex-shrink-0" />
+                  <span className="font-medium text-left text-sm leading-tight">{template.title}</span>
+                </div>
+                <span className="text-xs text-muted-foreground text-left leading-relaxed whitespace-normal break-words">
+                  {template.description}
+                </span>
               </Button>
-            </div>
+            ))}
           </div>
 
-          <div className="mt-6 p-4 bg-accent/20 rounded-lg">
-            <p className="text-sm text-muted-foreground text-center">
+          {/* Main Action Button */}
+          <div className="border-t pt-6">
+            <Button
+              onClick={handleCreateNewChat}
+              className="w-full gradient-primary text-primary-foreground hover:opacity-90"
+              size="lg"
+            >
+              <Plus className="h-4 w-4 mr-2" />
+              Start Fresh Conversation
+            </Button>
+          </div>
+
+          {/* Info Notice */}
+          <div className="p-4 bg-accent/20 rounded-lg">
+            <p className="text-sm text-muted-foreground text-center leading-relaxed">
               Your current conversation will be automatically saved to your chat history.
             </p>
           </div>
