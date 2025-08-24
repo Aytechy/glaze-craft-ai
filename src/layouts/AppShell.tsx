@@ -7,7 +7,7 @@ import Sidebar from '@/components/Sidebar';
  * AppShell - Main layout component with sidebar functionality
  * - Uses CSS custom properties for instant, flash-free positioning
  * - Responsive layout that adapts to screen size
- * - Proper spacing for fixed header and bottom tabs
+ * - Mobile keyboard friendly with dynamic viewport heights
  */
 export default function AppShell() {
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
@@ -101,15 +101,17 @@ export default function AppShell() {
         </>
       )}
 
-      {/* Main Content Area - Fixed to prevent white footer container */}
+      {/* Main Content Area - Mobile keyboard friendly */}
       <main
-        className="transition-all duration-300 ease-in-out max-h-[100svh] overflow-auto"
+        className="transition-all duration-300 ease-in-out overflow-auto"
         style={{
           marginLeft: 'var(--sidebar-offset, 0px)',
           paddingTop: '3.5rem',         // header is fixed, keep visual spacing
           paddingBottom: 0,             // remove extra padding
           scrollbarGutter: 'stable',
-          minHeight: 'calc(100svh - 56px)', // Use minHeight instead of height
+          // ✅ FIXED: Use dynamic viewport height that adjusts for mobile keyboards
+          maxHeight: 'calc(100dvh - 3.5rem)', // dvh = dynamic viewport height
+          minHeight: 'calc(100dvh - 3.5rem)', // Adjusts when keyboard opens
         }}
       >
         <Outlet />
