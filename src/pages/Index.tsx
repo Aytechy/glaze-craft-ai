@@ -72,6 +72,9 @@ const Index: React.FC = () => {
     setIsMessageTyping(isTyping);
   };
 
+  // ✅ SIMPLIFIED: Combine all busy states into one
+  const isBusy = isLoading || !canSendMessage || isMessageTyping;
+
   // Listen for new chat events from AppShell and Sidebar
   useEffect(() => {
     const handleNewChatEvent = () => {
@@ -144,13 +147,11 @@ const Index: React.FC = () => {
                 />
               </div>
               
-              {/* PromptCard centered under welcome area */}
+              {/* ✅ FIXED: Use simplified props */}
               <div>
                 <PromptCard
                   onSendMessage={handleSendMessage}
-                  isLoading={isLoading || !canSendMessage}
-                  isTyping={isLoading}
-                  isMessageTyping={isMessageTyping}
+                  isBusy={isBusy}
                   hasMessages={hasConversation}
                 />
               </div>
@@ -193,11 +194,10 @@ const Index: React.FC = () => {
                 paddingBottom: 'calc(env(safe-area-inset-bottom) + 16px)',
               }}
             >
+              {/* ✅ FIXED: Use simplified props */}
               <PromptCard
                 onSendMessage={handleSendMessage}
-                isLoading={isLoading || !canSendMessage}
-                isTyping={isLoading}
-                isMessageTyping={isMessageTyping}
+                isBusy={isBusy}
                 hasMessages={hasConversation}
               />
             </div>
