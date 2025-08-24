@@ -101,16 +101,15 @@ export default function AppShell() {
         </>
       )}
 
-      {/* Main Content Area - Now uses CSS variables */}
+      {/* Main Content Area - Fixed to prevent white footer container */}
       <main
-        className="transition-all duration-300 ease-in-out overflow-auto"
+        className="transition-all duration-300 ease-in-out max-h-[100svh] overflow-auto"
         style={{
           marginLeft: 'var(--sidebar-offset, 0px)',
           paddingTop: '3.5rem',         // header is fixed, keep visual spacing
           paddingBottom: 0,             // remove extra padding
           scrollbarGutter: 'stable',
-          height: 'calc(100svh - 56px)', // 56px header height
-          // border: '3px solid red'
+          minHeight: 'calc(100svh - 56px)', // Use minHeight instead of height
         }}
       >
         <Outlet />
