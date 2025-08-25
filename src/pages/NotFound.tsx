@@ -24,7 +24,7 @@ const NotFound = () => {
           className="inline-flex items-center px-4 py-2 bg-primary text-primary-foreground 
                    rounded-lg hover:opacity-90 transition-opacity"
         >
-          Return to GlazeAI
+          Return to GlazionStudio
         </a>
       </div>
     </div>

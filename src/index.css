@@ -2,7 +2,7 @@
 @tailwind components;
 @tailwind utilities;
 
-/* GlazeAI Design System - All colors, gradients, fonts, etc defined here */
+/* GlazionStudio Design System - All colors, gradients, fonts, etc defined here */
 /* All colors MUST be HSL format */
 
 @layer base {
@@ -34,7 +34,7 @@
     --popover: 0 0% 100%;
     --popover-foreground: 222.2 84% 4.9%;
 
-    /* Brand Colors for GlazeAI */
+    /* Brand Colors for GlazionStudio */
     --primary: 240 73% 59%; /* Professional blue for AI branding */
     --primary-foreground: 0 0% 100%;
     --primary-glow: 240 73% 70%;
@@ -65,7 +65,7 @@
     --input-border: 214.3 31.8% 85%;
     --ring: 240 73% 59%;
 
-    /* GlazeAI Specific Gradients */
+    /* GlazionStudio Specific Gradients */
     --gradient-primary: linear-gradient(135deg, hsl(240 73% 59%), hsl(240 73% 70%));
     --gradient-subtle: linear-gradient(135deg, hsl(0 0% 100%), hsl(210 20% 98%));
     --gradient-card: linear-gradient(135deg, hsl(0 0% 100%), hsl(210 20% 99%));
@@ -144,7 +144,7 @@
   }
 }
 
-/* Custom utility classes for GlazeAI */
+/* Custom utility classes for GlazionStudio */
 @layer utilities {
   .gradient-primary {
     background: var(--gradient-primary);

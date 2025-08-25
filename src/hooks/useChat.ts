@@ -4,7 +4,7 @@ import { useToast } from '@/hooks/use-toast';
 import type { Message, ChatSession, AppError } from '@/types/chat';
 
 /**
- * Custom hook for managing chat functionality in GlazeAI
+ * Custom hook for managing chat functionality in GlazionStudio
  * 
  * Features:
  * - Message state management

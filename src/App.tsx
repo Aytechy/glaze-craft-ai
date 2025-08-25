@@ -1,5 +1,5 @@
 /**
- * Main App Component for GlazeAI
+ * Main App Component for GlazionStudio
  * 
  * This is the root component that sets up:
  * - Global providers (React Query, Tooltip, Toast)

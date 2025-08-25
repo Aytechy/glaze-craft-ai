@@ -90,7 +90,7 @@ const History: React.FC = () => {
               <h1 className="text-3xl font-bold text-foreground">Chat History</h1>
             </div>
             <p className="text-muted-foreground max-w-2xl">
-              Browse and resume your previous conversations with GlazeAI. Find specific discussions 
+              Browse and resume your previous conversations with GlazionStudio. Find specific discussions 
               about glazes, firing techniques, and pottery advice.
             </p>
           </div>
@@ -115,7 +115,7 @@ const History: React.FC = () => {
                 <p className="text-muted-foreground mb-4">
                   {searchTerm 
                     ? "Try adjusting your search terms or start a new conversation."
-                    : "Start your first conversation with GlazeAI to see it here."
+                    : "Start your first conversation with GlazionStudio to see it here."
                   }
                 </p>
                 <Button 

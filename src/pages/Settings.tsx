@@ -383,7 +383,7 @@ const SettingsPage: React.FC = () => {
                     Appearance Settings
                   </CardTitle>
                   <CardDescription>
-                    Customize how GlazeAI looks and feels
+                    Customize how GlazionStudio looks and feels
                   </CardDescription>
                 </CardHeader>
                 <CardContent className="space-y-6">
@@ -509,7 +509,7 @@ const SettingsPage: React.FC = () => {
                       <div>
                         <Label htmlFor="analytics">Usage Analytics</Label>
                         <p className="text-sm text-muted-foreground">
-                          Help improve GlazeAI by sharing usage data
+                          Help improve GlazionStudio by sharing usage data
                         </p>
                       </div>
                       <Switch

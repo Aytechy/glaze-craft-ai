@@ -111,7 +111,7 @@ export const NewChatModal: React.FC<NewChatModalProps> = ({
         {/* Content - Increased spacing and text wrapping */}
         <div className="p-6 space-y-6">
           <p className="text-muted-foreground text-base leading-relaxed">
-            Begin a fresh conversation with GlazeAI. Your current chat will be saved automatically.
+            Begin a fresh conversation with GlazionStudio. Your current chat will be saved automatically.
           </p>
 
           {/* Templates Grid - Larger with proper text wrapping */}

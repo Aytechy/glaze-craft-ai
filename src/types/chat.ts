@@ -1,5 +1,5 @@
 /**
- * TypeScript type definitions for GlazeAI chat system
+ * TypeScript type definitions for GlazionStudio chat system
  * 
  * This file centralizes all type definitions to ensure:
  * - Type safety across components

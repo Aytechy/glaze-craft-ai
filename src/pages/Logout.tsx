@@ -46,7 +46,7 @@ const Logout: React.FC = () => {
             You're logged out
           </CardTitle>
           <CardDescription>
-            Thanks for using GlazeAI. You've been successfully logged out of your account.
+            Thanks for using GlazionStudio. You've been successfully logged out of your account.
           </CardDescription>
         </CardHeader>
         

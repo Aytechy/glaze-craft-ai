@@ -46,7 +46,7 @@ const Login: React.FC = () => {
       <Card className="w-full max-w-md">
         <CardHeader className="text-center">
           <CardTitle className="text-2xl font-bold gradient-primary bg-clip-text text-transparent">
-            Welcome to GlazeAI
+            Welcome to GlazionStudio
           </CardTitle>
           <CardDescription>
             Sign in to your account to continue

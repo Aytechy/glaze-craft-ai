@@ -120,7 +120,7 @@ export const UpgradeModal: React.FC<UpgradeModalProps> = ({ isOpen, onClose }) =
               <h1 className="text-2xl sm:text-3xl font-bold">Choose Your Plan</h1>
             </div>
             <p className="text-base sm:text-lg text-muted-foreground">
-              Unlock the full potential of GlazeAI with our premium features
+              Unlock the full potential of GlazionStudio with our premium features
             </p>
           </div>
 
